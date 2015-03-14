@@ -1,0 +1,42 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "http://repo.spring.io/snapshot" }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.1.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'spring-boot'
+apply plugin: 'war'
+
+war {
+    //baseName = 'moco'
+    //version =  '0.0.1'
+    archiveName = 'moco-running.war'
+}
+
+repositories {
+    mavenCentral()
+    maven { url "http://repo.spring.io/snapshot" }
+}
+
+configurations {
+    providedRuntime
+}
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web")
+    providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
+    compile("org.springframework.boot:spring-boot-starter-data-jpa")
+    compile("org.springframework.boot:spring-boot-gradle-plugin")
+    compile("commons-collections:commons-collections")
+    compile("org.projectlombok:lombok:1.16.2")
+    //testCompile("org.springframework.boot:spring-boot-starter-test")
+
+    // MySQL
+    compile("mysql:mysql-connector-java:5.1.34")
+}
