@@ -15,6 +15,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MstVoiceSetKey implements Serializable {
 
+    /** serialVersionUID */
+    private static final long serialVersionUID = 1L;
+
     @Column
     private Integer girlId;
     @Column

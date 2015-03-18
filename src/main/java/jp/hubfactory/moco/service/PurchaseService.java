@@ -11,7 +11,7 @@ import jp.hubfactory.moco.entity.UserGirlVoiceKey;
 import jp.hubfactory.moco.enums.UserVoiceStatus;
 import jp.hubfactory.moco.repository.MstVoiceSetRepository;
 import jp.hubfactory.moco.repository.UserGirlVoiceRepository;
-import jp.hubfactory.moco.util.DateUtils;
+import jp.hubfactory.moco.util.MocoDateUtils;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,15 +48,15 @@ public class PurchaseService {
             for (UserGirlVoice userGirlVoice : userGirlVoiceList) {
 
                 if (voiceIdSet.contains(userGirlVoice.getUserGirlVoiceKey().getVoiceId())) {
-                    userGirlVoice.setStatus(UserVoiceStatus.OF.getKey());
+                    userGirlVoice.setStatus(UserVoiceStatus.ON.getKey());
                 }
             }
         } else {
 
-            Date nowDate = DateUtils.getNowDate();
+            Date nowDate = MocoDateUtils.getNowDate();
             for (MstVoiceSet mstVoiceSet : mstVoiceSetList) {
                 UserGirlVoiceKey key = new UserGirlVoiceKey(userId, girlId, mstVoiceSet.getMstVoiceSetKey().getVoiceId());
-                UserGirlVoice record = new UserGirlVoice(key, UserVoiceStatus.OF.getKey(), nowDate,nowDate);
+                UserGirlVoice record = new UserGirlVoice(key, UserVoiceStatus.ON.getKey(), nowDate,nowDate);
                 userGirlVoiceRepository.save(record);
             }
         }

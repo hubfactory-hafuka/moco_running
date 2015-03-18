@@ -7,7 +7,7 @@ import lombok.Getter;
 public enum UserVoiceStatus {
 
     OFF(0),
-    OF(1);
+    ON(1);
 
     @Getter
     private Integer key;

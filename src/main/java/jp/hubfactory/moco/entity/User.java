@@ -6,6 +6,8 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
@@ -17,6 +19,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User implements Serializable {
+
+    /** serialVersionUID */
+    private static final long serialVersionUID = 1L;
+
     @Id
     @Column
     private Long userId;
@@ -32,8 +38,10 @@ public class User implements Serializable {
     @Column
     public Integer girlId;
     @Column
+    @Temporal(TemporalType.TIMESTAMP)
     public Date updDatetime;
     @Column
+    @Temporal(TemporalType.TIMESTAMP)
     public Date insDatetime;
 
 }

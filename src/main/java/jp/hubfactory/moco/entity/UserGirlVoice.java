@@ -6,6 +6,8 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,12 +19,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserGirlVoice implements Serializable {
 
+    /** serialVersionUID */
+    private static final long serialVersionUID = 1L;
+
     @EmbeddedId
     private UserGirlVoiceKey userGirlVoiceKey;
     @Column
     private Integer status;
     @Column
-    private Date updDatetime = new Date();
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updDatetime;
     @Column
-    private Date insDatetime= new Date();
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date insDatetime;
 }

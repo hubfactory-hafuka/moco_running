@@ -6,6 +6,8 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,6 +20,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MstVoice implements Serializable  {
 
+    /** serialVersionUID */
+    private static final long serialVersionUID = 1L;
+
     @EmbeddedId
     private MstVoiceKey mstVoiceKey;
     @Column
@@ -27,7 +32,9 @@ public class MstVoice implements Serializable  {
     @Column
     private Integer type;
     @Column
-    private Date updDatetime = new Date();
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updDatetime;
     @Column
-    private Date insDatetime= new Date();
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date insDatetime;
 }

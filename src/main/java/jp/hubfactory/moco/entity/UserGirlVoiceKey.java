@@ -14,6 +14,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserGirlVoiceKey implements Serializable {
+
+    /** serialVersionUID */
+    private static final long serialVersionUID = 1L;
+
     @Column
     private Long userId;
     @Column

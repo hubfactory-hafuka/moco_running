@@ -23,7 +23,7 @@
 		<g>255</g>
 		<b>255</b>
 	</color>
-	<font_name></font_name>
+	<font_name>メイリオ</font_name>
 	<font_size>9</font_size>
 	<settings>
 		<database>MySQL</database>
@@ -40,35 +40,60 @@
 		<use_bezier_curve>false</use_bezier_curve>
 		<suspend_validator>false</suspend_validator>
 		<export_setting>
-			<category_name_to_export>全体</category_name_to_export>
-			<ddl_output>C:\Users\hafuka_satoshi_gn\Desktop\moco-running.sql</ddl_output>
-			<excel_output></excel_output>
-			<excel_template></excel_template>
-			<image_output></image_output>
-			<put_diagram_on_excel>false</put_diagram_on_excel>
-			<use_logical_name_as_sheet>false</use_logical_name_as_sheet>
-			<open_after_saved>false</open_after_saved>
-			<create_comment>true</create_comment>
-			<create_foreignKey>true</create_foreignKey>
-			<create_index>true</create_index>
-			<create_sequence>true</create_sequence>
-			<create_table>true</create_table>
-			<create_tablespace>true</create_tablespace>
-			<create_trigger>true</create_trigger>
-			<create_view>true</create_view>
-			<drop_index>true</drop_index>
-			<drop_sequence>true</drop_sequence>
-			<drop_table>true</drop_table>
-			<drop_tablespace>true</drop_tablespace>
-			<drop_trigger>true</drop_trigger>
-			<drop_view>true</drop_view>
-			<inline_column_comment>true</inline_column_comment>
-			<inline_table_comment>true</inline_table_comment>
-			<comment_value_description>true</comment_value_description>
-			<comment_value_logical_name>false</comment_value_logical_name>
-			<comment_value_logical_name_description>false</comment_value_logical_name_description>
-			<comment_replace_line_feed>false</comment_replace_line_feed>
-			<comment_replace_string></comment_replace_string>
+			<export_ddl_setting>
+				<output_path>db\moco-running.sql</output_path>
+				<encoding>UTF-8</encoding>
+				<line_feed>CR+LF</line_feed>
+				<is_open_after_saved>true</is_open_after_saved>
+				<environment_id>0</environment_id>
+				<category_id>null</category_id>
+				<ddl_target>
+					<create_comment>true</create_comment>
+					<create_foreignKey>true</create_foreignKey>
+					<create_index>true</create_index>
+					<create_sequence>true</create_sequence>
+					<create_table>true</create_table>
+					<create_tablespace>true</create_tablespace>
+					<create_trigger>true</create_trigger>
+					<create_view>true</create_view>
+					<drop_index>true</drop_index>
+					<drop_sequence>true</drop_sequence>
+					<drop_table>true</drop_table>
+					<drop_tablespace>true</drop_tablespace>
+					<drop_trigger>true</drop_trigger>
+					<drop_view>true</drop_view>
+					<inline_column_comment>true</inline_column_comment>
+					<inline_table_comment>true</inline_table_comment>
+					<comment_value_description>true</comment_value_description>
+					<comment_value_logical_name>false</comment_value_logical_name>
+					<comment_value_logical_name_description>false</comment_value_logical_name_description>
+					<comment_replace_line_feed>false</comment_replace_line_feed>
+					<comment_replace_string></comment_replace_string>
+				</ddl_target>
+			</export_ddl_setting>
+			<export_excel_setting>
+				<category_id>null</category_id>
+				<output_path></output_path>
+				<template></template>
+				<template_path></template_path>
+				<used_default_template_lang></used_default_template_lang>
+				<image_output></image_output>
+				<is_open_after_saved>true</is_open_after_saved>
+				<is_put_diagram>true</is_put_diagram>
+				<is_use_logical_name>true</is_use_logical_name>
+			</export_excel_setting>
+			<export_html_setting>
+				<output_dir></output_dir>
+				<with_category_image>true</with_category_image>
+				<with_image>true</with_image>
+				<is_open_after_saved>true</is_open_after_saved>
+			</export_html_setting>
+			<export_image_setting>
+				<output_file_path></output_file_path>
+				<category_dir_path></category_dir_path>
+				<with_category_image>true</with_category_image>
+				<is_open_after_saved>true</is_open_after_saved>
+			</export_image_setting>
 			<export_java_setting>
 				<java_output></java_output>
 				<package_name></package_name>
@@ -113,7 +138,7 @@
 			</connections>
 			<display>false</display>
 			<creation_date>2014-11-07 16:21:09</creation_date>
-			<updated_date>2015-02-25 17:38:07</updated_date>
+			<updated_date>2015-03-18 18:48:32</updated_date>
 			<model_property>
 				<name>プロジェクト名</name>
 				<value></value>
@@ -197,7 +222,7 @@
 		</word>
 		<word>
 			<id>3</id>
-			<length>null</length>
+			<length>8</length>
 			<decimal>null</decimal>
 			<array>false</array>
 			<array_dimension>null</array_dimension>
@@ -208,7 +233,7 @@
 			<description></description>
 			<logical_name>キロ平均時間</logical_name>
 			<physical_name>avg_time</physical_name>
-			<type>time</type>
+			<type>varchar(n)</type>
 		</word>
 		<word>
 			<id>4</id>
@@ -303,7 +328,7 @@
 		<word>
 			<id>10</id>
 			<length>5</length>
-			<decimal>2</decimal>
+			<decimal>3</decimal>
 			<array>false</array>
 			<array_dimension>null</array_dimension>
 			<unsigned>false</unsigned>
@@ -527,7 +552,7 @@
 		</word>
 		<word>
 			<id>25</id>
-			<length>null</length>
+			<length>8</length>
 			<decimal>null</decimal>
 			<array>false</array>
 			<array_dimension>null</array_dimension>
@@ -536,9 +561,9 @@
 			<binary>false</binary>
 			<args></args>
 			<description></description>
-			<logical_name>増減</logical_name>
-			<physical_name>inc_dec</physical_name>
-			<type>time</type>
+			<logical_name>増減時間</logical_name>
+			<physical_name>inc_dec_time</physical_name>
+			<type>varchar(n)</type>
 		</word>
 		<word>
 			<id>26</id>
@@ -677,7 +702,7 @@
 		</word>
 		<word>
 			<id>35</id>
-			<length>null</length>
+			<length>8</length>
 			<decimal>null</decimal>
 			<array>false</array>
 			<array_dimension>null</array_dimension>
@@ -688,7 +713,7 @@
 			<description></description>
 			<logical_name>ラップタイム</logical_name>
 			<physical_name>lap_time</physical_name>
-			<type>time</type>
+			<type>varchar(n)</type>
 		</word>
 		<word>
 			<id>36</id>
@@ -827,7 +852,7 @@
 		</word>
 		<word>
 			<id>45</id>
-			<length>null</length>
+			<length>8</length>
 			<decimal>null</decimal>
 			<array>false</array>
 			<array_dimension>null</array_dimension>
@@ -838,11 +863,11 @@
 			<description></description>
 			<logical_name>ラン時間</logical_name>
 			<physical_name>time</physical_name>
-			<type>time</type>
+			<type>varchar(n)</type>
 		</word>
 		<word>
 			<id>46</id>
-			<length>null</length>
+			<length>8</length>
 			<decimal>null</decimal>
 			<array>false</array>
 			<array_dimension>null</array_dimension>
@@ -853,7 +878,7 @@
 			<description></description>
 			<logical_name>経過時間</logical_name>
 			<physical_name>time_elapsed</physical_name>
-			<type>time</type>
+			<type>varchar(n)</type>
 		</word>
 		<word>
 			<id>47</id>
@@ -1212,7 +1237,7 @@
 			<option></option>
 			<columns>
 				<normal_column>
-					<word_id>62</word_id>
+					<word_id>58</word_id>
 					<id>0</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -1410,7 +1435,7 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>51</word_id>
+					<word_id>53</word_id>
 					<id>6</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -1443,7 +1468,7 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>34</word_id>
+					<word_id>28</word_id>
 					<id>7</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -1528,7 +1553,7 @@
 			<option></option>
 			<columns>
 				<normal_column>
-					<word_id>20</word_id>
+					<word_id>18</word_id>
 					<id>8</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -1957,7 +1982,7 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>52</word_id>
+					<word_id>56</word_id>
 					<id>21</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -1990,7 +2015,7 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>28</word_id>
+					<word_id>29</word_id>
 					<id>22</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -2058,7 +2083,7 @@
 			<option></option>
 			<columns>
 				<normal_column>
-					<word_id>18</word_id>
+					<word_id>17</word_id>
 					<id>23</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -2091,7 +2116,7 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>63</word_id>
+					<word_id>64</word_id>
 					<id>24</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -2190,7 +2215,7 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>56</word_id>
+					<word_id>49</word_id>
 					<id>27</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -2223,7 +2248,7 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>31</word_id>
+					<word_id>33</word_id>
 					<id>28</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -2291,7 +2316,7 @@
 			<option></option>
 			<columns>
 				<normal_column>
-					<word_id>17</word_id>
+					<word_id>15</word_id>
 					<id>29</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -2324,7 +2349,7 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>11</word_id>
+					<word_id>12</word_id>
 					<id>30</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -2423,7 +2448,7 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>54</word_id>
+					<word_id>51</word_id>
 					<id>33</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -2456,7 +2481,7 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>26</word_id>
+					<word_id>27</word_id>
 					<id>34</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -2524,7 +2549,7 @@
 			<option></option>
 			<columns>
 				<normal_column>
-					<word_id>61</word_id>
+					<word_id>62</word_id>
 					<id>35</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -2623,7 +2648,7 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>53</word_id>
+					<word_id>54</word_id>
 					<id>38</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -2656,7 +2681,7 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>33</word_id>
+					<word_id>32</word_id>
 					<id>39</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -2703,12 +2728,12 @@
 		</table>
 		<table>
 			<id>5</id>
-			<height>262</height>
-			<width>285</width>
+			<height>166</height>
+			<width>279</width>
 				<font_name>メイリオ</font_name>
 				<font_size>9</font_size>
-			<x>337</x>
-			<y>264</y>
+			<x>636</x>
+			<y>192</y>
 			<color>
 				<r>255</r>
 				<g>128</g>
@@ -2716,15 +2741,15 @@
 			</color>
 			<connections>
 			</connections>
-			<physical_name>user_activity</physical_name>
-			<logical_name>ユーザーアクティビティ</logical_name>
+			<physical_name>user_girl_voice</physical_name>
+			<logical_name>ユーザーガール音声情報</logical_name>
 			<description></description>
 			<constraint></constraint>
 			<primary_key_name></primary_key_name>
 			<option></option>
 			<columns>
 				<normal_column>
-					<word_id>60</word_id>
+					<word_id>61</word_id>
 					<id>40</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -2757,7 +2782,7 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>1</word_id>
+					<word_id>20</word_id>
 					<id>41</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -2790,19 +2815,19 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>42</word_id>
+					<word_id>65</word_id>
 					<id>42</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
 					<physical_name></physical_name>
-					<type>datetime</type>
+					<type>integer</type>
 					<constraint></constraint>
 					<default_value></default_value>
 					<auto_increment>false</auto_increment>
 					<foreign_key>false</foreign_key>
 					<not_null>true</not_null>
-					<primary_key>false</primary_key>
+					<primary_key>true</primary_key>
 					<unique_key>false</unique_key>
 					<character_set></character_set>
 					<collation></collation>
@@ -2823,18 +2848,18 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>10</word_id>
+					<word_id>44</word_id>
 					<id>43</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
 					<physical_name></physical_name>
-					<type>double precision(m,d)</type>
+					<type>integer</type>
 					<constraint></constraint>
 					<default_value></default_value>
 					<auto_increment>false</auto_increment>
 					<foreign_key>false</foreign_key>
-					<not_null>true</not_null>
+					<not_null>false</not_null>
 					<primary_key>false</primary_key>
 					<unique_key>false</unique_key>
 					<character_set></character_set>
@@ -2856,107 +2881,8 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>45</word_id>
+					<word_id>55</word_id>
 					<id>44</id>
-					<description></description>
-					<unique_key_name></unique_key_name>
-					<logical_name></logical_name>
-					<physical_name></physical_name>
-					<type>time</type>
-					<constraint></constraint>
-					<default_value></default_value>
-					<auto_increment>false</auto_increment>
-					<foreign_key>false</foreign_key>
-					<not_null>true</not_null>
-					<primary_key>false</primary_key>
-					<unique_key>false</unique_key>
-					<character_set></character_set>
-					<collation></collation>
-					<sequence>
-						<name></name>
-						<schema></schema>
-						<increment></increment>
-						<min_value></min_value>
-						<max_value></max_value>
-						<start></start>
-						<cache></cache>
-						<nocache>false</nocache>
-						<cycle>false</cycle>
-						<order>false</order>
-						<description></description>
-						<data_type></data_type>
-						<decimal_size>0</decimal_size>
-					</sequence>
-				</normal_column>
-				<normal_column>
-					<word_id>3</word_id>
-					<id>45</id>
-					<description></description>
-					<unique_key_name></unique_key_name>
-					<logical_name></logical_name>
-					<physical_name></physical_name>
-					<type>time</type>
-					<constraint></constraint>
-					<default_value></default_value>
-					<auto_increment>false</auto_increment>
-					<foreign_key>false</foreign_key>
-					<not_null>true</not_null>
-					<primary_key>false</primary_key>
-					<unique_key>false</unique_key>
-					<character_set></character_set>
-					<collation></collation>
-					<sequence>
-						<name></name>
-						<schema></schema>
-						<increment></increment>
-						<min_value></min_value>
-						<max_value></max_value>
-						<start></start>
-						<cache></cache>
-						<nocache>false</nocache>
-						<cycle>false</cycle>
-						<order>false</order>
-						<description></description>
-						<data_type></data_type>
-						<decimal_size>0</decimal_size>
-					</sequence>
-				</normal_column>
-				<normal_column>
-					<word_id>36</word_id>
-					<id>46</id>
-					<description></description>
-					<unique_key_name></unique_key_name>
-					<logical_name></logical_name>
-					<physical_name></physical_name>
-					<type>text</type>
-					<constraint></constraint>
-					<default_value></default_value>
-					<auto_increment>false</auto_increment>
-					<foreign_key>false</foreign_key>
-					<not_null>true</not_null>
-					<primary_key>false</primary_key>
-					<unique_key>false</unique_key>
-					<character_set></character_set>
-					<collation></collation>
-					<sequence>
-						<name></name>
-						<schema></schema>
-						<increment></increment>
-						<min_value></min_value>
-						<max_value></max_value>
-						<start></start>
-						<cache></cache>
-						<nocache>false</nocache>
-						<cycle>false</cycle>
-						<order>false</order>
-						<description></description>
-						<data_type></data_type>
-						<decimal_size>0</decimal_size>
-					</sequence>
-				</normal_column>
-				<normal_column>
-					<word_id>57</word_id>
-					<id>47</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
@@ -2988,8 +2914,8 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>27</word_id>
-					<id>48</id>
+					<word_id>31</word_id>
+					<id>45</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
@@ -3039,58 +2965,25 @@
 			<width>279</width>
 				<font_name>メイリオ</font_name>
 				<font_size>9</font_size>
-			<x>636</x>
-			<y>192</y>
+			<x>684</x>
+			<y>408</y>
 			<color>
-				<r>255</r>
+				<r>128</r>
 				<g>128</g>
-				<b>0</b>
+				<b>192</b>
 			</color>
 			<connections>
 			</connections>
-			<physical_name>user_girl_voice</physical_name>
-			<logical_name>ユーザーガール音声情報</logical_name>
+			<physical_name>mst_voice_set</physical_name>
+			<logical_name>音声セットマスタ</logical_name>
 			<description></description>
 			<constraint></constraint>
 			<primary_key_name></primary_key_name>
 			<option></option>
 			<columns>
 				<normal_column>
-					<word_id>59</word_id>
-					<id>49</id>
-					<description></description>
-					<unique_key_name></unique_key_name>
-					<logical_name></logical_name>
-					<physical_name></physical_name>
-					<type>bigint</type>
-					<constraint></constraint>
-					<default_value></default_value>
-					<auto_increment>false</auto_increment>
-					<foreign_key>false</foreign_key>
-					<not_null>true</not_null>
-					<primary_key>true</primary_key>
-					<unique_key>false</unique_key>
-					<character_set></character_set>
-					<collation></collation>
-					<sequence>
-						<name></name>
-						<schema></schema>
-						<increment></increment>
-						<min_value></min_value>
-						<max_value></max_value>
-						<start></start>
-						<cache></cache>
-						<nocache>false</nocache>
-						<cycle>false</cycle>
-						<order>false</order>
-						<description></description>
-						<data_type></data_type>
-						<decimal_size>0</decimal_size>
-					</sequence>
-				</normal_column>
-				<normal_column>
-					<word_id>15</word_id>
-					<id>50</id>
+					<word_id>19</word_id>
+					<id>46</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
@@ -3122,8 +3015,8 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>64</word_id>
-					<id>51</id>
+					<word_id>63</word_id>
+					<id>47</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
@@ -3155,8 +3048,8 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>44</word_id>
-					<id>52</id>
+					<word_id>43</word_id>
+					<id>48</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
@@ -3166,7 +3059,7 @@
 					<default_value></default_value>
 					<auto_increment>false</auto_increment>
 					<foreign_key>false</foreign_key>
-					<not_null>false</not_null>
+					<not_null>true</not_null>
 					<primary_key>false</primary_key>
 					<unique_key>false</unique_key>
 					<character_set></character_set>
@@ -3188,8 +3081,8 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>55</word_id>
-					<id>53</id>
+					<word_id>50</word_id>
+					<id>49</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
@@ -3221,8 +3114,8 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>29</word_id>
-					<id>54</id>
+					<word_id>30</word_id>
+					<id>50</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
@@ -3289,8 +3182,8 @@
 			<option></option>
 			<columns>
 				<normal_column>
-					<word_id>58</word_id>
-					<id>55</id>
+					<word_id>59</word_id>
+					<id>51</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
@@ -3323,7 +3216,7 @@
 				</normal_column>
 				<normal_column>
 					<word_id>0</word_id>
-					<id>56</id>
+					<id>52</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
@@ -3356,7 +3249,7 @@
 				</normal_column>
 				<normal_column>
 					<word_id>8</word_id>
-					<id>57</id>
+					<id>53</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
@@ -3388,8 +3281,8 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>12</word_id>
-					<id>58</id>
+					<word_id>11</word_id>
+					<id>54</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
@@ -3422,12 +3315,12 @@
 				</normal_column>
 				<normal_column>
 					<word_id>46</word_id>
-					<id>59</id>
+					<id>55</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
 					<physical_name></physical_name>
-					<type>time</type>
+					<type>varchar(n)</type>
 					<constraint></constraint>
 					<default_value></default_value>
 					<auto_increment>false</auto_increment>
@@ -3455,12 +3348,12 @@
 				</normal_column>
 				<normal_column>
 					<word_id>35</word_id>
-					<id>60</id>
+					<id>56</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
 					<physical_name></physical_name>
-					<type>time</type>
+					<type>varchar(n)</type>
 					<constraint></constraint>
 					<default_value></default_value>
 					<auto_increment>false</auto_increment>
@@ -3488,12 +3381,12 @@
 				</normal_column>
 				<normal_column>
 					<word_id>25</word_id>
-					<id>61</id>
+					<id>57</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
 					<physical_name></physical_name>
-					<type>time</type>
+					<type>varchar(n)</type>
 					<constraint></constraint>
 					<default_value></default_value>
 					<auto_increment>false</auto_increment>
@@ -3520,8 +3413,8 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>50</word_id>
-					<id>62</id>
+					<word_id>52</word_id>
+					<id>58</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
@@ -3553,8 +3446,8 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>30</word_id>
-					<id>63</id>
+					<word_id>26</word_id>
+					<id>59</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
@@ -3600,29 +3493,62 @@
 		</table>
 		<table>
 			<id>8</id>
-			<height>166</height>
-			<width>279</width>
+			<height>262</height>
+			<width>285</width>
 				<font_name>メイリオ</font_name>
 				<font_size>9</font_size>
-			<x>684</x>
-			<y>408</y>
+			<x>337</x>
+			<y>264</y>
 			<color>
-				<r>128</r>
+				<r>255</r>
 				<g>128</g>
-				<b>192</b>
+				<b>0</b>
 			</color>
 			<connections>
 			</connections>
-			<physical_name>mst_voice_set</physical_name>
-			<logical_name>音声セットマスタ</logical_name>
+			<physical_name>user_activity</physical_name>
+			<logical_name>ユーザーアクティビティ</logical_name>
 			<description></description>
 			<constraint></constraint>
 			<primary_key_name></primary_key_name>
 			<option></option>
 			<columns>
 				<normal_column>
-					<word_id>19</word_id>
-					<id>64</id>
+					<word_id>60</word_id>
+					<id>60</id>
+					<description></description>
+					<unique_key_name></unique_key_name>
+					<logical_name></logical_name>
+					<physical_name></physical_name>
+					<type>bigint</type>
+					<constraint></constraint>
+					<default_value></default_value>
+					<auto_increment>false</auto_increment>
+					<foreign_key>false</foreign_key>
+					<not_null>true</not_null>
+					<primary_key>true</primary_key>
+					<unique_key>false</unique_key>
+					<character_set></character_set>
+					<collation></collation>
+					<sequence>
+						<name></name>
+						<schema></schema>
+						<increment></increment>
+						<min_value></min_value>
+						<max_value></max_value>
+						<start></start>
+						<cache></cache>
+						<nocache>false</nocache>
+						<cycle>false</cycle>
+						<order>false</order>
+						<description></description>
+						<data_type></data_type>
+						<decimal_size>0</decimal_size>
+					</sequence>
+				</normal_column>
+				<normal_column>
+					<word_id>1</word_id>
+					<id>61</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
@@ -3654,46 +3580,13 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>65</word_id>
-					<id>65</id>
+					<word_id>42</word_id>
+					<id>62</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
 					<physical_name></physical_name>
-					<type>integer</type>
-					<constraint></constraint>
-					<default_value></default_value>
-					<auto_increment>false</auto_increment>
-					<foreign_key>false</foreign_key>
-					<not_null>true</not_null>
-					<primary_key>true</primary_key>
-					<unique_key>false</unique_key>
-					<character_set></character_set>
-					<collation></collation>
-					<sequence>
-						<name></name>
-						<schema></schema>
-						<increment></increment>
-						<min_value></min_value>
-						<max_value></max_value>
-						<start></start>
-						<cache></cache>
-						<nocache>false</nocache>
-						<cycle>false</cycle>
-						<order>false</order>
-						<description></description>
-						<data_type></data_type>
-						<decimal_size>0</decimal_size>
-					</sequence>
-				</normal_column>
-				<normal_column>
-					<word_id>43</word_id>
-					<id>66</id>
-					<description></description>
-					<unique_key_name></unique_key_name>
-					<logical_name></logical_name>
-					<physical_name></physical_name>
-					<type>integer</type>
+					<type>datetime</type>
 					<constraint></constraint>
 					<default_value></default_value>
 					<auto_increment>false</auto_increment>
@@ -3720,7 +3613,139 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>49</word_id>
+					<word_id>10</word_id>
+					<id>63</id>
+					<description></description>
+					<unique_key_name></unique_key_name>
+					<logical_name></logical_name>
+					<physical_name></physical_name>
+					<type>double precision(m,d)</type>
+					<constraint></constraint>
+					<default_value></default_value>
+					<auto_increment>false</auto_increment>
+					<foreign_key>false</foreign_key>
+					<not_null>true</not_null>
+					<primary_key>false</primary_key>
+					<unique_key>false</unique_key>
+					<character_set></character_set>
+					<collation></collation>
+					<sequence>
+						<name></name>
+						<schema></schema>
+						<increment></increment>
+						<min_value></min_value>
+						<max_value></max_value>
+						<start></start>
+						<cache></cache>
+						<nocache>false</nocache>
+						<cycle>false</cycle>
+						<order>false</order>
+						<description></description>
+						<data_type></data_type>
+						<decimal_size>0</decimal_size>
+					</sequence>
+				</normal_column>
+				<normal_column>
+					<word_id>45</word_id>
+					<id>64</id>
+					<description></description>
+					<unique_key_name></unique_key_name>
+					<logical_name></logical_name>
+					<physical_name></physical_name>
+					<type>varchar(n)</type>
+					<constraint></constraint>
+					<default_value></default_value>
+					<auto_increment>false</auto_increment>
+					<foreign_key>false</foreign_key>
+					<not_null>true</not_null>
+					<primary_key>false</primary_key>
+					<unique_key>false</unique_key>
+					<character_set></character_set>
+					<collation></collation>
+					<sequence>
+						<name></name>
+						<schema></schema>
+						<increment></increment>
+						<min_value></min_value>
+						<max_value></max_value>
+						<start></start>
+						<cache></cache>
+						<nocache>false</nocache>
+						<cycle>false</cycle>
+						<order>false</order>
+						<description></description>
+						<data_type></data_type>
+						<decimal_size>0</decimal_size>
+					</sequence>
+				</normal_column>
+				<normal_column>
+					<word_id>3</word_id>
+					<id>65</id>
+					<description></description>
+					<unique_key_name></unique_key_name>
+					<logical_name></logical_name>
+					<physical_name></physical_name>
+					<type>varchar(n)</type>
+					<constraint></constraint>
+					<default_value></default_value>
+					<auto_increment>false</auto_increment>
+					<foreign_key>false</foreign_key>
+					<not_null>true</not_null>
+					<primary_key>false</primary_key>
+					<unique_key>false</unique_key>
+					<character_set></character_set>
+					<collation></collation>
+					<sequence>
+						<name></name>
+						<schema></schema>
+						<increment></increment>
+						<min_value></min_value>
+						<max_value></max_value>
+						<start></start>
+						<cache></cache>
+						<nocache>false</nocache>
+						<cycle>false</cycle>
+						<order>false</order>
+						<description></description>
+						<data_type></data_type>
+						<decimal_size>0</decimal_size>
+					</sequence>
+				</normal_column>
+				<normal_column>
+					<word_id>36</word_id>
+					<id>66</id>
+					<description></description>
+					<unique_key_name></unique_key_name>
+					<logical_name></logical_name>
+					<physical_name></physical_name>
+					<type>text</type>
+					<constraint></constraint>
+					<default_value></default_value>
+					<auto_increment>false</auto_increment>
+					<foreign_key>false</foreign_key>
+					<not_null>false</not_null>
+					<primary_key>false</primary_key>
+					<unique_key>false</unique_key>
+					<character_set></character_set>
+					<collation></collation>
+					<sequence>
+						<name></name>
+						<schema></schema>
+						<increment></increment>
+						<min_value></min_value>
+						<max_value></max_value>
+						<start></start>
+						<cache></cache>
+						<nocache>false</nocache>
+						<cycle>false</cycle>
+						<order>false</order>
+						<description></description>
+						<data_type></data_type>
+						<decimal_size>0</decimal_size>
+					</sequence>
+				</normal_column>
+				<normal_column>
+					<word_id>57</word_id>
 					<id>67</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -3753,7 +3778,7 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>32</word_id>
+					<word_id>34</word_id>
 					<id>68</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
