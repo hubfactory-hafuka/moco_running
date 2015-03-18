@@ -52,7 +52,7 @@ CREATE TABLE mst_girl_mission
     description varchar(255),
     upd_datetime datetime NOT NULL,
     ins_datetime datetime NOT NULL,
-    PRIMARY KEY (girl_id, distance, reward_voice_id)
+    PRIMARY KEY (girl_id, distance)
 );
 
 
@@ -85,7 +85,7 @@ CREATE TABLE user
     email varchar(255) NOT NULL,
     password varchar(255),
     name varchar(255),
-    total_distance double(5,2),
+    total_distance double(5,3),
     girl_id int,
     upd_datetime datetime NOT NULL,
     ins_datetime datetime NOT NULL,
@@ -127,7 +127,7 @@ CREATE TABLE user_girl
 (
     user_id bigint NOT NULL,
     girl_id int NOT NULL,
-    distance double(5,2),
+    distance double(5,3),
     upd_datetime datetime NOT NULL,
     ins_datetime datetime NOT NULL,
     PRIMARY KEY (user_id, girl_id)

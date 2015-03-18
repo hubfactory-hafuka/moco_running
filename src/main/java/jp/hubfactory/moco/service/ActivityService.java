@@ -5,15 +5,24 @@ import java.util.Date;
 import java.util.List;
 
 import jp.hubfactory.moco.bean.UserActivityBean;
+import jp.hubfactory.moco.entity.MstGirlMission;
 import jp.hubfactory.moco.entity.UserActivity;
 import jp.hubfactory.moco.entity.UserActivityDetail;
 import jp.hubfactory.moco.entity.UserActivityDetailKey;
 import jp.hubfactory.moco.entity.UserActivityKey;
+import jp.hubfactory.moco.entity.UserGirl;
+import jp.hubfactory.moco.entity.UserGirlKey;
+import jp.hubfactory.moco.entity.UserGirlVoice;
+import jp.hubfactory.moco.entity.UserGirlVoiceKey;
+import jp.hubfactory.moco.enums.UserVoiceStatus;
 import jp.hubfactory.moco.form.RegistUserActivityDetailForm;
 import jp.hubfactory.moco.form.RegistUserActivityForm;
 import jp.hubfactory.moco.form.RegistUserActivityLocationForm;
+import jp.hubfactory.moco.repository.MstGirlMissionRepository;
 import jp.hubfactory.moco.repository.UserActivityDetailRepository;
 import jp.hubfactory.moco.repository.UserActivityRepository;
+import jp.hubfactory.moco.repository.UserGirlRepository;
+import jp.hubfactory.moco.repository.UserGirlVoiceRepository;
 import jp.hubfactory.moco.util.MocoDateUtils;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -32,6 +41,12 @@ public class ActivityService {
     private UserActivityRepository userActivityRepository;
     @Autowired
     private UserActivityDetailRepository userActivityDetailRepository;
+    @Autowired
+    private MstGirlMissionRepository mstGirlMissionRepository;
+    @Autowired
+    private UserGirlRepository userGirlRepository;
+    @Autowired
+    private UserGirlVoiceRepository userGirlVoiceRepository;
 
     /**
      * ユーザーのアクティビティ一覧取得
@@ -92,7 +107,9 @@ public class ActivityService {
         // 現在日時取得
         Date nowDate = MocoDateUtils.getNowDate();
 
-        // アクティビティを登録する
+        // ***************************************************************************//
+        // アクティビティ登録
+        // ***************************************************************************//
         UserActivity record = new UserActivity();
         UserActivityKey userActivityKey = new UserActivityKey(form.getUserId(), activityId);
         record.setUserActivityKey(userActivityKey);
@@ -116,8 +133,9 @@ public class ActivityService {
         record.setLocations(locationStr);
         userActivityRepository.save(record);
 
-
-        // アクティビティ詳細情報
+        // ***************************************************************************//
+        // アクティビティ詳細登録
+        // ***************************************************************************//
         List<RegistUserActivityDetailForm> detailList = form.getDetails();
         List<UserActivityDetail> detailRecords = new ArrayList<>(detailList.size());
         int index = 1;
@@ -136,6 +154,41 @@ public class ActivityService {
             index++;
         }
         userActivityDetailRepository.save(detailRecords);
+
+        // ***************************************************************************//
+        // 達成報酬付与
+        // ***************************************************************************//
+
+        UserGirl userGirl = userGirlRepository.findOne(new UserGirlKey(form.getUserId(), form.getGirlId()));
+
+        List<MstGirlMission> girlMissions = mstGirlMissionRepository.findByKeyGirlIdOrderByKeyDistanceAsc(form.getGirlId());
+        if (CollectionUtils.isNotEmpty(girlMissions)) {
+
+            for (MstGirlMission mstGirlMission : girlMissions) {
+
+                double targetDistance = (double)mstGirlMission.getDistance();
+
+                if (userGirl.getDistance().doubleValue() < targetDistance
+                        && targetDistance <= (userGirl.getDistance().doubleValue() + form.getDistance())) {
+                    UserGirlVoice userGirlVoice = new UserGirlVoice();
+                    userGirlVoice.setUserGirlVoiceKey(new UserGirlVoiceKey(form.getUserId(), form.getGirlId(), mstGirlMission.getRewardVoiceId()));
+                    userGirlVoice.setStatus(UserVoiceStatus.ON.getKey());
+                    userGirlVoice.setUpdDatetime(nowDate);
+                    userGirlVoiceRepository.save(userGirlVoice);
+                }
+            }
+        }
+
+
+        // ***************************************************************************//
+        // ガール距離更新
+        // ***************************************************************************//
+
+        // ***************************************************************************//
+        // ユーザー総距離更新
+        // ***************************************************************************//
+
+
 
         return true;
     }

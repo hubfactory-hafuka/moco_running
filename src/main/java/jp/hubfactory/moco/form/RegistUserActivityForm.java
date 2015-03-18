@@ -11,6 +11,8 @@ public class RegistUserActivityForm {
 
     @NotNull(message="ユーザーIDは必須です")
     private Long userId;
+    @NotNull(message="ガールIDは必須です")
+    private Integer girlId;
 
     private String runDate;
 
