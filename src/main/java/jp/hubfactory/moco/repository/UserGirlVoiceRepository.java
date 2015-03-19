@@ -18,5 +18,5 @@ public interface UserGirlVoiceRepository extends JpaRepository<UserGirlVoice, Us
      * @param girlId ガールID
      * @return ユーザーガール音声リスト
      */
-    public List<UserGirlVoice> findByUserGirlVoiceKeyUserIdAndUserGirlVoiceKeyGirlId(Long userId, Integer girlId);
+    public List<UserGirlVoice> findByKeyUserIdAndKeyGirlId(Long userId, Integer girlId);
 }

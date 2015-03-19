@@ -23,7 +23,7 @@ public class UserGirlVoice implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @EmbeddedId
-    private UserGirlVoiceKey userGirlVoiceKey;
+    private UserGirlVoiceKey key;
     @Column
     private Integer status;
     @Column

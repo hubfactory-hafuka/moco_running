@@ -25,11 +25,9 @@ public class MstGirlMission implements Serializable {
     @EmbeddedId
     private MstGirlMissionKey key;
     @Column
-    private Integer rewardVoiceId;
+    private Double distance;
     @Column
     private String description;
-    @Column
-    private Integer distance;
     @Column
     @Temporal(TemporalType.TIMESTAMP)
     private Date updDatetime;

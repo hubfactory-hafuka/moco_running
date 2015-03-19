@@ -11,5 +11,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserActivityDetailRepository extends JpaRepository<UserActivityDetail, UserActivityDetailKey>, JpaSpecificationExecutor<UserActivityDetail> {
-    public List<UserActivityDetail> findByKeyUserIdAndKeyActivityIdOrderByKeyActivityIdDesc(Long userId, Integer activityId);
+
+    public List<UserActivityDetail> findByKeyUserIdAndKeyActivityIdOrderByKeyDetailIdAsc(Long userId, Integer activityId);
+
+    public List<UserActivityDetail> findByKeyUserIdOrderByKeyActivityIdAsc(Long userId);
 }

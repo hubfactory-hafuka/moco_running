@@ -26,6 +26,7 @@ DROP TABLE IF EXISTS user_girl_voice;
 CREATE TABLE mst_girl
 (
     girl_id int NOT NULL,
+    type int NOT NULL,
     name varchar(32),
     birthday date,
     age int,
@@ -47,12 +48,12 @@ CREATE TABLE mst_girl
 CREATE TABLE mst_girl_mission
 (
     girl_id int NOT NULL,
-    distance int NOT NULL,
-    reward_voice_id int NOT NULL,
+    voice_id int NOT NULL,
+    distance double(8,3) NOT NULL,
     description varchar(255),
     upd_datetime datetime NOT NULL,
     ins_datetime datetime NOT NULL,
-    PRIMARY KEY (girl_id, distance)
+    PRIMARY KEY (girl_id, voice_id)
 );
 
 
@@ -85,7 +86,7 @@ CREATE TABLE user
     email varchar(255) NOT NULL,
     password varchar(255),
     name varchar(255),
-    total_distance double(5,3),
+    total_distance double(8,3) DEFAULT 0.000,
     girl_id int,
     upd_datetime datetime NOT NULL,
     ins_datetime datetime NOT NULL,
@@ -98,7 +99,7 @@ CREATE TABLE user_activity
     user_id bigint NOT NULL,
     activity_id int NOT NULL,
     run_date datetime NOT NULL,
-    distance double(5,3) NOT NULL,
+    distance double(8,3) NOT NULL,
     time varchar(8) NOT NULL,
     avg_time varchar(8) NOT NULL,
     locations text,
@@ -127,7 +128,7 @@ CREATE TABLE user_girl
 (
     user_id bigint NOT NULL,
     girl_id int NOT NULL,
-    distance double(5,3),
+    distance double(8,3),
     upd_datetime datetime NOT NULL,
     ins_datetime datetime NOT NULL,
     PRIMARY KEY (user_id, girl_id)

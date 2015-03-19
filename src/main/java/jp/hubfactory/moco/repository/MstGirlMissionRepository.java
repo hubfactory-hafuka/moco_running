@@ -11,5 +11,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MstGirlMissionRepository extends JpaRepository<MstGirlMission, MstGirlMissionKey>, JpaSpecificationExecutor<MstGirlMission> {
-    public List<MstGirlMission> findByKeyGirlIdOrderByKeyDistanceAsc(Integer girlId);
+    public List<MstGirlMission> findByKeyGirlIdOrderByDistanceAsc(Integer girlId);
 }

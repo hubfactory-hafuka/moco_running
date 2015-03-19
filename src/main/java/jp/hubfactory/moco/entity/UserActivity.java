@@ -23,7 +23,7 @@ public class UserActivity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @EmbeddedId
-    private UserActivityKey userActivityKey;
+    private UserActivityKey key;
 
     @Column
     @Temporal(TemporalType.TIMESTAMP)

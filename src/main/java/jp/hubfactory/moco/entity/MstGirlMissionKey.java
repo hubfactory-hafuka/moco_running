@@ -21,5 +21,5 @@ public class MstGirlMissionKey implements Serializable {
     @Column
     private Integer girlId;
     @Column
-    private Integer distance;
+    private Integer voiceId;
 }

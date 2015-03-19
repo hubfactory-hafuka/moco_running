@@ -33,14 +33,14 @@ public class VoiceService {
         if (CollectionUtils.isEmpty(mstVoiceList)) {
             return null;
         }
-        List<UserGirlVoice> userGirlVoiceList = uesrGirlVoiceRepository.findByUserGirlVoiceKeyUserIdAndUserGirlVoiceKeyGirlId(userId, girlId);
+        List<UserGirlVoice> userGirlVoiceList = uesrGirlVoiceRepository.findByKeyUserIdAndKeyGirlId(userId, girlId);
         if (CollectionUtils.isEmpty(userGirlVoiceList)) {
             return null;
         }
 
         Map<Integer, UserGirlVoice> userGirlVoiceMap = new HashMap<>(userGirlVoiceList.size());
         for (UserGirlVoice userGirlVoice : userGirlVoiceList) {
-            userGirlVoiceMap.put(userGirlVoice.getUserGirlVoiceKey().getVoiceId(), userGirlVoice);
+            userGirlVoiceMap.put(userGirlVoice.getKey().getVoiceId(), userGirlVoice);
         }
 
         List<UserGirlVoiceBean> beanList = new ArrayList<>(mstVoiceList.size());

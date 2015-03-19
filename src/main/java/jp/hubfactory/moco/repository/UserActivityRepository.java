@@ -13,8 +13,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserActivityRepository extends JpaRepository<UserActivity, UserActivityKey>, JpaSpecificationExecutor<UserActivityKey> {
 
-    public List<UserActivity> findByUserActivityKeyUserIdOrderByUserActivityKeyActivityIdDesc(Long userId);
+    public List<UserActivity> findByKeyUserIdOrderByKeyActivityIdDesc(Long userId);
 
-    @Query("select max(ua.userActivityKey.activityId) from UserActivity ua where ua.userActivityKey.userId = ?1")
-    public Integer selectMaxActivityId(Long userId);
+    @Query("select max(ua.key.activityId) from UserActivity ua where ua.key.userId = ?1")
+    public Integer findMaxActivityId(Long userId);
 }

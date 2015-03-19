@@ -1,6 +1,7 @@
 package jp.hubfactory.moco.bean;
 
 import java.io.Serializable;
+import java.util.List;
 
 import lombok.Data;
 
@@ -20,4 +21,8 @@ public class UserActivityBean implements Serializable {
     private String time;
 
     private String avgTime;
+
+    private List<UserActivityLocationBean> locations;
+
+    private List<UserActivityDetailBean> details;
 }

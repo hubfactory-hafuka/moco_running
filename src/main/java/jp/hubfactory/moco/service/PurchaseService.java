@@ -42,12 +42,12 @@ public class PurchaseService {
         }
 
         // ユーザーのボイス情報取得
-        List<UserGirlVoice> userGirlVoiceList = userGirlVoiceRepository.findByUserGirlVoiceKeyUserIdAndUserGirlVoiceKeyGirlId(userId, girlId);
+        List<UserGirlVoice> userGirlVoiceList = userGirlVoiceRepository.findByKeyUserIdAndKeyGirlId(userId, girlId);
         if (CollectionUtils.isNotEmpty(userGirlVoiceList)) {
 
             for (UserGirlVoice userGirlVoice : userGirlVoiceList) {
 
-                if (voiceIdSet.contains(userGirlVoice.getUserGirlVoiceKey().getVoiceId())) {
+                if (voiceIdSet.contains(userGirlVoice.getKey().getVoiceId())) {
                     userGirlVoice.setStatus(UserVoiceStatus.ON.getKey());
                 }
             }
