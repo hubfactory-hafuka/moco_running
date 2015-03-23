@@ -26,6 +26,9 @@ public class UserActivity implements Serializable {
     private UserActivityKey key;
 
     @Column
+    private Integer girlId;
+
+    @Column
     @Temporal(TemporalType.TIMESTAMP)
     private Date runDate;
 

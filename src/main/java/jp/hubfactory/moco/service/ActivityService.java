@@ -1,5 +1,6 @@
 package jp.hubfactory.moco.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -8,6 +9,7 @@ import java.util.Map;
 
 import jp.hubfactory.moco.bean.UserActivityBean;
 import jp.hubfactory.moco.bean.UserActivityDetailBean;
+import jp.hubfactory.moco.bean.UserActivityLocationBean;
 import jp.hubfactory.moco.entity.MstGirlMission;
 import jp.hubfactory.moco.entity.User;
 import jp.hubfactory.moco.entity.UserActivity;
@@ -38,6 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
@@ -89,13 +92,21 @@ public class ActivityService {
         for (UserActivity userActivity : userActivities) {
 
             UserActivityBean bean = new UserActivityBean();
+            bean.setGirlId(userActivity.getGirlId());
             bean.setUserId(userActivity.getKey().getUserId());
             bean.setActivityId(userActivity.getKey().getActivityId());
             bean.setRunDate(MocoDateUtils.convertString(userActivity.getRunDate(), MocoDateUtils.DATE_FORMAT_yyyyMMdd_SLASH));
             bean.setDistance(String.format("%.3f", userActivity.getDistance()));
             bean.setTime(userActivity.getTime());
             bean.setAvgTime(userActivity.getAvgTime());
-//            bean.setLocations(userActivity.getLocations());
+
+            try {
+                List<UserActivityLocationBean> locations = new ObjectMapper().readValue(userActivity.getLocations(), new TypeReference<List<UserActivityLocationBean>>() {});
+                bean.setLocations(locations);
+            } catch (IOException e) {
+                logger.error("JSON変換エラー。 userId=" + userId + " activityId=" + userActivity.getKey().getActivityId());
+                e.printStackTrace();
+            }
 
             List<UserActivityDetail> userActivityDetails = activityIdKeyMap.get(userActivity.getKey().getActivityId());
             if (CollectionUtils.isEmpty(userActivityDetails)) {
@@ -184,6 +195,7 @@ public class ActivityService {
         UserActivity record = new UserActivity();
         UserActivityKey userActivityKey = new UserActivityKey(form.getUserId(), activityId);
         record.setKey(userActivityKey);
+        record.setGirlId(form.getGirlId());
         record.setDistance(form.getDistance());
         record.setRunDate(runDate);
         record.setTime(form.getTime());

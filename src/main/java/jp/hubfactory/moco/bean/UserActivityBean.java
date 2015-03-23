@@ -10,6 +10,8 @@ public class UserActivityBean implements Serializable {
     /** serialVersionUID */
     private static final long serialVersionUID = 1L;
 
+    private Integer girlId;
+
     private Long userId;
 
     private Integer activityId;

@@ -39,9 +39,4 @@ dependencies {
     compile("org.projectlombok:lombok:1.16.2")
     // MySQL
     compile("mysql:mysql-connector-java:5.1.34")
-
-    // SpringJDBC
-    //compile("org.springframework.boot:spring-boot-starter-jdbc")
-    // Doma1.x(Java1.7まで)
-    //compile("org.seasar.doma:doma:2.+")
 }
