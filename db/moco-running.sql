@@ -62,6 +62,7 @@ CREATE TABLE mst_voice
 	girl_id int NOT NULL,
 	voice_id int NOT NULL,
 	word varchar(255),
+	situation int NOT NULL,
 	type int NOT NULL,
 	upd_datetime datetime NOT NULL,
 	ins_datetime datetime NOT NULL,

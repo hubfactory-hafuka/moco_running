@@ -10,6 +10,7 @@ import java.util.Map;
 import jp.hubfactory.moco.bean.UserActivityBean;
 import jp.hubfactory.moco.bean.UserActivityDetailBean;
 import jp.hubfactory.moco.bean.UserActivityLocationBean;
+import jp.hubfactory.moco.cache.MstGirlMissionCache;
 import jp.hubfactory.moco.entity.MstGirlMission;
 import jp.hubfactory.moco.entity.User;
 import jp.hubfactory.moco.entity.UserActivity;
@@ -23,7 +24,6 @@ import jp.hubfactory.moco.enums.UserVoiceStatus;
 import jp.hubfactory.moco.form.RegistUserActivityDetailForm;
 import jp.hubfactory.moco.form.RegistUserActivityForm;
 import jp.hubfactory.moco.form.RegistUserActivityLocationForm;
-import jp.hubfactory.moco.repository.MstGirlMissionRepository;
 import jp.hubfactory.moco.repository.UserActivityDetailRepository;
 import jp.hubfactory.moco.repository.UserActivityRepository;
 import jp.hubfactory.moco.repository.UserGirlRepository;
@@ -54,13 +54,13 @@ public class ActivityService {
     @Autowired
     private UserActivityDetailRepository userActivityDetailRepository;
     @Autowired
-    private MstGirlMissionRepository mstGirlMissionRepository;
-    @Autowired
     private UserGirlRepository userGirlRepository;
     @Autowired
     private UserGirlVoiceRepository userGirlVoiceRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private MstGirlMissionCache mstGirlMissionCache;
 
     /**
      * ユーザーのアクティビティ一覧取得
@@ -262,7 +262,8 @@ public class ActivityService {
     private void updateUserGirl(RegistUserActivityForm form, UserGirl userGirl, Date nowDate) {
 
         // ガールミッション情報取得
-        List<MstGirlMission> girlMissions = mstGirlMissionRepository.findByKeyGirlIdOrderByDistanceAsc(form.getGirlId());
+        List<MstGirlMission> girlMissions = mstGirlMissionCache.getGirlMissions(form.getGirlId());
+
         // ミッション情報が存在する場合
         if (CollectionUtils.isNotEmpty(girlMissions)) {
 

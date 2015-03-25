@@ -4,12 +4,12 @@ import java.util.Date;
 import java.util.List;
 
 import jp.hubfactory.moco.bean.UserBean;
+import jp.hubfactory.moco.cache.MstGirlMissionCache;
 import jp.hubfactory.moco.entity.MstGirlMission;
 import jp.hubfactory.moco.entity.User;
 import jp.hubfactory.moco.entity.UserGirl;
 import jp.hubfactory.moco.entity.UserGirlKey;
 import jp.hubfactory.moco.entity.UserGirlVoice;
-import jp.hubfactory.moco.repository.MstGirlMissionRepository;
 import jp.hubfactory.moco.repository.UserGirlRepository;
 import jp.hubfactory.moco.repository.UserGirlVoiceRepository;
 import jp.hubfactory.moco.repository.UserRepository;
@@ -30,7 +30,7 @@ public class UserService {
     @Autowired
     private UserGirlRepository userGirlRepository;
     @Autowired
-    private MstGirlMissionRepository mstGirlMissionRepository;
+    private MstGirlMissionCache mstGirlMissionCache;
 
     /**
      * ユーザー情報取得
@@ -54,7 +54,7 @@ public class UserService {
         userBean.setGirlDistance(userGirl == null ? "0.000" : String.format("%.3f", userGirl.getDistance()));
 
         // 次の達成報酬までの残りの距離を求める
-        List<MstGirlMission> mstGirlMissionList = mstGirlMissionRepository.findByKeyGirlIdOrderByDistanceAsc(user.getGirlId());
+        List<MstGirlMission> mstGirlMissionList = mstGirlMissionCache.getGirlMissions(user.getGirlId());
         for (MstGirlMission mstGirlMission : mstGirlMissionList) {
             if (userGirl.getDistance().doubleValue() < mstGirlMission.getDistance().doubleValue()) {
                 double remainDistance = mstGirlMission.getDistance().doubleValue() - userGirl.getDistance().doubleValue();

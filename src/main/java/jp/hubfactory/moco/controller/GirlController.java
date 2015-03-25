@@ -4,7 +4,7 @@ import java.util.List;
 
 import jp.hubfactory.moco.entity.MstGirl;
 import jp.hubfactory.moco.form.InputForm;
-import jp.hubfactory.moco.service.MstGirlService;
+import jp.hubfactory.moco.service.GirlService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,18 +23,12 @@ public class GirlController {
     private static final Logger logger = LoggerFactory.getLogger(GirlController.class);
 
     @Autowired
-    private MstGirlService mstGirlService;
-
-//    @RequestMapping(value="/add", method = RequestMethod.POST)
-//    @ResponseStatus(HttpStatus.CREATED)
-//    public MstGirl insertMstGirl(@Validated @RequestBody MstGirl mstGirl) {
-//        return mstGirlService.insert(mstGirl);
-//    }
+    private GirlService girlService;
 
     @RequestMapping(value = "/get-all", method = RequestMethod.POST)
     public ResponseEntity<List<MstGirl>> getAll() {
         logger.info("GirlController#getAll");
-        List<MstGirl> mstGirlList = mstGirlService.selectMstGirls();
+        List<MstGirl> mstGirlList = girlService.selectMstGirls();
         return new ResponseEntity<List<MstGirl>>(mstGirlList, HttpStatus.OK);
     }
 
@@ -45,7 +39,7 @@ public class GirlController {
         if (inputForm.getGirlId() == null) {
             return new ResponseEntity<MstGirl>(mstGirl, HttpStatus.BAD_REQUEST);
         }
-        mstGirl = mstGirlService.selectMstGirl(inputForm.getGirlId());
+        mstGirl = girlService.selectMstGirl(inputForm.getGirlId());
         return new ResponseEntity<MstGirl>(mstGirl, HttpStatus.OK);
     }
 }
