@@ -3,12 +3,11 @@ package jp.hubfactory.moco.service;
 import java.util.Date;
 import java.util.List;
 
+import jp.hubfactory.moco.cache.MstGirlCache;
 import jp.hubfactory.moco.entity.MstGirl;
 import jp.hubfactory.moco.repository.MstGirlRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +17,8 @@ public class GirlService {
 
     @Autowired
     private MstGirlRepository repository;
+    @Autowired
+    private MstGirlCache mstGirlCache;
 
     public MstGirl insert(MstGirl mstGirl) {
 
@@ -34,10 +35,10 @@ public class GirlService {
     }
 
     public List<MstGirl> selectMstGirls() {
-        return repository.findAll(new Sort(Direction.ASC, "girlId"));
+        return mstGirlCache.getAll();
     }
 
     public MstGirl selectMstGirl(Integer girlId) {
-        return repository.findOne(girlId);
+        return mstGirlCache.getGirl(girlId);
     }
 }

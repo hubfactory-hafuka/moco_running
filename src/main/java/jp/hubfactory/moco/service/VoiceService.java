@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import jp.hubfactory.moco.bean.UserGirlVoiceBean;
+import jp.hubfactory.moco.cache.MstVoiceCache;
 import jp.hubfactory.moco.entity.MstVoice;
 import jp.hubfactory.moco.entity.UserGirlVoice;
 import jp.hubfactory.moco.enums.UserVoiceStatus;
 import jp.hubfactory.moco.enums.VoiceType;
-import jp.hubfactory.moco.repository.MstVoiceRepository;
 import jp.hubfactory.moco.repository.UserGirlVoiceRepository;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -23,13 +23,13 @@ import org.springframework.stereotype.Service;
 public class VoiceService {
 
     @Autowired
-    private MstVoiceRepository mstVoiceRepository;
+    private MstVoiceCache mstVoiceCache;
     @Autowired
     private UserGirlVoiceRepository uesrGirlVoiceRepository;
 
     public List<UserGirlVoiceBean> getUserGirlVoiceBeanList(Long userId, Integer girlId) {
 
-        List<MstVoice> mstVoiceList = mstVoiceRepository.findByMstVoiceKeyGirlId(girlId);
+        List<MstVoice> mstVoiceList = mstVoiceCache.getVoiceList(girlId);
         if (CollectionUtils.isEmpty(mstVoiceList)) {
             return null;
         }
@@ -47,12 +47,12 @@ public class VoiceService {
         for (MstVoice mstVocie : mstVoiceList) {
 
             UserGirlVoiceBean bean = new UserGirlVoiceBean();
-            BeanUtils.copyProperties(mstVocie.getMstVoiceKey(), bean);
+            BeanUtils.copyProperties(mstVocie.getKey(), bean);
             BeanUtils.copyProperties(mstVocie, bean);
             bean.setStatus(UserVoiceStatus.ON.getKey());
 
             if (!VoiceType.NORMAL.getKey().equals(mstVocie.getType())) {
-                Integer voiceId = mstVocie.getMstVoiceKey().getVoiceId();
+                Integer voiceId = mstVocie.getKey().getVoiceId();
                 if (userGirlVoiceMap.containsKey(voiceId)) {
                     bean.setStatus(userGirlVoiceMap.get(voiceId).getStatus());
                 }

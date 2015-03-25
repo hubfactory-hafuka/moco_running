@@ -37,7 +37,9 @@ public class Application implements CommandLineRunner {
         SpringApplication.run(Application.class, args);
     }
 
-
+    /**
+     * 起動時処理
+     */
     @Override
     public void run(String... args) throws Exception {
         logger.info("master load start.");

@@ -24,7 +24,7 @@ public class MstVoice implements Serializable  {
     private static final long serialVersionUID = 1L;
 
     @EmbeddedId
-    private MstVoiceKey mstVoiceKey;
+    private MstVoiceKey key;
     @Column
     private String word;
     @Column

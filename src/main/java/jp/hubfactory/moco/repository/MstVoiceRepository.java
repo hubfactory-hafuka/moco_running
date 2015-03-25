@@ -11,5 +11,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MstVoiceRepository extends JpaRepository<MstVoice, MstVoiceKey>, JpaSpecificationExecutor<MstVoice> {
-    public List<MstVoice> findByMstVoiceKeyGirlId(Integer girlId);
+    public List<MstVoice> findByKeyGirlId(Integer girlId);
 }
