@@ -147,6 +147,11 @@ public class ActivityService {
         UserGirl userGirl = userGirlRepository.findOne(new UserGirlKey(form.getUserId(), form.getGirlId()));
 
         // ***************************************************************************//
+        // 総平均ペース算出
+        // ***************************************************************************//
+        String totalAvgTime = this.calcTotalAvgTime(form);
+
+        // ***************************************************************************//
         // アクティビティ登録
         // ***************************************************************************//
         this.registActivity(form, activityId, nowDate);
@@ -169,28 +174,38 @@ public class ActivityService {
         // ***************************************************************************//
         // ユーザー総距離更新
         // ***************************************************************************//
-        this.updateUser(form, nowDate);
+        this.updateUser(form, totalAvgTime, nowDate);
 
         return true;
     }
 
+    private String calcTotalAvgTime(RegistUserActivityForm form) {
+        // ユーザーのアクティビティ一覧取得
+        List<UserActivity> userActivities = userActivityRepository.findByKeyUserIdOrderByKeyActivityIdDesc(form.getUserId());
+
+        int totalSecond = MocoDateUtils.convertTimeStrToSecond(form.getTime());;
+        double totalDistance = form.getDistance();
+
+        for (UserActivity userActivity : userActivities) {
+            totalSecond += MocoDateUtils.convertTimeStrToSecond(userActivity.getTime());
+            totalDistance += userActivity.getDistance();
+        }
+        return MocoDateUtils.calcAvgTime(totalSecond, totalDistance);
+    }
+
+    /**
+     * アクティビティ情報登録
+     * @param form
+     * @param activityId
+     * @param nowDate
+     * @return 総平均時間(9'99")
+     */
     private void registActivity(RegistUserActivityForm form, Integer activityId, Date nowDate) {
 
         Date runDate = MocoDateUtils.convertDate(form.getRunDate(), MocoDateUtils.DATE_FORMAT_yyyyMMdd_SLASH);
 
-        // 走った時間を秒に変換する
-        String times[] = form.getTime().split(":");
-        int hour = Integer.parseInt(times[0]) * 3600;
-        int minute = Integer.parseInt(times[1]) * 60;
-        int second = Integer.parseInt(times[2]);
-        int timeSecond = hour + minute + second;
-
-        // 平均時間(秒)を求める
-        int avgTimeSecond = Double.valueOf(Math.ceil(timeSecond / form.getDistance())).intValue();
-        int avgMinute = avgTimeSecond % 3600 / 60;
-        int avgSecond = avgTimeSecond % 60;
-        // 平均時間文字列
-        String avgTime = MocoDateUtils.convertTimeString(avgMinute, avgSecond);
+        // 平均時間算出
+        String avgTime = MocoDateUtils.calcAvgTime(form.getTime(), form.getDistance());
 
         UserActivity record = new UserActivity();
         UserActivityKey userActivityKey = new UserActivityKey(form.getUserId(), activityId);
@@ -214,6 +229,7 @@ public class ActivityService {
         }
         record.setLocations(locationStr);
         userActivityRepository.save(record);
+
     }
 
     private void registActivityDetail(RegistUserActivityForm form, Integer activityId, Date nowDate) {
@@ -255,7 +271,6 @@ public class ActivityService {
             for (UserGirlVoice userGirlVoice : userGirlVoiceList) {
                 userGirlVoiceMap.put(userGirlVoice.getKey().getVoiceId(), userGirlVoice);
             }
-
 
             if (userGirl == null) {
 
@@ -312,16 +327,18 @@ public class ActivityService {
     }
 
     /**
-     * ユーザーの総距離更新
+     * ユーザーの総距離・回数更新
      * @param form
      * @param nowDate
      */
-    private void updateUser(RegistUserActivityForm form, Date nowDate) {
+    private void updateUser(RegistUserActivityForm form, String totalAvgTime, Date nowDate) {
         User user = userRepository.findOne(form.getUserId());
         if (user == null) {
             throw new IllegalStateException("user is null. userId=" + form.getUserId());
         }
         user.setTotalDistance(user.getTotalDistance() + form.getDistance());
+        user.setTotalCount(user.getTotalCount().intValue() + 1);
+        user.setTotalAvgTime(totalAvgTime);
         user.setUpdDatetime(nowDate);
     }
 }

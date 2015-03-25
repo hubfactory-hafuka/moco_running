@@ -36,6 +36,10 @@ public class User implements Serializable {
     @Column
     public Double totalDistance;
     @Column
+    public Integer totalCount;
+    @Column
+    public String totalAvgTime;
+    @Column
     public Integer girlId;
     @Column
     @Temporal(TemporalType.TIMESTAMP)

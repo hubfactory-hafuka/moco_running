@@ -2,9 +2,11 @@ package jp.hubfactory.moco.controller;
 
 import java.util.List;
 
+import jp.hubfactory.moco.bean.UserBean;
 import jp.hubfactory.moco.entity.User;
 import jp.hubfactory.moco.entity.UserGirlVoice;
 import jp.hubfactory.moco.entity.UserGirlVoiceKey;
+import jp.hubfactory.moco.form.GetUserForm;
 import jp.hubfactory.moco.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value="/api/user")
+@RequestMapping(value="/user")
 public class UserController {
 
     @Autowired
@@ -41,8 +43,8 @@ public class UserController {
      */
     @RequestMapping(value = "/get-user", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    public User getUser(@Validated @RequestBody User user) {
-        return userService.findUserByUserId(user.getUserId());
+    public UserBean getUser(@Validated @RequestBody GetUserForm form) {
+        return userService.getUser(form.getUserId());
     }
 
     /**

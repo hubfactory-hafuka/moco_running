@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value="/api/girl")
+@RequestMapping(value="/girl")
 public class GirlController {
 
     private static final Logger logger = LoggerFactory.getLogger(GirlController.class);

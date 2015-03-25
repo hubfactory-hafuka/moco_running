@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value="/api/purchase")
+@RequestMapping(value="/purchase")
 public class PurchaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(PurchaseController.class);

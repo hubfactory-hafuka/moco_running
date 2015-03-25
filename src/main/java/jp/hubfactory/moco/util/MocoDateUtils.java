@@ -127,4 +127,37 @@ public class MocoDateUtils {
         return timeStr;
 
     }
+
+    /**
+     * 平均時間取得
+     * @param timeStr 時間文字列(hh:mm:ss)
+     * @param distance 距離
+     * @return 平均時間
+     */
+    public static String calcAvgTime(String timeStr, Double distance) {
+        // 走った時間を秒に変換する
+        int second = MocoDateUtils.convertTimeStrToSecond(timeStr);
+        // 平均を求める
+        return MocoDateUtils.calcAvgTime(second, distance);
+    }
+
+    public static int convertTimeStrToSecond(String timeStr) {
+        // 走った時間を秒に変換する
+        String times[] = timeStr.split(":");
+        int hour = Integer.parseInt(times[0]) * 3600;
+        int minute = Integer.parseInt(times[1]) * 60;
+        int second = Integer.parseInt(times[2]);
+        int timeSecond = hour + minute + second;
+        return timeSecond;
+    }
+
+    public static String calcAvgTime(int second, double distance) {
+        // 平均時間(秒)を求める
+        int avgTimeSecond = Double.valueOf(Math.ceil(second / distance)).intValue();
+        int avgMinute = avgTimeSecond % 3600 / 60;
+        int avgSecond = avgTimeSecond % 60;
+        // 平均時間文字列
+        String avgTime = MocoDateUtils.convertTimeString(avgMinute, avgSecond);
+        return avgTime;
+    }
 }

@@ -1,23 +1,36 @@
 package jp.hubfactory.moco;
 
+import jp.hubfactory.moco.repository.UserRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.web.SpringBootServletInitializer;
 
 @SpringBootApplication
-public class Application extends SpringBootServletInitializer {
+// public class Application extends SpringBootServletInitializer {
+public class Application implements CommandLineRunner {
+    // @Override
+    // protected SpringApplicationBuilder configure(SpringApplicationBuilder
+    // application) {
+    // return super.configure(application);
+    // }
 
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        // Customize the application or call application.sources(...) to add sources
-        // Since our example is itself a @Configuration class we actually don't
-        // need to override this method.
-        return application;
-    }
+    @Autowired
+    private UserRepository userRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
-        System.out.println("Application run");
     }
+
+
+    @Override
+    public void run(String... args) throws Exception {
+
+        userRepository.findAll();
+
+        System.out.println("run");
+
+    }
+
 }

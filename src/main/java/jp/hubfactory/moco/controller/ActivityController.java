@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * アクティビティコントローラー
  */
 @RestController
-@RequestMapping(value="/api/activity")
+@RequestMapping(value="/activity")
 public class ActivityController {
 
     @Autowired

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value="/api/voice")
+@RequestMapping(value="/voice")
 public class VoiceController {
 
     private static final Logger logger = LoggerFactory.getLogger(VoiceController.class);
