@@ -20,7 +20,9 @@ public class MstVoiceCache {
     @Autowired
     MstVoiceRepository repository;
 
-    private Map<Integer, List<MstVoice>> voiceMap;
+    private Map<Integer, List<MstVoice>> girlIdKeyListMap;
+
+    private Map<String, MstVoice> girlIdAndvoiceIdKeyMap;
 
     private List<MstVoice> list;
 
@@ -35,11 +37,20 @@ public class MstVoiceCache {
     }
 
     public List<MstVoice> getVoiceList(Integer girlId) {
-        if (voiceMap == null) {
+        if (girlIdKeyListMap == null) {
             this.load();
         }
-        return voiceMap.get(girlId);
+        return girlIdKeyListMap.get(girlId);
     }
+
+    public MstVoice getMstVoice(Integer girlId, Integer voiceId) {
+        if (girlIdAndvoiceIdKeyMap == null) {
+            this.load();
+        }
+        String key = girlId + "-" + voiceId;
+        return girlIdAndvoiceIdKeyMap.get(key);
+    }
+
 
     private void sort() {
         Collections.sort(list, new Comparator<MstVoice>() {
@@ -52,12 +63,17 @@ public class MstVoiceCache {
 
     private void createData() {
         Map<Integer, List<MstVoice>> tmpMap = new HashMap<>();
+        Map<String, MstVoice> tmpMap2 = new HashMap<>();
 
         for (MstVoice mstVoice : list) {
             List<MstVoice> list = (tmpMap.containsKey(mstVoice.getKey().getGirlId())) ? tmpMap.get(mstVoice.getKey().getGirlId()) : new ArrayList<MstVoice>();
             list.add(mstVoice);
             tmpMap.put(mstVoice.getKey().getGirlId(), list);
+
+            String key = mstVoice.getKey().getGirlId() + "-" + mstVoice.getKey().getVoiceId();
+            tmpMap2.put(key, mstVoice);
         }
-        voiceMap = Collections.unmodifiableMap(tmpMap);
+        girlIdKeyListMap = Collections.unmodifiableMap(tmpMap);
+        girlIdAndvoiceIdKeyMap = Collections.unmodifiableMap(tmpMap2);
     }
 }

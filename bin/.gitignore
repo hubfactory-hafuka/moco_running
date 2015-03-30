@@ -1,1 +1,5 @@
+/application-dev.properties
+/application-product.properties
+/application.properties
 /jp/
+/logback.xml

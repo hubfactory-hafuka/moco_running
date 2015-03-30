@@ -2,6 +2,7 @@ package jp.hubfactory.moco.controller;
 
 import java.util.List;
 
+import jp.hubfactory.moco.bean.MissionClearVoiceBean;
 import jp.hubfactory.moco.bean.UserActivityBean;
 import jp.hubfactory.moco.form.RegistUserActivityForm;
 import jp.hubfactory.moco.form.UserActivityForm;
@@ -33,8 +34,8 @@ public class ActivityController {
     }
 
     @RequestMapping(value = "/add-user-activity", method = RequestMethod.POST)
-    public ResponseEntity<Boolean> addActivity(@Validated @RequestBody RegistUserActivityForm form) {
-        activityServie.addUserActivity(form);
-        return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+    public ResponseEntity<List<MissionClearVoiceBean>> addActivity(@Validated @RequestBody RegistUserActivityForm form) {
+        List<MissionClearVoiceBean> missionClearVoiceBeans = activityServie.addUserActivity(form);
+        return new ResponseEntity<List<MissionClearVoiceBean>>(missionClearVoiceBeans, HttpStatus.OK);
     }
 }

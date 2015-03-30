@@ -7,11 +7,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jp.hubfactory.moco.bean.MissionClearVoiceBean;
 import jp.hubfactory.moco.bean.UserActivityBean;
 import jp.hubfactory.moco.bean.UserActivityDetailBean;
 import jp.hubfactory.moco.bean.UserActivityLocationBean;
 import jp.hubfactory.moco.cache.MstGirlMissionCache;
+import jp.hubfactory.moco.cache.MstVoiceCache;
 import jp.hubfactory.moco.entity.MstGirlMission;
+import jp.hubfactory.moco.entity.MstVoice;
 import jp.hubfactory.moco.entity.User;
 import jp.hubfactory.moco.entity.UserActivity;
 import jp.hubfactory.moco.entity.UserActivityDetail;
@@ -61,6 +64,8 @@ public class ActivityService {
     private UserRepository userRepository;
     @Autowired
     private MstGirlMissionCache mstGirlMissionCache;
+    @Autowired
+    private MstVoiceCache mstVoiceCache;
 
     /**
      * ユーザーのアクティビティ一覧取得
@@ -135,7 +140,7 @@ public class ActivityService {
      * @param time 時間
      * @return
      */
-    public boolean addUserActivity(RegistUserActivityForm form) {
+    public List<MissionClearVoiceBean> addUserActivity(RegistUserActivityForm form) {
 
         // 現在日時取得
         Date nowDate = MocoDateUtils.getNowDate();
@@ -143,7 +148,9 @@ public class ActivityService {
         Integer activityId = userActivityRepository.findMaxActivityId(form.getUserId());
         activityId = activityId == null ? 1 : activityId.intValue() + 1;
 
+        // ***************************************************************************//
         // ユーザーの現在のガール情報取得
+        // ***************************************************************************//
         UserGirl userGirl = userGirlRepository.findOne(new UserGirlKey(form.getUserId(), form.getGirlId()));
 
         // ***************************************************************************//
@@ -164,7 +171,7 @@ public class ActivityService {
         // ***************************************************************************//
         // 達成報酬付与
         // ***************************************************************************//
-        this.updateUserGirl(form, userGirl, nowDate);
+        List<MstVoice> clearVoiceList = this.updateUserGirl(form, userGirl, nowDate);
 
         // ***************************************************************************//
         // ガール距離更新
@@ -176,7 +183,14 @@ public class ActivityService {
         // ***************************************************************************//
         this.updateUser(form, totalAvgTime, nowDate);
 
-        return true;
+        List<MissionClearVoiceBean> beanList = new ArrayList<MissionClearVoiceBean>();
+        for (MstVoice mstVoice : clearVoiceList) {
+            MissionClearVoiceBean bean = new MissionClearVoiceBean();
+            BeanUtils.copyProperties(mstVoice.getKey(), bean);
+            BeanUtils.copyProperties(mstVoice, bean);
+            beanList.add(bean);
+        }
+        return beanList;
     }
 
     private String calcTotalAvgTime(RegistUserActivityForm form) {
@@ -259,7 +273,10 @@ public class ActivityService {
      * @param form
      * @param nowDate
      */
-    private void updateUserGirl(RegistUserActivityForm form, UserGirl userGirl, Date nowDate) {
+    private List<MstVoice> updateUserGirl(RegistUserActivityForm form, UserGirl userGirl, Date nowDate) {
+
+        // ミッション達成ボイスリスト
+        List<MstVoice> clearVoiceList = new ArrayList<>();
 
         // ガールミッション情報取得
         List<MstGirlMission> girlMissions = mstGirlMissionCache.getGirlMissions(form.getGirlId());
@@ -284,24 +301,33 @@ public class ActivityService {
                         userGirlVoice.setStatus(UserVoiceStatus.ON.getKey());
                         userGirlVoice.setUpdDatetime(nowDate);
 //                        userGirlVoiceRepository.save(userGirlVoice);
+
+                        // 達成ボイスを設定
+                        clearVoiceList.add(mstVoiceCache.getMstVoice(mstGirlMission.getKey().getGirlId(), mstGirlMission.getKey().getVoiceId()));
                     }
                 }
             } else {
 
+                double userDistance = userGirl.getDistance().doubleValue() + form.getDistance().doubleValue();
+
                 for (MstGirlMission mstGirlMission : girlMissions) {
 
                     double targetDistance = mstGirlMission.getDistance();
-                    double userDistance = userGirl.getDistance().doubleValue() + form.getDistance().doubleValue();
 
-                    if (userDistance <= targetDistance && targetDistance <= userDistance) {
+                    if (userGirl.getDistance() < targetDistance && targetDistance <= userDistance) {
                         UserGirlVoice userGirlVoice = userGirlVoiceMap.get(mstGirlMission.getKey().getVoiceId());
                         userGirlVoice.setStatus(UserVoiceStatus.ON.getKey());
                         userGirlVoice.setUpdDatetime(nowDate);
 //                        userGirlVoiceRepository.save(userGirlVoice);
+
+                        // 達成ボイスを設定
+                        clearVoiceList.add(mstVoiceCache.getMstVoice(mstGirlMission.getKey().getGirlId(), mstGirlMission.getKey().getVoiceId()));
                     }
                 }
             }
         }
+
+        return clearVoiceList;
     }
 
     /**
