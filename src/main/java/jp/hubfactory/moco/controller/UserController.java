@@ -1,16 +1,17 @@
 package jp.hubfactory.moco.controller;
 
-import java.util.List;
-
 import jp.hubfactory.moco.bean.UserBean;
 import jp.hubfactory.moco.entity.User;
-import jp.hubfactory.moco.entity.UserGirlVoice;
-import jp.hubfactory.moco.entity.UserGirlVoiceKey;
+import jp.hubfactory.moco.entity.UserGirl;
 import jp.hubfactory.moco.form.GetUserForm;
+import jp.hubfactory.moco.form.GirlFavoriteForm;
 import jp.hubfactory.moco.service.UserService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value="/user")
 public class UserController {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
     @Autowired
     private UserService userService;
 
@@ -30,7 +33,7 @@ public class UserController {
      * @param user
      * @return
      */
-    @RequestMapping(value = "/create-user", method = RequestMethod.POST)
+    @RequestMapping(value = "/add-user", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public User createUser(@Validated @RequestBody User user) {
         return userService.createUser(user);
@@ -44,18 +47,32 @@ public class UserController {
     @RequestMapping(value = "/get-user", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public UserBean getUser(@Validated @RequestBody GetUserForm form) {
-        return userService.getUser(form.getUserId());
+        return userService.getUserBean(form.getUserId());
     }
 
     /**
-     * ユーザーガール音声情報取得
-     * @param userGirlVoiceKey
+     * お気に入り登録
+     * @param form
      * @return
      */
-    @RequestMapping(value = "/get-user-girl-voice", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.OK)
-    public List<UserGirlVoice> getUserGirlVoice(@Validated @RequestBody UserGirlVoiceKey userGirlVoiceKey) {
-        System.out.println("#getUserGirlVoice. userId=" + userGirlVoiceKey.getUserId() + " girlId=" + userGirlVoiceKey.getGirlId());
-        return userService.findUserGirlVoice(userGirlVoiceKey.getUserId(), userGirlVoiceKey.getGirlId());
+    @RequestMapping(value = "/upd-favorite", method = RequestMethod.POST)
+    public ResponseEntity<Boolean> updFavorite(@RequestBody GirlFavoriteForm form) {
+        // ユーザー情報取得
+        User user = userService.getUser(form.getUserId());
+        if (user == null) {
+            logger.error("user is null. userId=" + form.getUserId());
+            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
+        }
+
+        // ガール所持しているかの判定
+        UserGirl userGirl = userService.getUserGirl(form.getUserId(), form.getGirlId());
+        if (userGirl == null) {
+            logger.error("userGirl is null. userId=" + form.getUserId() + " girlId=" + form.getGirlId());
+            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
+        }
+
+        // お気に入り設定処理
+        boolean execFlg = userService.updFavoriete(form.getUserId(), form.getGirlId());
+        return new ResponseEntity<Boolean>(execFlg, execFlg == true ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
 }

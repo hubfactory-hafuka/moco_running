@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class UserService {
+
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -37,10 +38,10 @@ public class UserService {
      * @param userId
      * @return
      */
-    public UserBean getUser(Long userId) {
+    public UserBean getUserBean(Long userId) {
 
         // ユーザー情報取得
-        User user = this.findUserByUserId(userId);
+        User user = this.getUser(userId);
         if (user == null) {
             return null;
         }
@@ -49,8 +50,7 @@ public class UserService {
         userBean.setTotalDistance(String.format("%.3f", user.getTotalDistance()));
 
         // ユーザーガール情報取得
-        UserGirlKey userGirlKey = new UserGirlKey(userId, user.getGirlId());
-        UserGirl userGirl = userGirlRepository.findOne(userGirlKey);
+        UserGirl userGirl = this.getUserGirl(userId, user.getGirlId());
         userBean.setGirlDistance(userGirl == null ? "0.000" : String.format("%.3f", userGirl.getDistance()));
 
         // 次の達成報酬までの残りの距離を求める
@@ -66,16 +66,26 @@ public class UserService {
         return userBean;
     }
 
-    public User findUserByUserId(Long userId) {
+    /**
+     * ユーザー情報取得
+     * @param userId
+     * @return
+     */
+    public User getUser(Long userId) {
         return userRepository.findOne(userId);
     }
 
+    /**
+     * ユーザー情報登録
+     * @param user
+     * @return
+     */
     public User createUser(User user) {
         Date nowDate = MocoDateUtils.getNowDate();
         Long userId = userRepository.findMaxUserId();
         userId = userId == null ? 1 : userId + 1;
 
-        User findRecord = findUserByUserId(user.getUserId());
+        User findRecord = getUser(user.getUserId());
         if (findRecord == null) {
             user.setUpdDatetime(nowDate);
             user.setInsDatetime(nowDate);
@@ -84,7 +94,59 @@ public class UserService {
         return null;
     }
 
-    public List<UserGirlVoice> findUserGirlVoice(Long userId, Integer girlId) {
+    /**
+     * ユーザーガールボイスリスト取得
+     * @param userId
+     * @param girlId
+     * @return
+     */
+    public List<UserGirlVoice> getUserGirlVoiceList(Long userId, Integer girlId) {
         return userGirlVoiceRepository.findByKeyUserIdAndKeyGirlId(userId, girlId);
+    }
+
+    /**
+     * お気に入り登録処理
+     * @param userId
+     * @param girlId
+     * @return
+     */
+    public boolean updFavoriete(Long userId, Integer girlId) {
+
+        User user = this.getUser(userId);
+        if (user == null) {
+            return false;
+        }
+        // テーブルから取得したentityに対してセットするとＤＢも更新されている
+        user.setGirlId(girlId);
+
+        return true;
+    }
+
+    /**
+     * ユーザーガール情報取得
+     * @param userId
+     * @param girlId
+     * @return
+     */
+    public UserGirl getUserGirl(Long userId, Integer girlId) {
+        return userGirlRepository.findOne(new UserGirlKey(userId, girlId));
+    }
+
+    /**
+     * ユーザーガール情報登録
+     * @param userId
+     * @param girlId
+     */
+    public void insertUserGirl(Long userId, Integer girlId) {
+
+        Date nowDate = MocoDateUtils.getNowDate();
+
+        UserGirlKey userGirlKey = new UserGirlKey(userId, girlId);
+        UserGirl userGirl = new UserGirl();
+        userGirl.setKey(userGirlKey);
+        userGirl.setDistance(0.000d);
+        userGirl.setUpdDatetime(nowDate);
+        userGirl.setInsDatetime(nowDate);
+        userGirlRepository.save(userGirl);
     }
 }

@@ -1,10 +1,11 @@
 package jp.hubfactory.moco.controller;
 
-import java.util.List;
-
 import jp.hubfactory.moco.entity.MstGirl;
-import jp.hubfactory.moco.form.InputForm;
+import jp.hubfactory.moco.entity.User;
+import jp.hubfactory.moco.entity.UserGirl;
+import jp.hubfactory.moco.form.GetGirlForm;
 import jp.hubfactory.moco.service.GirlService;
+import jp.hubfactory.moco.service.UserService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,22 +25,41 @@ public class GirlController {
 
     @Autowired
     private GirlService girlService;
+    @Autowired
+    private UserService userService;
 
-    @RequestMapping(value = "/get-all", method = RequestMethod.POST)
-    public ResponseEntity<List<MstGirl>> getAll() {
-        logger.info("GirlController#getAll");
-        List<MstGirl> mstGirlList = girlService.selectMstGirls();
-        return new ResponseEntity<List<MstGirl>>(mstGirlList, HttpStatus.OK);
-    }
+//    @RequestMapping(value = "/get-all", method = RequestMethod.POST)
+//    public ResponseEntity<List<MstGirl>> getAll() {
+//        logger.info("GirlController#getAll");
+//        List<MstGirl> mstGirlList = girlService.selectMstGirls();
+//        return new ResponseEntity<List<MstGirl>>(mstGirlList, HttpStatus.OK);
+//    }
 
     @RequestMapping(value = "/get-one", method = RequestMethod.POST)
-    public ResponseEntity<MstGirl> getOne(@RequestBody InputForm inputForm) {
-        logger.info("GirlController#getOne");
-        MstGirl mstGirl = new MstGirl();
-        if (inputForm.getGirlId() == null) {
+    public ResponseEntity<MstGirl> getOne(@RequestBody GetGirlForm form) {
+
+        MstGirl mstGirl = null;
+
+        // ユーザー情報取得
+        User user = userService.getUser(form.getUserId());
+        if (user == null) {
+            logger.error("user is null. userId=" + form.getUserId());
             return new ResponseEntity<MstGirl>(mstGirl, HttpStatus.BAD_REQUEST);
         }
-        mstGirl = girlService.selectMstGirl(inputForm.getGirlId());
+
+        // ガール所持しているか判定
+        UserGirl userGirl = userService.getUserGirl(form.getUserId(), form.getGirlId());
+        if (userGirl == null) {
+            logger.error("girl not purchase. userId=" + form.getUserId() + " girlId=" + form.getGirlId());
+            return new ResponseEntity<MstGirl>(mstGirl, HttpStatus.BAD_REQUEST);
+        }
+
+        // ガール情報取得
+        mstGirl = girlService.selectMstGirl(form.getGirlId());
+        if (mstGirl == null) {
+            logger.error("mstGirl is null. girlId=" + form.getGirlId());
+            return new ResponseEntity<MstGirl>(mstGirl, HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<MstGirl>(mstGirl, HttpStatus.OK);
     }
 }

@@ -21,7 +21,6 @@ import jp.hubfactory.moco.entity.UserActivityDetail;
 import jp.hubfactory.moco.entity.UserActivityDetailKey;
 import jp.hubfactory.moco.entity.UserActivityKey;
 import jp.hubfactory.moco.entity.UserGirl;
-import jp.hubfactory.moco.entity.UserGirlKey;
 import jp.hubfactory.moco.entity.UserGirlVoice;
 import jp.hubfactory.moco.enums.UserVoiceStatus;
 import jp.hubfactory.moco.form.RegistUserActivityDetailForm;
@@ -29,7 +28,6 @@ import jp.hubfactory.moco.form.RegistUserActivityForm;
 import jp.hubfactory.moco.form.RegistUserActivityLocationForm;
 import jp.hubfactory.moco.repository.UserActivityDetailRepository;
 import jp.hubfactory.moco.repository.UserActivityRepository;
-import jp.hubfactory.moco.repository.UserGirlRepository;
 import jp.hubfactory.moco.repository.UserGirlVoiceRepository;
 import jp.hubfactory.moco.repository.UserRepository;
 import jp.hubfactory.moco.util.MocoDateUtils;
@@ -56,8 +54,8 @@ public class ActivityService {
     private UserActivityRepository userActivityRepository;
     @Autowired
     private UserActivityDetailRepository userActivityDetailRepository;
-    @Autowired
-    private UserGirlRepository userGirlRepository;
+//    @Autowired
+//    private UserGirlRepository userGirlRepository;
     @Autowired
     private UserGirlVoiceRepository userGirlVoiceRepository;
     @Autowired
@@ -66,6 +64,8 @@ public class ActivityService {
     private MstGirlMissionCache mstGirlMissionCache;
     @Autowired
     private MstVoiceCache mstVoiceCache;
+    @Autowired
+    private UserService userService;
 
     /**
      * ユーザーのアクティビティ一覧取得
@@ -151,7 +151,11 @@ public class ActivityService {
         // ***************************************************************************//
         // ユーザーの現在のガール情報取得
         // ***************************************************************************//
-        UserGirl userGirl = userGirlRepository.findOne(new UserGirlKey(form.getUserId(), form.getGirlId()));
+        UserGirl userGirl = userService.getUserGirl(form.getUserId(), form.getGirlId());
+        if (userGirl == null) {
+            logger.error("userGirl is null. userId=" + form.getUserId() + " girlId=" + form.getGirlId());
+            return null;
+        }
 
         // ***************************************************************************//
         // 総平均ペース算出
@@ -337,20 +341,15 @@ public class ActivityService {
      * @param nowDate
      */
     private void updateUserGirlDistance(RegistUserActivityForm form, UserGirl userGirl, Date nowDate) {
-        if (userGirl == null) {
-            UserGirl record = new UserGirl();
-            record.setKey(new UserGirlKey(form.getUserId(), form.getGirlId()));
-            record.setDistance(form.getDistance());
-            record.setUpdDatetime(nowDate);
-            record.setInsDatetime(nowDate);
-            userGirlRepository.save(record);
-        } else {
-            UserGirl record = new UserGirl();
-            BeanUtils.copyProperties(userGirl, record);
-            record.setDistance(record.getDistance() + form.getDistance());
-            record.setUpdDatetime(nowDate);
-            userGirlRepository.save(record);
-        }
+//        UserGirl record = new UserGirl();
+//        BeanUtils.copyProperties(userGirl, record);
+//        record.setDistance(record.getDistance() + form.getDistance());
+//        record.setUpdDatetime(nowDate);
+//        userGirlRepository.save(record);
+//
+        userGirl.setDistance(userGirl.getDistance() + form.getDistance());
+        userGirl.setUpdDatetime(nowDate);
+
     }
 
     /**

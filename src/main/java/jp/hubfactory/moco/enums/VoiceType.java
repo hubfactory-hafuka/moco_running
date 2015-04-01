@@ -16,4 +16,14 @@ public enum VoiceType {
     @Getter
     private Integer key;
 
+
+    public static VoiceType valueOf(Integer voiceType) {
+        for (VoiceType type : VoiceType.values()) {
+            if (type.getKey().equals(voiceType)) {
+                return type;
+            }
+        }
+        throw new IllegalStateException("voiceType error. voiceType=" + voiceType);
+    }
+
 }

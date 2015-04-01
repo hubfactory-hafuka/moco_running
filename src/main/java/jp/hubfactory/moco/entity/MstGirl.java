@@ -29,25 +29,13 @@ public class MstGirl implements Serializable {
     @Column
     private String name;
     @Column
-    private Date birthday;
-    @Column
     private Integer age;
     @Column
     private Integer height;
     @Column
     private Integer weight;
     @Column
-    private Integer bust;
-    @Column
-    private Integer waist;
-    @Column
-    private Integer hip;
-    @Column
-    private String hobby;
-    @Column
     private String profile;
-    @Column
-    private String image_id;
     @Column
     private String cv;
     @Column

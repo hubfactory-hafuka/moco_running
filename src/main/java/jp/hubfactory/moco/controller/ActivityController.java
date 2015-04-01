@@ -27,12 +27,22 @@ public class ActivityController {
     @Autowired
     private ActivityService activityServie;
 
+    /**
+     * アクティビティ一覧取得
+     * @param form
+     * @return
+     */
     @RequestMapping(value = "/get-user-activity", method = RequestMethod.POST)
     public ResponseEntity<List<UserActivityBean>> getActivity(@Validated @RequestBody UserActivityForm form) {
         List<UserActivityBean> userActivities = activityServie.getUserActivities(form.getUserId());
         return new ResponseEntity<List<UserActivityBean>>(userActivities, HttpStatus.OK);
     }
 
+    /**
+     * アクティビティ登録
+     * @param form
+     * @return
+     */
     @RequestMapping(value = "/add-user-activity", method = RequestMethod.POST)
     public ResponseEntity<List<MissionClearVoiceBean>> addActivity(@Validated @RequestBody RegistUserActivityForm form) {
         List<MissionClearVoiceBean> missionClearVoiceBeans = activityServie.addUserActivity(form);
