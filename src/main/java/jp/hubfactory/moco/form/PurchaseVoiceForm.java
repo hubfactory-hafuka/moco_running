@@ -10,4 +10,6 @@ public class PurchaseVoiceForm {
     private Long userId;
     @NotNull(message="setIdは必須です")
     private Integer setId;
+    @NotNull(message="receiptは必須です")
+    private String receipt;
 }

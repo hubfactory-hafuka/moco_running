@@ -42,7 +42,7 @@ public class PurchaseController {
             logger.error("user is null. userId=" + form.getUserId());
             return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
         }
-        boolean execFlg = purchaseService.purchaseVoiceSet(form.getUserId(), form.getSetId());
+        boolean execFlg = purchaseService.purchaseVoiceSet(form.getUserId(), form.getSetId(), form.getReceipt());
         return new ResponseEntity<Boolean>(execFlg, execFlg == true ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
 
@@ -69,7 +69,7 @@ public class PurchaseController {
             return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
         }
 
-        boolean execFlg = purchaseService.purchaseGirl(form.getUserId(), form.getGirlId());
+        boolean execFlg = purchaseService.purchaseGirl(form.getUserId(), form.getGirlId(), form.getReceipt());
         return new ResponseEntity<Boolean>(execFlg, execFlg == true ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
 }

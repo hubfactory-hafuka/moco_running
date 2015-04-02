@@ -16,10 +16,13 @@ import jp.hubfactory.moco.entity.UserGirlVoice;
 import jp.hubfactory.moco.entity.UserGirlVoiceKey;
 import jp.hubfactory.moco.enums.UserVoiceStatus;
 import jp.hubfactory.moco.enums.VoiceType;
+import jp.hubfactory.moco.purchase.VerifyReceipt;
 import jp.hubfactory.moco.repository.UserGirlVoiceRepository;
 import jp.hubfactory.moco.util.MocoDateUtils;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class PurchaseService {
+
+    private static final Logger logger = LoggerFactory.getLogger(PurchaseService.class);
 
     @Autowired
     private MstVoiceSetCache mstVoiceSetCache;
@@ -38,6 +43,8 @@ public class PurchaseService {
     private UserGirlVoiceRepository userGirlVoiceRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private VerifyReceipt verifyReceipt;
 
     /**
      * ボイスセット購入処理
@@ -46,7 +53,16 @@ public class PurchaseService {
      * @param girlId
      * @return
      */
-    public boolean purchaseVoiceSet(Long userId, Integer setId) {
+    public boolean purchaseVoiceSet(Long userId, Integer setId, String receipt) {
+
+        try {
+            if (!verifyReceipt.verifyReceipt(receipt)) {
+                return false;
+            }
+        } catch (Exception e) {
+            logger.error("レシート認証失敗 userId=" + userId + " setId=" + setId);
+            return false;
+        }
 
         // ボイスセットリスト取得
         List<MstVoiceSet> mstVoiceSetList = mstVoiceSetCache.getVoiceSet(setId);
@@ -92,7 +108,16 @@ public class PurchaseService {
      * @param girlId
      * @return
      */
-    public boolean purchaseGirl(Long userId, Integer girlId) {
+    public boolean purchaseGirl(Long userId, Integer girlId, String receipt) {
+
+        try {
+            if (!verifyReceipt.verifyReceipt(receipt)) {
+                return false;
+            }
+        } catch (Exception e) {
+            logger.error("レシート認証失敗 userId=" + userId + " girlId=" + girlId);
+            return false;
+        }
 
         Date nowDate = MocoDateUtils.getNowDate();
 

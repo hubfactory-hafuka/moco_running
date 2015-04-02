@@ -6,6 +6,10 @@ import lombok.Data;
 @Data
 public class CreateUserForm {
 
-    @NotNull(message="userIdは必須です")
-    private Long userId;
+    @NotNull(message="emailは必須です")
+    private String email;
+    @NotNull(message="passwordは必須です")
+    private String password;
+    @NotNull(message="uuIdは必須です")
+    private String uuId;
 }

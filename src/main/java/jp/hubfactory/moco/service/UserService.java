@@ -1,15 +1,24 @@
 package jp.hubfactory.moco.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import jp.hubfactory.moco.bean.UserBean;
+import jp.hubfactory.moco.cache.MstGirlCache;
 import jp.hubfactory.moco.cache.MstGirlMissionCache;
+import jp.hubfactory.moco.cache.MstVoiceCache;
+import jp.hubfactory.moco.entity.MstGirl;
 import jp.hubfactory.moco.entity.MstGirlMission;
+import jp.hubfactory.moco.entity.MstVoice;
 import jp.hubfactory.moco.entity.User;
 import jp.hubfactory.moco.entity.UserGirl;
 import jp.hubfactory.moco.entity.UserGirlKey;
 import jp.hubfactory.moco.entity.UserGirlVoice;
+import jp.hubfactory.moco.entity.UserGirlVoiceKey;
+import jp.hubfactory.moco.enums.GirlType;
+import jp.hubfactory.moco.enums.UserVoiceStatus;
+import jp.hubfactory.moco.enums.VoiceType;
 import jp.hubfactory.moco.repository.UserGirlRepository;
 import jp.hubfactory.moco.repository.UserGirlVoiceRepository;
 import jp.hubfactory.moco.repository.UserRepository;
@@ -32,6 +41,10 @@ public class UserService {
     private UserGirlRepository userGirlRepository;
     @Autowired
     private MstGirlMissionCache mstGirlMissionCache;
+    @Autowired
+    private MstGirlCache mstGirlCache;
+    @Autowired
+    private MstVoiceCache mstVoiceCache;
 
     /**
      * ユーザー情報取得
@@ -80,18 +93,54 @@ public class UserService {
      * @param user
      * @return
      */
-    public User createUser(User user) {
+    public User createUser(String email, String password, String uuId) {
         Date nowDate = MocoDateUtils.getNowDate();
         Long userId = userRepository.findMaxUserId();
         userId = userId == null ? 1 : userId + 1;
-
-        User findRecord = getUser(user.getUserId());
-        if (findRecord == null) {
-            user.setUpdDatetime(nowDate);
-            user.setInsDatetime(nowDate);
-            return userRepository.save(user);
+        User user = getUser(userId);
+        if (user != null) {
+            return null;
         }
-        return null;
+        // ユーザー情報登録
+        User record = new User();
+        record.setUserId(userId);
+        record.setEmail(email);
+        record.setPassword(password);
+        record.setGirlId(1);
+        record.setTotalCount(0);
+        record.setTotalDistance(0.000d);
+        record.setUpdDatetime(nowDate);
+        record.setInsDatetime(nowDate);
+        userRepository.save(record);
+
+        List<MstGirl> normalGirls = mstGirlCache.getGirlTypeList(GirlType.NORMAL.getKey());
+        for (MstGirl mstGirl : normalGirls) {
+
+            // ユーザーガールの登録
+            this.insertUserGirl(userId, mstGirl.getGirlId());
+
+            // ユーザーガールボイス情報登録
+            List<UserGirlVoice> insertRecords = new ArrayList<>();
+            List<MstVoice> voiceList = mstVoiceCache.getVoiceList(mstGirl.getGirlId());
+            for (MstVoice mstVoice : voiceList) {
+
+                if (VoiceType.NORMAL.getKey().equals(mstVoice.getType())) {
+                    continue;
+                }
+                UserGirlVoiceKey key = new UserGirlVoiceKey(userId, mstGirl.getGirlId(), mstVoice.getKey().getVoiceId());
+                UserGirlVoice userGirlVoiceRecord = new UserGirlVoice();
+                userGirlVoiceRecord.setKey(key);
+                userGirlVoiceRecord.setStatus(UserVoiceStatus.OFF.getKey());
+                userGirlVoiceRecord.setUpdDatetime(nowDate);
+                userGirlVoiceRecord.setInsDatetime(nowDate);
+                insertRecords.add(userGirlVoiceRecord);
+            }
+
+            // バルクインサート
+            userGirlVoiceRepository.save(insertRecords);
+        }
+
+        return record;
     }
 
     /**

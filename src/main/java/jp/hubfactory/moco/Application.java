@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
 
 @SpringBootApplication
+//@EnableCaching
  public class Application extends SpringBootServletInitializer implements CommandLineRunner {
 
 //    private static final Logger logger = LoggerFactory.getLogger(Application.class);
@@ -45,7 +46,19 @@ import org.springframework.boot.context.web.SpringBootServletInitializer;
         mstVoiceCache.load();
         mstVoiceSetCache.load();
         mstGirlMissionCache.load();
+//        logger.info("1 -->" + mstVoiceRepository.findByKeyGirlId(1));
+//        logger.info("1 -->" + mstVoiceRepository.findByKeyGirlId(1));
+//        logger.info("1 -->" + mstVoiceRepository.findByKeyGirlId(1));
+//        logger.info("1 -->" + mstVoiceRepository.findByKeyGirlId(1));
+//        logger.info("1 -->" + mstVoiceRepository.findByKeyGirlId(1));
+//        logger.info("1 -->" + mstVoiceRepository.findByKeyGirlId(1));
+//        logger.info("1 -->" + mstVoiceRepository.findByKeyGirlId(1));
         logger.info("master load end.");
     }
+
+//    @Bean
+//    public CacheManager cacheManager() {
+//        return new ConcurrentMapCacheManager("mstVoiceCache");
+//    }
 
 }

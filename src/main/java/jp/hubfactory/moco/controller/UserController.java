@@ -3,6 +3,7 @@ package jp.hubfactory.moco.controller;
 import jp.hubfactory.moco.bean.UserBean;
 import jp.hubfactory.moco.entity.User;
 import jp.hubfactory.moco.entity.UserGirl;
+import jp.hubfactory.moco.form.CreateUserForm;
 import jp.hubfactory.moco.form.GetUserForm;
 import jp.hubfactory.moco.form.GirlFavoriteForm;
 import jp.hubfactory.moco.service.UserService;
@@ -35,8 +36,8 @@ public class UserController {
      */
     @RequestMapping(value = "/add-user", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
-    public User createUser(@Validated @RequestBody User user) {
-        return userService.createUser(user);
+    public User createUser(@Validated @RequestBody CreateUserForm form) {
+        return userService.createUser(form.getEmail(), form.getPassword(), form.getUuId());
     }
 
     /**

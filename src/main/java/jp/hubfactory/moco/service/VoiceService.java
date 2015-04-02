@@ -11,6 +11,7 @@ import jp.hubfactory.moco.entity.MstVoice;
 import jp.hubfactory.moco.entity.UserGirlVoice;
 import jp.hubfactory.moco.enums.UserVoiceStatus;
 import jp.hubfactory.moco.enums.VoiceType;
+import jp.hubfactory.moco.repository.MstVoiceRepository;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.BeanUtils;
@@ -25,6 +26,8 @@ public class VoiceService {
     private MstVoiceCache mstVoiceCache;
     @Autowired
     private UserService userService;
+    @Autowired
+    private MstVoiceRepository mstVoiceRepository;
 
     /**
      * ガール音声情報を取得する

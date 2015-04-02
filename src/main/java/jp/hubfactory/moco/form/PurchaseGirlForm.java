@@ -10,4 +10,6 @@ public class PurchaseGirlForm {
     private Long userId;
     @NotNull(message="girlIdは必須です")
     private Integer girlId;
+    @NotNull(message="receiptは必須です")
+    private String receipt;
 }
