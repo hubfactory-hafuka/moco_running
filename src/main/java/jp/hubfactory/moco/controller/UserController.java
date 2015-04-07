@@ -6,6 +6,7 @@ import jp.hubfactory.moco.entity.UserGirl;
 import jp.hubfactory.moco.form.CreateUserForm;
 import jp.hubfactory.moco.form.GetUserForm;
 import jp.hubfactory.moco.form.GirlFavoriteForm;
+import jp.hubfactory.moco.form.LoginForm;
 import jp.hubfactory.moco.service.UserService;
 
 import org.slf4j.Logger;
@@ -38,6 +39,20 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public User createUser(@Validated @RequestBody CreateUserForm form) {
         return userService.createUser(form.getEmail(), form.getPassword(), form.getUuId());
+    }
+
+    /**
+     * ログイン
+     * @param form
+     * @return
+     */
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public ResponseEntity<UserBean> login(@Validated @RequestBody LoginForm form) {
+        UserBean userBean = userService.login(form.getEmail(), form.getPassword(), form.getUuId());
+        if (userBean == null) {
+            return new ResponseEntity<UserBean>(userBean, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<UserBean>(userBean, HttpStatus.OK);
     }
 
     /**

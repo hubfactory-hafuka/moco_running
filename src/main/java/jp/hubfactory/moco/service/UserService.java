@@ -47,6 +47,22 @@ public class UserService {
     private MstVoiceCache mstVoiceCache;
 
     /**
+     * ログイン処理
+     * @param email
+     * @param password
+     * @param uuId
+     * @return
+     */
+    public UserBean login(String email, String password, String uuId) {
+        // ユーザー情報取得
+        User user = userRepository.findByEmailAndPassword(email, password);
+        if (user == null) {
+            return null;
+        }
+        return this.getUserBean(user.getUserId());
+    }
+
+    /**
      * ユーザー情報取得
      * @param userId
      * @return
@@ -101,7 +117,9 @@ public class UserService {
         if (user != null) {
             return null;
         }
+        // ***************************************************************************//
         // ユーザー情報登録
+        // ***************************************************************************//
         User record = new User();
         record.setUserId(userId);
         record.setEmail(email);
@@ -116,7 +134,9 @@ public class UserService {
         List<MstGirl> normalGirls = mstGirlCache.getGirlTypeList(GirlType.NORMAL.getKey());
         for (MstGirl mstGirl : normalGirls) {
 
+            // ***************************************************************************//
             // ユーザーガールの登録
+            // ***************************************************************************//
             this.insertUserGirl(userId, mstGirl.getGirlId());
 
             // ユーザーガールボイス情報登録
@@ -136,7 +156,9 @@ public class UserService {
                 insertRecords.add(userGirlVoiceRecord);
             }
 
-            // バルクインサート
+            // ***************************************************************************//
+            // ユーザーガールボイス情報登録
+            // ***************************************************************************//
             userGirlVoiceRepository.save(insertRecords);
         }
 
