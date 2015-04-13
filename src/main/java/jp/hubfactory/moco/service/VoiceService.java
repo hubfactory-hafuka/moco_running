@@ -58,6 +58,7 @@ public class VoiceService {
             BeanUtils.copyProperties(mstVocie.getKey(), bean);
             BeanUtils.copyProperties(mstVocie, bean);
             bean.setStatus(UserVoiceStatus.ON.getKey());
+            bean.setVoiceFileId(bean.getGirlId() + "_" + bean.getVoiceId());
 
             if (!VoiceType.NORMAL.getKey().equals(mstVocie.getType())) {
                 Integer voiceId = mstVocie.getKey().getVoiceId();

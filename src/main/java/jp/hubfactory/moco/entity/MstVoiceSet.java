@@ -23,9 +23,9 @@ public class MstVoiceSet implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @EmbeddedId
-    private MstVoiceSetKey mstVoiceSetKey;
+    private MstVoiceSetKey key;
     @Column
-    private Integer setId;
+    private Integer price;
     @Column
     @Temporal(TemporalType.TIMESTAMP)
     private Date updDatetime;

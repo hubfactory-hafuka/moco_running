@@ -4,6 +4,7 @@ import jp.hubfactory.moco.cache.MstGirlCache;
 import jp.hubfactory.moco.cache.MstGirlMissionCache;
 import jp.hubfactory.moco.cache.MstVoiceCache;
 import jp.hubfactory.moco.cache.MstVoiceSetCache;
+import jp.hubfactory.moco.cache.MstVoiceSetDetailCache;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -30,6 +31,8 @@ import org.springframework.boot.context.web.SpringBootServletInitializer;
     @Autowired
     private MstVoiceSetCache mstVoiceSetCache;
     @Autowired
+    private MstVoiceSetDetailCache mstVoiceSetDetailCache;
+    @Autowired
     private MstGirlMissionCache mstGirlMissionCache;
 
     public static void main(String[] args) {
@@ -45,6 +48,7 @@ import org.springframework.boot.context.web.SpringBootServletInitializer;
         mstGirlCache.load();
         mstVoiceCache.load();
         mstVoiceSetCache.load();
+        mstVoiceSetDetailCache.load();
         mstGirlMissionCache.load();
 //        logger.info("1 -->" + mstVoiceRepository.findByKeyGirlId(1));
 //        logger.info("1 -->" + mstVoiceRepository.findByKeyGirlId(1));

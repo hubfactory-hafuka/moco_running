@@ -6,18 +6,25 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jp.hubfactory.moco.bean.VoiceSetBean;
+import jp.hubfactory.moco.bean.VoiceSetDetailBean;
 import jp.hubfactory.moco.cache.MstGirlCache;
 import jp.hubfactory.moco.cache.MstVoiceCache;
 import jp.hubfactory.moco.cache.MstVoiceSetCache;
+import jp.hubfactory.moco.cache.MstVoiceSetDetailCache;
 import jp.hubfactory.moco.entity.MstGirl;
 import jp.hubfactory.moco.entity.MstVoice;
 import jp.hubfactory.moco.entity.MstVoiceSet;
+import jp.hubfactory.moco.entity.MstVoiceSetDetail;
 import jp.hubfactory.moco.entity.UserGirlVoice;
 import jp.hubfactory.moco.entity.UserGirlVoiceKey;
+import jp.hubfactory.moco.enums.PurchaseType;
 import jp.hubfactory.moco.enums.UserVoiceStatus;
+import jp.hubfactory.moco.enums.VoiceSituation;
 import jp.hubfactory.moco.enums.VoiceType;
 import jp.hubfactory.moco.purchase.VerifyReceipt;
 import jp.hubfactory.moco.repository.UserGirlVoiceRepository;
+import jp.hubfactory.moco.repository.UserPurchaseHistoryRepository;
 import jp.hubfactory.moco.util.MocoDateUtils;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -36,11 +43,15 @@ public class PurchaseService {
     @Autowired
     private MstVoiceSetCache mstVoiceSetCache;
     @Autowired
+    private MstVoiceSetDetailCache mstVoiceSetDetailCache;
+    @Autowired
     private MstGirlCache mstGirlCache;
     @Autowired
     private MstVoiceCache mstVoiceCache;
     @Autowired
     private UserGirlVoiceRepository userGirlVoiceRepository;
+    @Autowired
+    private UserPurchaseHistoryRepository userPurchaseHistoryRepository;
     @Autowired
     private UserService userService;
     @Autowired
@@ -65,18 +76,18 @@ public class PurchaseService {
         }
 
         // ボイスセットリスト取得
-        List<MstVoiceSet> mstVoiceSetList = mstVoiceSetCache.getVoiceSet(setId);
+        List<MstVoiceSetDetail> mstVoiceSetList = mstVoiceSetDetailCache.getVoiceSetDetail(setId);
         if (CollectionUtils.isEmpty(mstVoiceSetList)) {
             return false;
         }
 
         // ガールＩＤ
-        Integer girlId = mstVoiceSetList.get(0).getMstVoiceSetKey().getGirlId();
+        Integer girlId = mstVoiceSetList.get(0).getKey().getGirlId();
 
         // ボイスIDのSetオブジェクト生成
         Set<Integer> voiceIdSet = new HashSet<Integer>();
-        for (MstVoiceSet mstVoiceSet : mstVoiceSetList) {
-            voiceIdSet.add(mstVoiceSet.getMstVoiceSetKey().getVoiceId());
+        for (MstVoiceSetDetail mstVoiceSet : mstVoiceSetList) {
+            voiceIdSet.add(mstVoiceSet.getKey().getVoiceId());
         }
 
         // ユーザーのボイス情報取得
@@ -92,14 +103,51 @@ public class PurchaseService {
         } else {
 
             Date nowDate = MocoDateUtils.getNowDate();
-            for (MstVoiceSet mstVoiceSet : mstVoiceSetList) {
-                UserGirlVoiceKey key = new UserGirlVoiceKey(userId, girlId, mstVoiceSet.getMstVoiceSetKey().getVoiceId());
+            for (MstVoiceSetDetail mstVoiceSet : mstVoiceSetList) {
+                UserGirlVoiceKey key = new UserGirlVoiceKey(userId, girlId, mstVoiceSet.getKey().getVoiceId());
                 UserGirlVoice record = new UserGirlVoice(key, UserVoiceStatus.ON.getKey(), nowDate,nowDate);
                 userGirlVoiceRepository.save(record);
             }
         }
 
         return true;
+    }
+
+
+    public List<VoiceSetBean> getVoiceSetList(Long userId, Integer girlId) {
+
+        List<VoiceSetBean> voiceSetBeans = new ArrayList<VoiceSetBean>();
+
+        List<MstVoiceSet> voiceSetList = mstVoiceSetCache.getVoiceSetListByGirlId(girlId);
+        for (MstVoiceSet mstVoiceSet : voiceSetList) {
+
+            Integer count = userPurchaseHistoryRepository.selectCountByKey(userId, PurchaseType.VOICE.getKey(), mstVoiceSet.getKey().getSetId());
+
+            VoiceSetBean voiceSetBean = new VoiceSetBean();
+            voiceSetBean.setSetId(mstVoiceSet.getKey().getSetId());
+            voiceSetBean.setGirlId(girlId);
+            voiceSetBean.setPrice(mstVoiceSet.getPrice());
+            voiceSetBean.setHoldFlg(count <= 0 ? false : true);
+
+            List<VoiceSetDetailBean> detailBeans = new ArrayList<>();
+            List<MstVoiceSetDetail> mstVoiceSetList = mstVoiceSetDetailCache.getVoiceSetDetailList(mstVoiceSet.getKey().getSetId(), mstVoiceSet.getKey().getGirlId());
+            for (MstVoiceSetDetail mstVoiceSetDetail : mstVoiceSetList) {
+
+                MstVoice mstVoice =mstVoiceCache.getMstVoice(mstVoiceSetDetail.getKey().getGirlId(), mstVoiceSetDetail.getKey().getVoiceId());
+                String situationName = VoiceSituation.valueOf(mstVoice.getSituation()).getName();
+
+                VoiceSetDetailBean detailBean = new VoiceSetDetailBean();
+                detailBean.setSituationName(situationName);
+                detailBean.setWord(mstVoice.getWord());
+                detailBean.setVoiceFileId(mstVoice.getKey().getGirlId() + "_" + mstVoice.getKey().getVoiceId());
+                detailBeans.add(detailBean);
+            }
+
+            voiceSetBean.setSetDetailList(detailBeans);
+            voiceSetBeans.add(voiceSetBean);
+        }
+
+        return voiceSetBeans;
     }
 
     /**
@@ -123,7 +171,7 @@ public class PurchaseService {
 
         // ガール情報取得
         MstGirl mstGirl = mstGirlCache.getGirl(girlId);
-        if (mstGirl == null) {
+        if (mstGirl == null || !MocoDateUtils.isWithin(mstGirl.getStartDatetime(), mstGirl.getEndDatetime())) {
             return false;
         }
         // 台詞一覧取得

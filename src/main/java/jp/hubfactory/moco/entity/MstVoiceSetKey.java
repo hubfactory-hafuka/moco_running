@@ -17,9 +17,8 @@ public class MstVoiceSetKey implements Serializable {
 
     /** serialVersionUID */
     private static final long serialVersionUID = 1L;
-
+    @Column
+    private Integer setId;
     @Column
     private Integer girlId;
-    @Column
-    private Integer voiceId;
 }

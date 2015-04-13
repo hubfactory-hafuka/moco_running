@@ -8,7 +8,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,10 +26,7 @@ public class User implements Serializable {
     @Column
     private Long userId;
     @Column
-    @NotNull
-    private String email;
-    @Column
-    private String password;
+    private String token;
     @Column
     private String name;
     @Column

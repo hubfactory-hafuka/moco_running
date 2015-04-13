@@ -9,6 +9,7 @@ public class UserGirlVoiceBean implements Serializable {
     /** serialVersionUID */
     private static final long serialVersionUID = 1L;
 
+    private String voiceFileId;
     private Integer girlId;
     private Integer voiceId;
     private String word;

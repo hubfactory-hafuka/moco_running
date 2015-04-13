@@ -2,6 +2,7 @@ package jp.hubfactory.moco.cache;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,10 +22,11 @@ public class MstVoiceSetCache {
 
     private List<MstVoiceSet> list;
 
-    private Map<Integer, List<MstVoiceSet>> setIdKeyListMap;
+    private Map<Integer, List<MstVoiceSet>> girlIdKeyListMap;
 
     public void load() {
         list = repository.findAll();
+        this.sort();
         this.createData();
     }
 
@@ -32,21 +34,31 @@ public class MstVoiceSetCache {
         return list;
     }
 
-    public List<MstVoiceSet> getVoiceSet(Integer setId) {
-        if (setIdKeyListMap == null) {
+    public List<MstVoiceSet> getVoiceSetListByGirlId(Integer girlId) {
+        if (girlIdKeyListMap == null) {
             this.load();
         }
-        return setIdKeyListMap.get(setId);
+        return girlIdKeyListMap.get(girlId);
+    }
+
+    private void sort() {
+        Collections.sort(list, new Comparator<MstVoiceSet>() {
+            @Override
+            public int compare(MstVoiceSet o1, MstVoiceSet o2) {
+                return o1.getKey().getSetId().compareTo(o2.getKey().getSetId());
+            }
+        });
     }
 
     private void createData() {
         Map<Integer, List<MstVoiceSet>> tmpMap = new HashMap<>();
+
         for (MstVoiceSet mst : list) {
-            Integer key = mst.getSetId();
+            Integer key = mst.getKey().getGirlId();
             List<MstVoiceSet> list = (tmpMap.containsKey(key)) ? tmpMap.get(key) : new ArrayList<MstVoiceSet>();
             list.add(mst);
             tmpMap.put(key, list);
         }
-        setIdKeyListMap = Collections.unmodifiableMap(tmpMap);
+        girlIdKeyListMap = Collections.unmodifiableMap(tmpMap);
     }
 }

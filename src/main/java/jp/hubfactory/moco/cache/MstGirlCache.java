@@ -3,13 +3,16 @@ package jp.hubfactory.moco.cache;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import jp.hubfactory.moco.entity.MstGirl;
 import jp.hubfactory.moco.repository.MstGirlRepository;
+import jp.hubfactory.moco.util.MocoDateUtils;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +37,23 @@ public class MstGirlCache {
 
     public List<MstGirl> getAll() {
         return list;
+    }
+
+    public List<MstGirl> getActiveGirls() {
+        if (CollectionUtils.isEmpty(list)) {
+            load();
+        }
+
+        List<MstGirl> activeList = new ArrayList<>();
+
+        Date nowDate = MocoDateUtils.getNowDate();
+
+        for (MstGirl mstGirl : list) {
+            if (MocoDateUtils.isWithin(mstGirl.getStartDatetime(), mstGirl.getEndDatetime(), nowDate)) {
+                activeList.add(mstGirl);
+            }
+        }
+        return activeList;
     }
 
     public MstGirl getGirl(Integer girlId) {

@@ -39,6 +39,14 @@ public class MstGirl implements Serializable {
     @Column
     private String cv;
     @Column
+    private Integer price;
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date startDatetime;
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date endDatetime;
+    @Column
     @Temporal(TemporalType.TIMESTAMP)
     private Date updDatetime;
     @Column

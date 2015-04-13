@@ -7,6 +7,7 @@ import jp.hubfactory.moco.form.CreateUserForm;
 import jp.hubfactory.moco.form.GetUserForm;
 import jp.hubfactory.moco.form.GirlFavoriteForm;
 import jp.hubfactory.moco.form.LoginForm;
+import jp.hubfactory.moco.form.LogoutForm;
 import jp.hubfactory.moco.service.UserService;
 
 import org.slf4j.Logger;
@@ -38,7 +39,7 @@ public class UserController {
     @RequestMapping(value = "/add-user", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.CREATED)
     public User createUser(@Validated @RequestBody CreateUserForm form) {
-        return userService.createUser(form.getEmail(), form.getPassword(), form.getUuId());
+        return userService.createUser(form.getLoginId(), form.getPassword(), form.getServiceId(), form.getUuId(), form.getUserName());
     }
 
     /**
@@ -47,12 +48,26 @@ public class UserController {
      * @return
      */
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseEntity<UserBean> login(@Validated @RequestBody LoginForm form) {
-        UserBean userBean = userService.login(form.getEmail(), form.getPassword(), form.getUuId());
-        if (userBean == null) {
-            return new ResponseEntity<UserBean>(userBean, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Boolean> login(@Validated @RequestBody LoginForm form) {
+        boolean loginFlg = userService.login(form.getLoginId(), form.getPassword(), form.getServiceId(), form.getUuId());
+        if (!loginFlg) {
+            return new ResponseEntity<Boolean>(loginFlg, HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<UserBean>(userBean, HttpStatus.OK);
+        return new ResponseEntity<Boolean>(loginFlg, HttpStatus.OK);
+    }
+
+    /**
+     * ログアウト
+     * @param form
+     * @return
+     */
+    @RequestMapping(value = "/logout", method = RequestMethod.POST)
+    public ResponseEntity<Boolean> logout(@Validated @RequestBody LogoutForm form) {
+        boolean logoutFlg = userService.logout(form.getUserId(), form.getToken());
+        if (!logoutFlg) {
+            return new ResponseEntity<Boolean>(logoutFlg, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<Boolean>(logoutFlg, HttpStatus.OK);
     }
 
     /**

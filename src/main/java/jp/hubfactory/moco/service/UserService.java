@@ -12,6 +12,8 @@ import jp.hubfactory.moco.entity.MstGirl;
 import jp.hubfactory.moco.entity.MstGirlMission;
 import jp.hubfactory.moco.entity.MstVoice;
 import jp.hubfactory.moco.entity.User;
+import jp.hubfactory.moco.entity.UserAuth;
+import jp.hubfactory.moco.entity.UserAuthKey;
 import jp.hubfactory.moco.entity.UserGirl;
 import jp.hubfactory.moco.entity.UserGirlKey;
 import jp.hubfactory.moco.entity.UserGirlVoice;
@@ -19,11 +21,13 @@ import jp.hubfactory.moco.entity.UserGirlVoiceKey;
 import jp.hubfactory.moco.enums.GirlType;
 import jp.hubfactory.moco.enums.UserVoiceStatus;
 import jp.hubfactory.moco.enums.VoiceType;
+import jp.hubfactory.moco.repository.UserAuthRepository;
 import jp.hubfactory.moco.repository.UserGirlRepository;
 import jp.hubfactory.moco.repository.UserGirlVoiceRepository;
 import jp.hubfactory.moco.repository.UserRepository;
 import jp.hubfactory.moco.util.MocoDateUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,27 +44,63 @@ public class UserService {
     @Autowired
     private UserGirlRepository userGirlRepository;
     @Autowired
+    private UserAuthRepository userAuthRepository;
+    @Autowired
     private MstGirlMissionCache mstGirlMissionCache;
     @Autowired
     private MstGirlCache mstGirlCache;
     @Autowired
     private MstVoiceCache mstVoiceCache;
+    @Autowired
+    private TokenService tokenService;
 
     /**
      * ログイン処理
-     * @param email
+     * @param loginId
      * @param password
+     * @param serviceId
      * @param uuId
      * @return
      */
-    public UserBean login(String email, String password, String uuId) {
-        // ユーザー情報取得
-        User user = userRepository.findByEmailAndPassword(email, password);
-        if (user == null) {
-            return null;
+    public boolean login(String loginId, String password, String serviceId, String uuId) {
+        UserAuth userAuth = userAuthRepository.findOne(new UserAuthKey(loginId, password, serviceId));
+        if (userAuth == null) {
+            return false;
         }
-        return this.getUserBean(user.getUserId());
+
+        User user = this.getUser(userAuth.getUserId());
+        if (user == null) {
+            return false;
+        }
+
+        user.setToken(tokenService.getToken(uuId));
+        user.setUpdDatetime(MocoDateUtils.getNowDate());
+
+        return true;
     }
+
+    /**
+     * ログインアウト処理
+     * @param userId
+     * @param token
+     * @return
+     */
+    public boolean logout(Long userId, String token) {
+
+        User user = this.getUser(userId);
+        if (user == null) {
+            return false;
+        }
+        // tokenチェック
+        if (StringUtils.equals(user.getToken(), token)) {
+            user.setToken(null);
+            user.setUpdDatetime(MocoDateUtils.getNowDate());
+        } else {
+            return false;
+        }
+        return true;
+    }
+
 
     /**
      * ユーザー情報取得
@@ -76,18 +116,18 @@ public class UserService {
         }
         UserBean userBean = new UserBean();
         BeanUtils.copyProperties(user, userBean);
-        userBean.setTotalDistance(String.format("%.3f", user.getTotalDistance()));
+        userBean.setTotalDistance(String.format("%.2f", user.getTotalDistance()));
 
         // ユーザーガール情報取得
         UserGirl userGirl = this.getUserGirl(userId, user.getGirlId());
-        userBean.setGirlDistance(userGirl == null ? "0.000" : String.format("%.3f", userGirl.getDistance()));
+        userBean.setGirlDistance(userGirl == null ? "0.00" : String.format("%.2f", userGirl.getDistance()));
 
         // 次の達成報酬までの残りの距離を求める
         List<MstGirlMission> mstGirlMissionList = mstGirlMissionCache.getGirlMissions(user.getGirlId());
         for (MstGirlMission mstGirlMission : mstGirlMissionList) {
             if (userGirl.getDistance().doubleValue() < mstGirlMission.getDistance().doubleValue()) {
                 double remainDistance = mstGirlMission.getDistance().doubleValue() - userGirl.getDistance().doubleValue();
-                userBean.setRemainDistance(String.format("%.3f", remainDistance));
+                userBean.setRemainDistance(String.format("%.2f", remainDistance));
                 break;
             }
         }
@@ -109,27 +149,49 @@ public class UserService {
      * @param user
      * @return
      */
-    public User createUser(String email, String password, String uuId) {
+    public User createUser(String loginId, String password, String serviceId, String uuId, String userName) {
+
+        // 認証情報取得
+        UserAuthKey userAuthKey = new UserAuthKey(loginId, password, serviceId);
+        UserAuth checkUserAuth = userAuthRepository.findOne(userAuthKey);
+        if (checkUserAuth != null) {
+            return this.getUser(checkUserAuth.getUserId());
+        }
+
+        // トークン取得
+        String token = tokenService.getToken(uuId);
+
         Date nowDate = MocoDateUtils.getNowDate();
         Long userId = userRepository.findMaxUserId();
         userId = userId == null ? 1 : userId + 1;
-        User user = getUser(userId);
+        User user = this.getUser(userId);
         if (user != null) {
-            return null;
+            return user;
         }
         // ***************************************************************************//
         // ユーザー情報登録
         // ***************************************************************************//
         User record = new User();
         record.setUserId(userId);
-        record.setEmail(email);
-        record.setPassword(password);
         record.setGirlId(1);
+        record.setToken(token);
+        record.setName(userName);
         record.setTotalCount(0);
-        record.setTotalDistance(0.000d);
+        record.setTotalDistance(0.00d);
+        record.setTotalAvgTime("0'00\"");
         record.setUpdDatetime(nowDate);
         record.setInsDatetime(nowDate);
         userRepository.save(record);
+
+        // ***************************************************************************//
+        // ユーザー認証登録
+        // ***************************************************************************//
+        UserAuth userAuth = new UserAuth();
+        userAuth.setKey(userAuthKey);
+        userAuth.setUserId(userId);
+        userAuth.setUpdDatetime(nowDate);
+        userAuth.setInsDatetime(nowDate);
+        userAuthRepository.save(userAuth);
 
         List<MstGirl> normalGirls = mstGirlCache.getGirlTypeList(GirlType.NORMAL.getKey());
         for (MstGirl mstGirl : normalGirls) {
@@ -215,7 +277,7 @@ public class UserService {
         UserGirlKey userGirlKey = new UserGirlKey(userId, girlId);
         UserGirl userGirl = new UserGirl();
         userGirl.setKey(userGirlKey);
-        userGirl.setDistance(0.000d);
+        userGirl.setDistance(0.00d);
         userGirl.setUpdDatetime(nowDate);
         userGirl.setInsDatetime(nowDate);
         userGirlRepository.save(userGirl);

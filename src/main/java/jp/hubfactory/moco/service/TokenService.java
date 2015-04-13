@@ -1,5 +1,7 @@
 package jp.hubfactory.moco.service;
 
+import jp.hubfactory.moco.util.CryptUtils;
+
 import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
@@ -12,8 +14,13 @@ public class TokenService {
      * トークン取得
      * @return
      */
-    String getToken() {
-        return RandomStringUtils.randomAlphanumeric(TOKEN_LENGTH);
+    String getToken(String uuId) {
+        String randomValue = RandomStringUtils.randomAlphanumeric(TOKEN_LENGTH);
+        try {
+            return CryptUtils.encrypt(uuId, randomValue);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }

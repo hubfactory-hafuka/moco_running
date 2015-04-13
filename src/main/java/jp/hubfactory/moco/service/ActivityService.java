@@ -29,7 +29,6 @@ import jp.hubfactory.moco.form.RegistUserActivityLocationForm;
 import jp.hubfactory.moco.repository.UserActivityDetailRepository;
 import jp.hubfactory.moco.repository.UserActivityRepository;
 import jp.hubfactory.moco.repository.UserGirlVoiceRepository;
-import jp.hubfactory.moco.repository.UserRepository;
 import jp.hubfactory.moco.util.MocoDateUtils;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -58,8 +57,6 @@ public class ActivityService {
 //    private UserGirlRepository userGirlRepository;
     @Autowired
     private UserGirlVoiceRepository userGirlVoiceRepository;
-    @Autowired
-    private UserRepository userRepository;
     @Autowired
     private MstGirlMissionCache mstGirlMissionCache;
     @Autowired
@@ -101,7 +98,7 @@ public class ActivityService {
             bean.setUserId(userActivity.getKey().getUserId());
             bean.setActivityId(userActivity.getKey().getActivityId());
             bean.setRunDate(MocoDateUtils.convertString(userActivity.getRunDate(), MocoDateUtils.DATE_FORMAT_yyyyMMdd_SLASH));
-            bean.setDistance(String.format("%.3f", userActivity.getDistance()));
+            bean.setDistance(String.format("%.2f", userActivity.getDistance()));
             bean.setTime(userActivity.getTime());
             bean.setAvgTime(userActivity.getAvgTime());
 
@@ -201,7 +198,7 @@ public class ActivityService {
         // ユーザーのアクティビティ一覧取得
         List<UserActivity> userActivities = userActivityRepository.findByKeyUserIdOrderByKeyActivityIdDesc(form.getUserId());
 
-        int totalSecond = MocoDateUtils.convertTimeStrToSecond(form.getTime());;
+        int totalSecond = MocoDateUtils.convertTimeStrToSecond(form.getTime());
         double totalDistance = form.getDistance();
 
         for (UserActivity userActivity : userActivities) {
@@ -250,20 +247,62 @@ public class ActivityService {
 
     }
 
+    /**
+     * アクティビティ詳細情報登録
+     * @param form
+     * @param activityId
+     * @param nowDate
+     */
     private void registActivityDetail(RegistUserActivityForm form, Integer activityId, Date nowDate) {
 
         List<RegistUserActivityDetailForm> detailList = form.getDetails();
         List<UserActivityDetail> detailRecords = new ArrayList<>(detailList.size());
         int index = 1;
+        int beforeTimeElapsedSec = 0;
+        int beforeLapTime = 0;
         for (RegistUserActivityDetailForm registUserActivityDetailForm : detailList) {
+
+            // 距離
+            Integer distance = registUserActivityDetailForm.getDistance();
+
+            // 経過時間(秒)
+            int timeElapsed = registUserActivityDetailForm.getTimeElapsed();
+            // 経過時間(秒) → 経過時間(hh:mm:ss)
+            String timeElapsedStr = MocoDateUtils.convertSecToHMS(timeElapsed);
+
+            String incDecTime = null;
+
+            String lapTime = null;
+
+            if (distance.intValue() == 1) {
+                lapTime = timeElapsedStr;
+                beforeLapTime = timeElapsed;
+            } else {
+                int lapTimeSec = timeElapsed - beforeTimeElapsedSec;
+                lapTime = MocoDateUtils.convertSecToHMS(lapTimeSec);
+
+                String sign = "";
+                if (beforeLapTime == lapTimeSec) {
+                    incDecTime = "0'00\"";
+                } else {
+                    int nowIncDecTimeSec = beforeLapTime - lapTimeSec;
+                    incDecTime = MocoDateUtils.convertSecToLapTimeString(nowIncDecTimeSec);
+                    sign = nowIncDecTimeSec < 0 ? "+" : "-";
+
+                }
+                incDecTime = sign + incDecTime;
+                beforeLapTime = lapTimeSec;
+
+            }
+            beforeTimeElapsedSec = timeElapsed;
 
             UserActivityDetailKey detailKey = new UserActivityDetailKey(form.getUserId(), activityId, index);
             UserActivityDetail detailRecord = new UserActivityDetail();
             detailRecord.setKey(detailKey);
             detailRecord.setDistance(registUserActivityDetailForm.getDistance());
-            detailRecord.setIncDecTime(registUserActivityDetailForm.getIncDecTime());
-            detailRecord.setLapTime(registUserActivityDetailForm.getLapTime());
-            detailRecord.setTimeElapsed(registUserActivityDetailForm.getTimeElapsed());
+            detailRecord.setIncDecTime(incDecTime);
+            detailRecord.setLapTime(lapTime);
+            detailRecord.setTimeElapsed(timeElapsedStr);
             detailRecord.setUpdDatetime(nowDate);
             detailRecord.setInsDatetime(nowDate);
             detailRecords.add(detailRecord);
@@ -358,7 +397,7 @@ public class ActivityService {
      * @param nowDate
      */
     private void updateUser(RegistUserActivityForm form, String totalAvgTime, Date nowDate) {
-        User user = userRepository.findOne(form.getUserId());
+        User user = userService.getUser(form.getUserId());
         if (user == null) {
             throw new IllegalStateException("user is null. userId=" + form.getUserId());
         }

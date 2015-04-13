@@ -6,6 +6,7 @@ import java.util.Date;
 
 import lombok.NoArgsConstructor;
 
+import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang.time.FastDateFormat;
 
@@ -93,25 +94,25 @@ public class MocoDateUtils {
         return timeStr;
     }
 
-    public static String convertAvgTimeString(Date date, String format) {
-
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-
-        int minute = cal.get(Calendar.MINUTE);
-        int second = cal.get(Calendar.SECOND);
-
-        String timeStr = null;
-
-        if (minute > 0) {
-            timeStr = String.format("%01d'%02d\"", minute, second);
-        } else if (second > 0) {
-            timeStr = String.format("%01d\"", second);
-        } else {
-            timeStr = "";
-        }
-        return timeStr;
-    }
+//    public static String convertAvgTimeString(Date date, String format) {
+//
+//        Calendar cal = Calendar.getInstance();
+//        cal.setTime(date);
+//
+//        int minute = cal.get(Calendar.MINUTE);
+//        int second = cal.get(Calendar.SECOND);
+//
+//        String timeStr = null;
+//
+//        if (minute > 0) {
+//            timeStr = String.format("%01d'%02d\"", minute, second);
+//        } else if (second > 0) {
+//            timeStr = String.format("%01d\"", second);
+//        } else {
+//            timeStr = "";
+//        }
+//        return timeStr;
+//    }
 
     public static String convertTimeString(int minute, int second) {
 
@@ -159,5 +160,77 @@ public class MocoDateUtils {
         // 平均時間文字列
         String avgTime = MocoDateUtils.convertTimeString(avgMinute, avgSecond);
         return avgTime;
+    }
+
+    /**
+     * 指定された日付が、指定された開始日時、終了日時の期間内かどうかを判定する
+     *
+     * <pre>
+     * 秒単位まで確認し、境界を含む(start <= now <= end の場合true).
+     * 開始日時が nullの場合、最小値。 終了日時が nullの場合、最大値として判断する
+     * </pre>
+     *
+     * @param startDate 開始日時(任意)
+     * @param endDate 終了日時(任意)
+     * @param targetDate ターゲット日時
+     * @return 判定結果
+     */
+    public static boolean isWithin(Date startDate, Date endDate, Date targetDate) {
+        Validate.notNull(targetDate);
+        if ((startDate == null) && (endDate == null)) {
+            return true;
+        }
+        long start = startDate != null ? startDate.getTime() / 1000L : Long.MIN_VALUE;
+        long end = endDate != null ? endDate.getTime() / 1000L : Long.MAX_VALUE;
+        long now = targetDate.getTime() / 1000L;
+        return start <= now && now <= end;
+    }
+
+    public static boolean isWithin(Date startDate, Date endDate) {
+        return isWithin(startDate, endDate, getNowDate());
+    }
+
+    public static String convertSecToHMS(int sec) {
+
+        int HH = sec / 3600;
+        int mm = sec % 3600 / 60;
+        int ss = sec % 60;
+
+        String timeStr = null;
+
+        if (HH > 0) {
+            timeStr = String.format("%01d:%02d:%02d", HH, mm, ss);
+        } else if (mm > 0) {
+            timeStr = String.format("%02d:%02d", mm, ss);
+        } else if (ss > 0) {
+            timeStr = String.format("0'%02d", ss);
+        } else {
+            timeStr = "";
+        }
+
+        return timeStr;
+    }
+
+    public static String convertSecToLapTimeString(int sec) {
+
+        int second = sec < 0 ? sec * -1 : sec;
+
+        int HH = second / 3600;
+        int mm = second % 3600 / 60;
+        int ss = second % 60;
+
+        String timeStr = null;
+
+        if (HH > 0) {
+            timeStr = String.format("%01'%02d'%02d\"", HH, mm, ss);
+        } else if (mm > 0) {
+            timeStr = String.format("%01d'%02d\"", mm, ss);
+        } else if (ss > 0) {
+            timeStr = String.format("0'%02d\"", ss);
+        } else {
+            timeStr = "";
+        }
+
+        return timeStr;
     }
 }

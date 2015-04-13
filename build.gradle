@@ -38,6 +38,7 @@ dependencies {
     compile("commons-codec:commons-codec:1.2")
     compile("commons-lang:commons-lang:2.6")
     compile("org.projectlombok:lombok:1.16.2")
+    compile("commons-beanutils:commons-beanutils:1.8.3")
     // MySQL
     compile("mysql:mysql-connector-java:5.1.34")
 

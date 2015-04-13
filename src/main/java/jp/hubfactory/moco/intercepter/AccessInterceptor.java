@@ -3,15 +3,23 @@ package jp.hubfactory.moco.intercepter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import jp.hubfactory.moco.service.UserService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 public class AccessInterceptor implements HandlerInterceptor {
 
+    @Autowired
+    private UserService userService;
+
+
     @Override
     public boolean preHandle(HttpServletRequest request,
             HttpServletResponse response, Object handler) throws Exception {
         // TODO 自動生成されたメソッド・スタブ
+
         System.out.println("preHandle");
 
         return true;

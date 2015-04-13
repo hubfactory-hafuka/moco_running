@@ -10,8 +10,4 @@ import org.springframework.stereotype.Repository;
 public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select max(u.userId) from User u")
     public Long findMaxUserId();
-
-
-    public User findByEmailAndPassword(String email, String password);
-
 }
