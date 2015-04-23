@@ -1,13 +1,12 @@
 package jp.hubfactory.moco.controller;
 
+import jp.hubfactory.moco.bean.LoginBean;
 import jp.hubfactory.moco.bean.UserBean;
 import jp.hubfactory.moco.entity.User;
 import jp.hubfactory.moco.entity.UserGirl;
-import jp.hubfactory.moco.form.CreateUserForm;
-import jp.hubfactory.moco.form.GetUserForm;
+import jp.hubfactory.moco.form.BaseForm;
 import jp.hubfactory.moco.form.GirlFavoriteForm;
 import jp.hubfactory.moco.form.LoginForm;
-import jp.hubfactory.moco.form.LogoutForm;
 import jp.hubfactory.moco.service.UserService;
 
 import org.slf4j.Logger;
@@ -36,25 +35,28 @@ public class UserController {
      * @param user
      * @return
      */
-    @RequestMapping(value = "/add-user", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.CREATED)
-    public User createUser(@Validated @RequestBody CreateUserForm form) {
-        return userService.createUser(form.getLoginId(), form.getPassword(), form.getServiceId(), form.getUuId(), form.getUserName());
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public ResponseEntity<LoginBean> login(@Validated @RequestBody LoginForm form) {
+        LoginBean loginBean = userService.createUser(form.getLoginId(), form.getPassword(), form.getServiceId(), form.getUuId(), form.getUserName());
+        if (loginBean == null) {
+            return new ResponseEntity<LoginBean>(loginBean, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<LoginBean>(loginBean, HttpStatus.OK);
     }
 
-    /**
-     * ログイン
-     * @param form
-     * @return
-     */
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseEntity<Boolean> login(@Validated @RequestBody LoginForm form) {
-        boolean loginFlg = userService.login(form.getLoginId(), form.getPassword(), form.getServiceId(), form.getUuId());
-        if (!loginFlg) {
-            return new ResponseEntity<Boolean>(loginFlg, HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<Boolean>(loginFlg, HttpStatus.OK);
-    }
+//    /**
+//     * ログイン
+//     * @param form
+//     * @return
+//     */
+//    @RequestMapping(value = "/login", method = RequestMethod.POST)
+//    public ResponseEntity<LoginBean> login(@Validated @RequestBody LoginForm form) {
+//        LoginBean loginBean = userService.login(form.getLoginId(), form.getPassword(), form.getServiceId(), form.getUuId());
+//        if (loginBean == null) {
+//            return new ResponseEntity<LoginBean>(loginBean, HttpStatus.BAD_REQUEST);
+//        }
+//        return new ResponseEntity<LoginBean>(loginBean, HttpStatus.OK);
+//    }
 
     /**
      * ログアウト
@@ -62,7 +64,7 @@ public class UserController {
      * @return
      */
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
-    public ResponseEntity<Boolean> logout(@Validated @RequestBody LogoutForm form) {
+    public ResponseEntity<Boolean> logout(@Validated @RequestBody BaseForm form) {
         boolean logoutFlg = userService.logout(form.getUserId(), form.getToken());
         if (!logoutFlg) {
             return new ResponseEntity<Boolean>(logoutFlg, HttpStatus.BAD_REQUEST);
@@ -77,7 +79,7 @@ public class UserController {
      */
     @RequestMapping(value = "/get-user", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    public UserBean getUser(@Validated @RequestBody GetUserForm form) {
+    public UserBean getUser(@Validated @RequestBody BaseForm form) {
         return userService.getUserBean(form.getUserId());
     }
 

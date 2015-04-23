@@ -3,11 +3,11 @@ package jp.hubfactory.moco.form;
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class GirlFavoriteForm {
-    @NotNull(message="userIdは必須です")
-    private Long userId;
+@EqualsAndHashCode(callSuper=false)
+public class GirlFavoriteForm extends BaseForm {
     @NotNull(message="girlIdは必須です")
     private Integer girlId;
 }

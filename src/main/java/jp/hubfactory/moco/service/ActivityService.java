@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jp.hubfactory.moco.bean.ActivityResultBean;
 import jp.hubfactory.moco.bean.MissionClearVoiceBean;
 import jp.hubfactory.moco.bean.UserActivityBean;
 import jp.hubfactory.moco.bean.UserActivityDetailBean;
@@ -22,6 +23,8 @@ import jp.hubfactory.moco.entity.UserActivityDetailKey;
 import jp.hubfactory.moco.entity.UserActivityKey;
 import jp.hubfactory.moco.entity.UserGirl;
 import jp.hubfactory.moco.entity.UserGirlVoice;
+import jp.hubfactory.moco.entity.UserGoal;
+import jp.hubfactory.moco.entity.UserGoalKey;
 import jp.hubfactory.moco.enums.UserVoiceStatus;
 import jp.hubfactory.moco.form.RegistUserActivityDetailForm;
 import jp.hubfactory.moco.form.RegistUserActivityForm;
@@ -29,6 +32,7 @@ import jp.hubfactory.moco.form.RegistUserActivityLocationForm;
 import jp.hubfactory.moco.repository.UserActivityDetailRepository;
 import jp.hubfactory.moco.repository.UserActivityRepository;
 import jp.hubfactory.moco.repository.UserGirlVoiceRepository;
+import jp.hubfactory.moco.repository.UserGoalRepository;
 import jp.hubfactory.moco.util.MocoDateUtils;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -53,8 +57,8 @@ public class ActivityService {
     private UserActivityRepository userActivityRepository;
     @Autowired
     private UserActivityDetailRepository userActivityDetailRepository;
-//    @Autowired
-//    private UserGirlRepository userGirlRepository;
+    @Autowired
+    private UserGoalRepository userGoalRepository;
     @Autowired
     private UserGirlVoiceRepository userGirlVoiceRepository;
     @Autowired
@@ -137,7 +141,7 @@ public class ActivityService {
      * @param time 時間
      * @return
      */
-    public List<MissionClearVoiceBean> addUserActivity(RegistUserActivityForm form) {
+    public ActivityResultBean addUserActivity(RegistUserActivityForm form) {
 
         // 現在日時取得
         Date nowDate = MocoDateUtils.getNowDate();
@@ -184,6 +188,11 @@ public class ActivityService {
         // ***************************************************************************//
         this.updateUser(form, totalAvgTime, nowDate);
 
+        // ***************************************************************************//
+        // 新記録更新処理
+        // ***************************************************************************//
+        boolean isNewRecord = this.updateUserGoal(form.getUserId(), form.getGoalDistance(), form.getGoalTime(), form.getDistance());
+
         List<MissionClearVoiceBean> beanList = new ArrayList<MissionClearVoiceBean>();
         for (MstVoice mstVoice : clearVoiceList) {
             MissionClearVoiceBean bean = new MissionClearVoiceBean();
@@ -191,7 +200,11 @@ public class ActivityService {
             BeanUtils.copyProperties(mstVoice, bean);
             beanList.add(bean);
         }
-        return beanList;
+
+        ActivityResultBean resultBean = new ActivityResultBean();
+        resultBean.setNewRecordFlg(isNewRecord);
+        resultBean.setMissionClearVoiceBeans(beanList);
+        return resultBean;
     }
 
     private String calcTotalAvgTime(RegistUserActivityForm form) {
@@ -339,7 +352,7 @@ public class ActivityService {
 
                     double targetDistance = mstGirlMission.getDistance();
 
-                    if (targetDistance <= form.getDistance()) {
+                    if (targetDistance <= form.getDistance().doubleValue()) {
                         UserGirlVoice userGirlVoice = userGirlVoiceMap.get(mstGirlMission.getKey().getVoiceId());
                         userGirlVoice.setStatus(UserVoiceStatus.ON.getKey());
                         userGirlVoice.setUpdDatetime(nowDate);
@@ -405,5 +418,47 @@ public class ActivityService {
         user.setTotalCount(user.getTotalCount().intValue() + 1);
         user.setTotalAvgTime(totalAvgTime);
         user.setUpdDatetime(nowDate);
+    }
+
+
+    /**
+     * 新記録更新処理
+     * @param userId
+     * @param gaolDistance
+     * @param goalTime
+     * @return true:新記録達成/false:達成してない
+     */
+    private boolean updateUserGoal(Long userId, Integer goalDistance, Integer goalTime, Double distance) {
+
+        // どちらかしか設定されていない場合
+        if (goalDistance == null || goalTime == null) {
+            return false;
+        }
+
+        // 走行距離が目標距離に達していない場合
+        if (Double.valueOf(String.valueOf(goalDistance)) > distance) {
+            return false;
+        }
+
+        Date nowDate = MocoDateUtils.getNowDate();
+
+        UserGoal userGoal = userGoalRepository.findOne(new UserGoalKey(userId, goalDistance));
+        if (userGoal == null) {
+            userGoal = new UserGoal();
+            userGoal.setKey(new UserGoalKey(userId, goalDistance));
+            userGoal.setTime(goalTime);
+            userGoal.setUpdDatetime(nowDate);
+            userGoal.setInsDatetime(nowDate);
+            userGoalRepository.save(userGoal);
+            return false;
+        } else {
+            // 記録更新
+            if (goalTime < userGoal.getTime().intValue()) {
+                userGoal.setTime(goalTime);
+                userGoal.setUpdDatetime(nowDate);
+                return true;
+            }
+        }
+        return false;
     }
 }

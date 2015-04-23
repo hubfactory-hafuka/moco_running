@@ -14,14 +14,10 @@ public class AccessInterceptor implements HandlerInterceptor {
     @Autowired
     private UserService userService;
 
-
     @Override
-    public boolean preHandle(HttpServletRequest request,
-            HttpServletResponse response, Object handler) throws Exception {
-        // TODO 自動生成されたメソッド・スタブ
-
-        System.out.println("preHandle");
-
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+//        String body = request.getReader().lines().reduce("", (accumulator, actual) -> accumulator + actual);
+//        System.out.println("####BODY###=" + body);
         return true;
     }
 
@@ -30,9 +26,7 @@ public class AccessInterceptor implements HandlerInterceptor {
             HttpServletResponse response, Object handler,
             ModelAndView modelAndView) throws Exception {
         // TODO 自動生成されたメソッド・スタブ
-
         System.out.println("postHandle");
-
     }
 
     @Override
@@ -41,7 +35,6 @@ public class AccessInterceptor implements HandlerInterceptor {
             throws Exception {
         // TODO 自動生成されたメソッド・スタブ
         System.out.println("afterCompletion");
-
     }
 
 }

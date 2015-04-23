@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import jp.hubfactory.moco.bean.LoginBean;
 import jp.hubfactory.moco.bean.UserBean;
 import jp.hubfactory.moco.cache.MstGirlCache;
 import jp.hubfactory.moco.cache.MstGirlMissionCache;
@@ -62,21 +63,21 @@ public class UserService {
      * @param uuId
      * @return
      */
-    public boolean login(String loginId, String password, String serviceId, String uuId) {
+    public LoginBean login(String loginId, String password, String serviceId, String uuId) {
         UserAuth userAuth = userAuthRepository.findOne(new UserAuthKey(loginId, password, serviceId));
         if (userAuth == null) {
-            return false;
+            return null;
         }
 
         User user = this.getUser(userAuth.getUserId());
         if (user == null) {
-            return false;
+            return null;
         }
 
         user.setToken(tokenService.getToken(uuId));
         user.setUpdDatetime(MocoDateUtils.getNowDate());
 
-        return true;
+        return new LoginBean(user.getUserId(), user.getToken(), user.getGirlId());
     }
 
     /**
@@ -149,25 +150,35 @@ public class UserService {
      * @param user
      * @return
      */
-    public User createUser(String loginId, String password, String serviceId, String uuId, String userName) {
+    public LoginBean createUser(String loginId, String password, String serviceId, String uuId, String userName) {
 
-        // 認証情報取得
-        UserAuthKey userAuthKey = new UserAuthKey(loginId, password, serviceId);
-        UserAuth checkUserAuth = userAuthRepository.findOne(userAuthKey);
-        if (checkUserAuth != null) {
-            return this.getUser(checkUserAuth.getUserId());
+        LoginBean loginBean = this.login(loginId, password, serviceId, uuId);
+        if (loginBean != null) {
+            return loginBean;
         }
+
+//        // 認証情報取得
+//        UserAuthKey userAuthKey = new UserAuthKey(loginId, password, serviceId);
+//        UserAuth checkUserAuth = userAuthRepository.findOne(userAuthKey);
+//        if (checkUserAuth != null) {
+//            User user = this.getUser(checkUserAuth.getUserId());
+//            return new LoginBean(user.getUserId(), user.getToken(), user.getGirlId());
+//        }
 
         // トークン取得
         String token = tokenService.getToken(uuId);
+        if (token == null) {
+            return null;
+        }
 
         Date nowDate = MocoDateUtils.getNowDate();
         Long userId = userRepository.findMaxUserId();
         userId = userId == null ? 1 : userId + 1;
-        User user = this.getUser(userId);
-        if (user != null) {
-            return user;
-        }
+
+//        User user = this.getUser(userId);
+//        if (user != null) {
+//            return new LoginBean(user.getUserId(), user.getToken(), user.getGirlId());
+//        }
         // ***************************************************************************//
         // ユーザー情報登録
         // ***************************************************************************//
@@ -187,7 +198,7 @@ public class UserService {
         // ユーザー認証登録
         // ***************************************************************************//
         UserAuth userAuth = new UserAuth();
-        userAuth.setKey(userAuthKey);
+        userAuth.setKey(new UserAuthKey(loginId, password, serviceId));
         userAuth.setUserId(userId);
         userAuth.setUpdDatetime(nowDate);
         userAuth.setInsDatetime(nowDate);
@@ -223,8 +234,7 @@ public class UserService {
             // ***************************************************************************//
             userGirlVoiceRepository.save(insertRecords);
         }
-
-        return record;
+        return new LoginBean(record.getUserId(), record.getToken(), record.getGirlId());
     }
 
     /**

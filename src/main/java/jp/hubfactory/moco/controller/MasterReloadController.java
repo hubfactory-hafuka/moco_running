@@ -34,7 +34,7 @@ public class MasterReloadController {
     private MstGirlMissionCache mstGirlMissionCache;
 
     @RequestMapping(value = "/fa8ed510d830fff7ec209533e38fc3e2106404f02a4b504ced14e969be0151913645e126beaf136f", method = RequestMethod.POST)
-    public ResponseEntity<Boolean> index() {
+    public ResponseEntity<Boolean> masterReload() {
         logger.info("master reload start.");
         mstGirlCache.load();
         mstVoiceCache.load();

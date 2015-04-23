@@ -13,6 +13,7 @@ DROP TABLE IF EXISTS user_activity_detail;
 DROP TABLE IF EXISTS user_auth;
 DROP TABLE IF EXISTS user_girl;
 DROP TABLE IF EXISTS user_girl_voice;
+DROP TABLE IF EXISTS user_goal;
 DROP TABLE IF EXISTS user_purchase_history;
 
 
@@ -165,6 +166,17 @@ CREATE TABLE user_girl_voice
     upd_datetime datetime NOT NULL,
     ins_datetime datetime NOT NULL,
     PRIMARY KEY (user_id, girl_id, voice_id)
+);
+
+
+CREATE TABLE user_goal
+(
+    user_id bigint NOT NULL,
+    distance int NOT NULL,
+    time int NOT NULL,
+    upd_datetime datetime NOT NULL,
+    ins_datetime datetime NOT NULL,
+    PRIMARY KEY (user_id, distance)
 );
 
 

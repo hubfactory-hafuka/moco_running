@@ -2,10 +2,10 @@ package jp.hubfactory.moco.controller;
 
 import java.util.List;
 
-import jp.hubfactory.moco.bean.MissionClearVoiceBean;
+import jp.hubfactory.moco.bean.ActivityResultBean;
 import jp.hubfactory.moco.bean.UserActivityBean;
+import jp.hubfactory.moco.form.BaseForm;
 import jp.hubfactory.moco.form.RegistUserActivityForm;
-import jp.hubfactory.moco.form.UserActivityForm;
 import jp.hubfactory.moco.service.ActivityService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class ActivityController {
      * @return
      */
     @RequestMapping(value = "/get-user-activity", method = RequestMethod.POST)
-    public ResponseEntity<List<UserActivityBean>> getActivity(@Validated @RequestBody UserActivityForm form) {
+    public ResponseEntity<List<UserActivityBean>> getActivity(@Validated @RequestBody BaseForm form) {
         List<UserActivityBean> userActivities = activityServie.getUserActivities(form.getUserId());
         return new ResponseEntity<List<UserActivityBean>>(userActivities, HttpStatus.OK);
     }
@@ -44,8 +44,11 @@ public class ActivityController {
      * @return
      */
     @RequestMapping(value = "/add-user-activity", method = RequestMethod.POST)
-    public ResponseEntity<List<MissionClearVoiceBean>> addActivity(@Validated @RequestBody RegistUserActivityForm form) {
-        List<MissionClearVoiceBean> missionClearVoiceBeans = activityServie.addUserActivity(form);
-        return new ResponseEntity<List<MissionClearVoiceBean>>(missionClearVoiceBeans, HttpStatus.OK);
+    public ResponseEntity<ActivityResultBean> addActivity(@Validated @RequestBody RegistUserActivityForm form) {
+        ActivityResultBean resultBean = activityServie.addUserActivity(form);
+        if (resultBean == null) {
+            return new ResponseEntity<ActivityResultBean>(resultBean, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<ActivityResultBean>(resultBean, HttpStatus.OK);
     }
 }

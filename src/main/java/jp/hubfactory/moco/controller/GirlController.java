@@ -4,8 +4,8 @@ import java.util.List;
 
 import jp.hubfactory.moco.bean.GirlBean;
 import jp.hubfactory.moco.entity.User;
+import jp.hubfactory.moco.form.BaseForm;
 import jp.hubfactory.moco.form.GetGirlForm;
-import jp.hubfactory.moco.form.GetGirlsForm;
 import jp.hubfactory.moco.service.GirlService;
 import jp.hubfactory.moco.service.UserService;
 
@@ -54,7 +54,7 @@ public class GirlController {
      * @return
      */
     @RequestMapping(value = "/get-list", method = RequestMethod.POST)
-    public ResponseEntity<List<GirlBean>> getList(@Validated @RequestBody GetGirlsForm form) {
+    public ResponseEntity<List<GirlBean>> getList(@Validated @RequestBody BaseForm form) {
 
         List<GirlBean> girlList = null;
 
@@ -69,5 +69,4 @@ public class GirlController {
 
         return new ResponseEntity<List<GirlBean>>(girlList, HttpStatus.OK);
     }
-
 }

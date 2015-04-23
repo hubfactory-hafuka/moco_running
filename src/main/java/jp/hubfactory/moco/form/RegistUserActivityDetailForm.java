@@ -9,6 +9,4 @@ public class RegistUserActivityDetailForm {
     private Integer distance;
     /** 経過時間 */
     private Integer timeElapsed;
-//    /** ラップタイム */
-//    private String lapTime;
 }
