@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(value="/activity")
-public class ActivityController {
+public class ActivityController extends BaseController {
 
     @Autowired
     private ActivityService activityServie;
@@ -34,7 +34,14 @@ public class ActivityController {
      */
     @RequestMapping(value = "/get-user-activity", method = RequestMethod.POST)
     public ResponseEntity<List<UserActivityBean>> getActivity(@Validated @RequestBody BaseForm form) {
-        List<UserActivityBean> userActivities = activityServie.getUserActivities(form.getUserId());
+
+        List<UserActivityBean> userActivities = null;
+
+        if (!super.checkAuth(form.getUserId(), form.getToken())) {
+            return new ResponseEntity<List<UserActivityBean>>(userActivities, HttpStatus.UNAUTHORIZED);
+
+        }
+        userActivities = activityServie.getUserActivities(form.getUserId());
         return new ResponseEntity<List<UserActivityBean>>(userActivities, HttpStatus.OK);
     }
 
@@ -45,7 +52,14 @@ public class ActivityController {
      */
     @RequestMapping(value = "/add-user-activity", method = RequestMethod.POST)
     public ResponseEntity<ActivityResultBean> addActivity(@Validated @RequestBody RegistUserActivityForm form) {
-        ActivityResultBean resultBean = activityServie.addUserActivity(form);
+
+        ActivityResultBean resultBean = null;
+
+        if (!super.checkAuth(form.getUserId(), form.getToken())) {
+            return new ResponseEntity<ActivityResultBean>(resultBean, HttpStatus.UNAUTHORIZED);
+        }
+
+        resultBean = activityServie.addUserActivity(form);
         if (resultBean == null) {
             return new ResponseEntity<ActivityResultBean>(resultBean, HttpStatus.BAD_REQUEST);
         }

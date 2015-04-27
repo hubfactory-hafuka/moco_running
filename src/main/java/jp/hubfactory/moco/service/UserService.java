@@ -157,14 +157,6 @@ public class UserService {
             return loginBean;
         }
 
-//        // 認証情報取得
-//        UserAuthKey userAuthKey = new UserAuthKey(loginId, password, serviceId);
-//        UserAuth checkUserAuth = userAuthRepository.findOne(userAuthKey);
-//        if (checkUserAuth != null) {
-//            User user = this.getUser(checkUserAuth.getUserId());
-//            return new LoginBean(user.getUserId(), user.getToken(), user.getGirlId());
-//        }
-
         // トークン取得
         String token = tokenService.getToken(uuId);
         if (token == null) {
@@ -175,10 +167,6 @@ public class UserService {
         Long userId = userRepository.findMaxUserId();
         userId = userId == null ? 1 : userId + 1;
 
-//        User user = this.getUser(userId);
-//        if (user != null) {
-//            return new LoginBean(user.getUserId(), user.getToken(), user.getGirlId());
-//        }
         // ***************************************************************************//
         // ユーザー情報登録
         // ***************************************************************************//
@@ -234,6 +222,7 @@ public class UserService {
             // ***************************************************************************//
             userGirlVoiceRepository.save(insertRecords);
         }
+
         return new LoginBean(record.getUserId(), record.getToken(), record.getGirlId());
     }
 

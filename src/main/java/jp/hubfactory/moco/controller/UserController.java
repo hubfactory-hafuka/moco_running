@@ -2,11 +2,11 @@ package jp.hubfactory.moco.controller;
 
 import jp.hubfactory.moco.bean.LoginBean;
 import jp.hubfactory.moco.bean.UserBean;
-import jp.hubfactory.moco.entity.User;
 import jp.hubfactory.moco.entity.UserGirl;
 import jp.hubfactory.moco.form.BaseForm;
 import jp.hubfactory.moco.form.GirlFavoriteForm;
 import jp.hubfactory.moco.form.LoginForm;
+import jp.hubfactory.moco.service.InformationService;
 import jp.hubfactory.moco.service.UserService;
 
 import org.slf4j.Logger;
@@ -18,17 +18,18 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value="/user")
-public class UserController {
+public class UserController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private InformationService informationService;
 
     /**
      * ユーザー登録
@@ -78,9 +79,17 @@ public class UserController {
      * @return
      */
     @RequestMapping(value = "/get-user", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.OK)
-    public UserBean getUser(@Validated @RequestBody BaseForm form) {
-        return userService.getUserBean(form.getUserId());
+    public ResponseEntity<UserBean> getUser(@Validated @RequestBody BaseForm form) {
+
+        UserBean userBean = null;
+
+        if (!super.checkAuth(form.getUserId(), form.getToken())) {
+            return new ResponseEntity<UserBean>(userBean, HttpStatus.UNAUTHORIZED);
+
+        }
+        userBean = userService.getUserBean(form.getUserId());
+        userBean.setInfoBean(informationService.getInformation());
+        return new ResponseEntity<UserBean>(userBean, HttpStatus.OK);
     }
 
     /**
@@ -90,13 +99,11 @@ public class UserController {
      */
     @RequestMapping(value = "/upd-favorite", method = RequestMethod.POST)
     public ResponseEntity<Boolean> updFavorite(@RequestBody GirlFavoriteForm form) {
-        // ユーザー情報取得
-        User user = userService.getUser(form.getUserId());
-        if (user == null) {
-            logger.error("user is null. userId=" + form.getUserId());
-            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
-        }
 
+        if (!super.checkAuth(form.getUserId(), form.getToken())) {
+            return new ResponseEntity<Boolean>(false, HttpStatus.UNAUTHORIZED);
+
+        }
         // ガール所持しているかの判定
         UserGirl userGirl = userService.getUserGirl(form.getUserId(), form.getGirlId());
         if (userGirl == null) {

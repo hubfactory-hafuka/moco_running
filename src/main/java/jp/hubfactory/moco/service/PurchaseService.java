@@ -22,6 +22,7 @@ import jp.hubfactory.moco.enums.PurchaseType;
 import jp.hubfactory.moco.enums.UserVoiceStatus;
 import jp.hubfactory.moco.enums.VoiceSituation;
 import jp.hubfactory.moco.enums.VoiceType;
+import jp.hubfactory.moco.logger.MocoLogger;
 import jp.hubfactory.moco.purchase.VerifyReceipt;
 import jp.hubfactory.moco.repository.UserGirlVoiceRepository;
 import jp.hubfactory.moco.repository.UserPurchaseHistoryRepository;
@@ -65,6 +66,9 @@ public class PurchaseService {
      * @return
      */
     public boolean purchaseVoiceSet(Long userId, Integer setId, String receipt) {
+
+        // 課金ログ出力
+        MocoLogger.purchaseLog(userId, PurchaseType.VOICE, setId, receipt);
 
         try {
             if (!verifyReceipt.verifyReceipt(receipt)) {
@@ -113,7 +117,12 @@ public class PurchaseService {
         return true;
     }
 
-
+    /**
+     * ボイスセットリスト取得
+     * @param userId
+     * @param girlId
+     * @return
+     */
     public List<VoiceSetBean> getVoiceSetList(Long userId, Integer girlId) {
 
         List<VoiceSetBean> voiceSetBeans = new ArrayList<VoiceSetBean>();
@@ -157,6 +166,9 @@ public class PurchaseService {
      * @return
      */
     public boolean purchaseGirl(Long userId, Integer girlId, String receipt) {
+
+        // 課金ログ出力
+        MocoLogger.purchaseLog(userId, PurchaseType.GIRL, girlId, receipt);
 
         try {
             if (!verifyReceipt.verifyReceipt(receipt)) {

@@ -16,5 +16,4 @@ public class LoginBean implements Serializable {
     private Long userId;
     private String token;
     private Integer girlId;
-
 }

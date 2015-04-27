@@ -2,6 +2,7 @@ package jp.hubfactory.moco;
 
 import jp.hubfactory.moco.cache.MstGirlCache;
 import jp.hubfactory.moco.cache.MstGirlMissionCache;
+import jp.hubfactory.moco.cache.MstInformationCache;
 import jp.hubfactory.moco.cache.MstVoiceCache;
 import jp.hubfactory.moco.cache.MstVoiceSetCache;
 import jp.hubfactory.moco.cache.MstVoiceSetDetailCache;
@@ -34,6 +35,8 @@ import org.springframework.boot.context.web.SpringBootServletInitializer;
     private MstVoiceSetDetailCache mstVoiceSetDetailCache;
     @Autowired
     private MstGirlMissionCache mstGirlMissionCache;
+    @Autowired
+    private MstInformationCache mstInformationCache;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -50,13 +53,7 @@ import org.springframework.boot.context.web.SpringBootServletInitializer;
         mstVoiceSetCache.load();
         mstVoiceSetDetailCache.load();
         mstGirlMissionCache.load();
-//        logger.info("1 -->" + mstVoiceRepository.findByKeyGirlId(1));
-//        logger.info("1 -->" + mstVoiceRepository.findByKeyGirlId(1));
-//        logger.info("1 -->" + mstVoiceRepository.findByKeyGirlId(1));
-//        logger.info("1 -->" + mstVoiceRepository.findByKeyGirlId(1));
-//        logger.info("1 -->" + mstVoiceRepository.findByKeyGirlId(1));
-//        logger.info("1 -->" + mstVoiceRepository.findByKeyGirlId(1));
-//        logger.info("1 -->" + mstVoiceRepository.findByKeyGirlId(1));
+        mstInformationCache.load();
         logger.info("master load end.");
     }
 

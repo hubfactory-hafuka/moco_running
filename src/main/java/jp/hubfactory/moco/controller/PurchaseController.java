@@ -3,7 +3,6 @@ package jp.hubfactory.moco.controller;
 import java.util.List;
 
 import jp.hubfactory.moco.bean.VoiceSetBean;
-import jp.hubfactory.moco.entity.User;
 import jp.hubfactory.moco.entity.UserGirl;
 import jp.hubfactory.moco.form.GetVoiceSetForm;
 import jp.hubfactory.moco.form.PurchaseGirlForm;
@@ -24,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value="/purchase")
-public class PurchaseController {
+public class PurchaseController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(PurchaseController.class);
 
@@ -41,11 +40,9 @@ public class PurchaseController {
     @RequestMapping(value = "/voice", method = RequestMethod.POST)
     public ResponseEntity<Boolean> voice(@Validated @RequestBody PurchaseVoiceForm form) {
 
-        // ユーザー情報取得
-        User user = userService.getUser(form.getUserId());
-        if (user == null) {
-            logger.error("user is null. userId=" + form.getUserId());
-            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
+        if (!super.checkAuth(form.getUserId(), form.getToken())) {
+            return new ResponseEntity<Boolean>(false, HttpStatus.UNAUTHORIZED);
+
         }
         boolean execFlg = purchaseService.purchaseVoiceSet(form.getUserId(), form.getSetId(), form.getReceipt());
         return new ResponseEntity<Boolean>(execFlg, execFlg == true ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
@@ -62,11 +59,9 @@ public class PurchaseController {
 
         List<VoiceSetBean> voiceSetBeans = null;
 
-        // ユーザー情報取得
-        User user = userService.getUser(form.getUserId());
-        if (user == null) {
-            logger.error("user is null. userId=" + form.getUserId());
-            return new ResponseEntity<List<VoiceSetBean>>(voiceSetBeans, HttpStatus.BAD_REQUEST);
+        if (!super.checkAuth(form.getUserId(), form.getToken())) {
+            return new ResponseEntity<List<VoiceSetBean>>(voiceSetBeans, HttpStatus.UNAUTHORIZED);
+
         }
         voiceSetBeans = purchaseService.getVoiceSetList(form.getUserId(), form.getGirlId());
 
@@ -81,13 +76,10 @@ public class PurchaseController {
     @RequestMapping(value = "/girl", method = RequestMethod.POST)
     public ResponseEntity<Boolean> girl(@Validated @RequestBody PurchaseGirlForm form) {
 
-        // ユーザー情報取得
-        User user = userService.getUser(form.getUserId());
-        if (user == null) {
-            logger.error("user is null. userId=" + form.getUserId());
-            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
-        }
+        if (!super.checkAuth(form.getUserId(), form.getToken())) {
+            return new ResponseEntity<Boolean>(false, HttpStatus.UNAUTHORIZED);
 
+        }
         // ユーザーガール情報取得
         UserGirl userGirl = userService.getUserGirl(form.getUserId(), form.getGirlId());
         // 既に購入済みの場合

@@ -17,4 +17,5 @@ public class UserBean implements Serializable {
     public Integer girlId;
     public String girlDistance;
     public String remainDistance;
+    public InformationBean infoBean;
 }

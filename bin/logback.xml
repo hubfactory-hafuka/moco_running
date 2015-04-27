@@ -7,18 +7,49 @@
         </encoder>
     </appender>
     <!--
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>/usr/local/moco/logs/moco.log</file>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/usr/local/moco/logs/moco.log.%d{yyyy-MM-dd}</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
         <encoder>
-            <charset>UTF-8</charset>
             <pattern>%d{yyyy/MM/dd HH:mm:ss} %-5level %msg%n</pattern>
         </encoder>
     </appender>
      -->
+    <appender name="PURCHASE_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/usr/local/moco/logs/purchase.log.%d{yyyy-MM-dd}</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy/MM/dd HH:mm:ss} %-5level %msg%n</pattern>
+        </encoder>
+    </appender>
+    <!--
+    <appender name="CREATE_USER_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>/usr/local/moco/logs/create_user.log.%d{yyyy-MM-dd}</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy/MM/dd HH:mm:ss} %-5level %msg%n</pattern>
+        </encoder>
+    </appender>
+    -->
+    <logger name="purchaseLog" level="info">
+        <appender-ref ref="PURCHASE_LOG" />
+    </logger>
+
+    <!--
+    <logger name="createUserLog" level="info">
+        <appender-ref ref="CREATE_USER_LOG" />
+    </logger>
+     -->
     <root>
-        <level value="INFO" />
+        <level value="ERROR" />
         <appender-ref ref="STDOUT" />
-        <!-- <appender-ref ref="FILE" /> -->
+        <!-- <appender-ref ref="FILE" />  -->
     </root>
 
 </configuration>

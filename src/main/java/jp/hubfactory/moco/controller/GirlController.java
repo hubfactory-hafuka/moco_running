@@ -3,7 +3,6 @@ package jp.hubfactory.moco.controller;
 import java.util.List;
 
 import jp.hubfactory.moco.bean.GirlBean;
-import jp.hubfactory.moco.entity.User;
 import jp.hubfactory.moco.form.BaseForm;
 import jp.hubfactory.moco.form.GetGirlForm;
 import jp.hubfactory.moco.service.GirlService;
@@ -22,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value="/girl")
-public class GirlController {
+public class GirlController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(GirlController.class);
 
@@ -39,8 +38,15 @@ public class GirlController {
     @RequestMapping(value = "/get-one", method = RequestMethod.POST)
     public ResponseEntity<GirlBean> getOne(@Validated @RequestBody GetGirlForm form) {
 
+        GirlBean girlBean = null;
+
+        if (!super.checkAuth(form.getUserId(), form.getToken())) {
+            return new ResponseEntity<GirlBean>(girlBean, HttpStatus.UNAUTHORIZED);
+
+        }
+
         // ガール情報取得
-        GirlBean girlBean = girlService.selectMstGirl(form.getUserId(), form.getGirlId());
+        girlBean = girlService.selectMstGirl(form.getUserId(), form.getGirlId());
         if (girlBean == null) {
             logger.error("mstGirl is null. girlId=" + form.getGirlId());
             return new ResponseEntity<GirlBean>(girlBean, HttpStatus.BAD_REQUEST);
@@ -58,13 +64,10 @@ public class GirlController {
 
         List<GirlBean> girlList = null;
 
-        // ユーザー情報取得
-        User user = userService.getUser(form.getUserId());
-        if (user == null) {
-            logger.error("user is null. userId=" + form.getUserId());
-            return new ResponseEntity<List<GirlBean>>(girlList, HttpStatus.BAD_REQUEST);
-        }
+        if (!super.checkAuth(form.getUserId(), form.getToken())) {
+            return new ResponseEntity<List<GirlBean>>(girlList, HttpStatus.UNAUTHORIZED);
 
+        }
         girlList = girlService.selectActiveGirls(form.getUserId());
 
         return new ResponseEntity<List<GirlBean>>(girlList, HttpStatus.OK);
