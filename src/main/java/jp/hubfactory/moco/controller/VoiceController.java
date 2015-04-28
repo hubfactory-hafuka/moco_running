@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value="/voice")
-public class VoiceController {
+public class VoiceController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(VoiceController.class);
 
@@ -40,8 +40,15 @@ public class VoiceController {
      */
     @RequestMapping(value = "/get-user-girl-voice", method = RequestMethod.POST)
     public ResponseEntity<List<UserGirlVoiceBean>> voice(@Validated @RequestBody UserGirlVoiceForm form) {
+
+        List<UserGirlVoiceBean> userGirlVoiceBeanList = null;
+
+        if (!super.checkAuth(form.getUserId(), form.getToken())) {
+            return new ResponseEntity<List<UserGirlVoiceBean>>(userGirlVoiceBeanList, HttpStatus.UNAUTHORIZED);
+        }
+
         // ユーザー情報取得
-        List<UserGirlVoiceBean> userGirlVoiceBeanList = voiceService.getUserGirlVoiceBeanList(form.getUserId(), form.getGirlId());
+        userGirlVoiceBeanList = voiceService.getUserGirlVoiceBeanList(form.getUserId(), form.getGirlId());
         if (CollectionUtils.isEmpty(userGirlVoiceBeanList)) {
             logger.error("userGirlVoiceBeanList is empty. userId=" + form.getUserId());
             return new ResponseEntity<List<UserGirlVoiceBean>>(userGirlVoiceBeanList, HttpStatus.BAD_REQUEST);
@@ -56,8 +63,15 @@ public class VoiceController {
      */
     @RequestMapping(value = "/get-user-run-voice", method = RequestMethod.POST)
     public ResponseEntity<Map<Integer, List<UserGirlVoiceBean>>> runVoice(@Validated @RequestBody UserGirlVoiceForm form) {
+
+        Map<Integer, List<UserGirlVoiceBean>> situationVoiceListMap = null;
+
+        if (!super.checkAuth(form.getUserId(), form.getToken())) {
+            return new ResponseEntity<Map<Integer, List<UserGirlVoiceBean>>>(situationVoiceListMap, HttpStatus.UNAUTHORIZED);
+        }
+
         // ユーザー情報取得
-        Map<Integer, List<UserGirlVoiceBean>> situationVoiceListMap = voiceService.getRunVoiceList(form.getUserId(), form.getGirlId());
+        situationVoiceListMap = voiceService.getRunVoiceList(form.getUserId(), form.getGirlId());
         if (MapUtils.isEmpty(situationVoiceListMap)) {
             logger.error("situationVoiceListMap is empty. userId=" + form.getUserId() + " girlId=" + form.getGirlId());
             return new ResponseEntity<Map<Integer, List<UserGirlVoiceBean>>>(situationVoiceListMap, HttpStatus.BAD_REQUEST);

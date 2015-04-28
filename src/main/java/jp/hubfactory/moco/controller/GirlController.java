@@ -42,7 +42,6 @@ public class GirlController extends BaseController {
 
         if (!super.checkAuth(form.getUserId(), form.getToken())) {
             return new ResponseEntity<GirlBean>(girlBean, HttpStatus.UNAUTHORIZED);
-
         }
 
         // ガール情報取得
@@ -66,7 +65,6 @@ public class GirlController extends BaseController {
 
         if (!super.checkAuth(form.getUserId(), form.getToken())) {
             return new ResponseEntity<List<GirlBean>>(girlList, HttpStatus.UNAUTHORIZED);
-
         }
         girlList = girlService.selectActiveGirls(form.getUserId());
 

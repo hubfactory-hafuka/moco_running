@@ -256,6 +256,7 @@ public class ActivityService {
             throw new IllegalStateException("JSON変換エラー:" + e.toString());
         }
         record.setLocations(locationStr);
+
         userActivityRepository.save(record);
 
     }

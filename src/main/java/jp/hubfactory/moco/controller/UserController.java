@@ -85,7 +85,6 @@ public class UserController extends BaseController {
 
         if (!super.checkAuth(form.getUserId(), form.getToken())) {
             return new ResponseEntity<UserBean>(userBean, HttpStatus.UNAUTHORIZED);
-
         }
         userBean = userService.getUserBean(form.getUserId());
         userBean.setInfoBean(informationService.getInformation());
@@ -102,7 +101,6 @@ public class UserController extends BaseController {
 
         if (!super.checkAuth(form.getUserId(), form.getToken())) {
             return new ResponseEntity<Boolean>(false, HttpStatus.UNAUTHORIZED);
-
         }
         // ガール所持しているかの判定
         UserGirl userGirl = userService.getUserGirl(form.getUserId(), form.getGirlId());

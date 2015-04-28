@@ -42,7 +42,6 @@ public class PurchaseController extends BaseController {
 
         if (!super.checkAuth(form.getUserId(), form.getToken())) {
             return new ResponseEntity<Boolean>(false, HttpStatus.UNAUTHORIZED);
-
         }
         boolean execFlg = purchaseService.purchaseVoiceSet(form.getUserId(), form.getSetId(), form.getReceipt());
         return new ResponseEntity<Boolean>(execFlg, execFlg == true ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
@@ -59,10 +58,10 @@ public class PurchaseController extends BaseController {
 
         List<VoiceSetBean> voiceSetBeans = null;
 
-        if (!super.checkAuth(form.getUserId(), form.getToken())) {
-            return new ResponseEntity<List<VoiceSetBean>>(voiceSetBeans, HttpStatus.UNAUTHORIZED);
+//        if (!super.checkAuth(form.getUserId(), form.getToken())) {
+//            return new ResponseEntity<List<VoiceSetBean>>(voiceSetBeans, HttpStatus.UNAUTHORIZED);
+//        }
 
-        }
         voiceSetBeans = purchaseService.getVoiceSetList(form.getUserId(), form.getGirlId());
 
         return new ResponseEntity<List<VoiceSetBean>>(voiceSetBeans, HttpStatus.OK);
@@ -78,8 +77,8 @@ public class PurchaseController extends BaseController {
 
         if (!super.checkAuth(form.getUserId(), form.getToken())) {
             return new ResponseEntity<Boolean>(false, HttpStatus.UNAUTHORIZED);
-
         }
+
         // ユーザーガール情報取得
         UserGirl userGirl = userService.getUserGirl(form.getUserId(), form.getGirlId());
         // 既に購入済みの場合
