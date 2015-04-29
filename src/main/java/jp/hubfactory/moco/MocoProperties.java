@@ -18,5 +18,6 @@ public class MocoProperties {
     @Data
     public static class System {
         private String itunes;
+        private String itunesSandbox;
     }
 }

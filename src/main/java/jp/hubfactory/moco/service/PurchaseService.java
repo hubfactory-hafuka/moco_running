@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jp.hubfactory.moco.MocoProperties;
 import jp.hubfactory.moco.bean.VoiceSetBean;
 import jp.hubfactory.moco.bean.VoiceSetDetailBean;
 import jp.hubfactory.moco.cache.MstGirlCache;
@@ -18,6 +19,8 @@ import jp.hubfactory.moco.entity.MstVoiceSet;
 import jp.hubfactory.moco.entity.MstVoiceSetDetail;
 import jp.hubfactory.moco.entity.UserGirlVoice;
 import jp.hubfactory.moco.entity.UserGirlVoiceKey;
+import jp.hubfactory.moco.entity.UserPurchaseHistory;
+import jp.hubfactory.moco.entity.UserPurchaseHistoryKey;
 import jp.hubfactory.moco.enums.PurchaseType;
 import jp.hubfactory.moco.enums.UserVoiceStatus;
 import jp.hubfactory.moco.enums.VoiceSituation;
@@ -57,6 +60,8 @@ public class PurchaseService {
     private UserService userService;
     @Autowired
     private VerifyReceipt verifyReceipt;
+    @Autowired
+    private MocoProperties mocoProperties;
 
     /**
      * ボイスセット購入処理
@@ -67,14 +72,36 @@ public class PurchaseService {
      */
     public boolean purchaseVoiceSet(Long userId, Integer setId, String receipt) {
 
+        Date nowDate = MocoDateUtils.getNowDate();
+
         // 課金ログ出力
         MocoLogger.purchaseLog(userId, PurchaseType.VOICE, setId, receipt);
 
         try {
-            if (!verifyReceipt.verifyReceipt(receipt)) {
+            // 本番用iTunesパスで認証
+            String itunesPath = mocoProperties.getSystem().getItunes();
+            int status = verifyReceipt.verifyReceipt(receipt, itunesPath);
+
+            logger.error("iTunesPath=" + itunesPath);
+            logger.error("status=" + status);
+
+
+            // ステータスが21007の場合、サンドボックス用パスで認証
+            if (status == 21007) {
+                itunesPath = mocoProperties.getSystem().getItunesSandbox();
+                status = verifyReceipt.verifyReceipt(receipt, itunesPath);
+
+                logger.error("iTunesPath=" + itunesPath);
+                logger.error("status=" + status);
+            }
+
+            if (status != 0) {
+                logger.error("レシート認証失敗 userId=" + userId + " setId=" + setId + " status=" + status);
                 return false;
             }
+
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error("レシート認証失敗 userId=" + userId + " setId=" + setId);
             return false;
         }
@@ -106,13 +133,18 @@ public class PurchaseService {
             }
         } else {
 
-            Date nowDate = MocoDateUtils.getNowDate();
             for (MstVoiceSetDetail mstVoiceSet : mstVoiceSetList) {
                 UserGirlVoiceKey key = new UserGirlVoiceKey(userId, girlId, mstVoiceSet.getKey().getVoiceId());
                 UserGirlVoice record = new UserGirlVoice(key, UserVoiceStatus.ON.getKey(), nowDate,nowDate);
                 userGirlVoiceRepository.save(record);
             }
         }
+
+
+        // 購入履歴登録
+        UserPurchaseHistoryKey historyKey = new UserPurchaseHistoryKey(userId, PurchaseType.VOICE.getKey(), setId);
+        UserPurchaseHistory history = new UserPurchaseHistory(historyKey, nowDate, nowDate);
+        userPurchaseHistoryRepository.save(history);
 
         return true;
     }
@@ -171,10 +203,29 @@ public class PurchaseService {
         MocoLogger.purchaseLog(userId, PurchaseType.GIRL, girlId, receipt);
 
         try {
-            if (!verifyReceipt.verifyReceipt(receipt)) {
+            // 本番用iTunesパスで認証
+            String itunesPath = mocoProperties.getSystem().getItunes();
+            int status = verifyReceipt.verifyReceipt(receipt, itunesPath);
+
+            logger.error("iTunesPath=" + itunesPath);
+            logger.error("status=" + status);
+
+
+            // ステータスが21007の場合、サンドボックス用パスで認証
+            if (status == 21007) {
+                itunesPath = mocoProperties.getSystem().getItunesSandbox();
+                status = verifyReceipt.verifyReceipt(receipt, itunesPath);
+
+                logger.error("iTunesPath=" + itunesPath);
+                logger.error("status=" + status);
+            }
+
+            if (status != 0) {
+                logger.error("レシート認証失敗 userId=" + userId + " girlId=" + girlId + " status=" + status);
                 return false;
             }
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error("レシート認証失敗 userId=" + userId + " girlId=" + girlId);
             return false;
         }

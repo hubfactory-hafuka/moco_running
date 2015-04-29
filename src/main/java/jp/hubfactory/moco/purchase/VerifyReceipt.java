@@ -9,12 +9,6 @@ import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import jp.hubfactory.moco.MocoProperties;
-import jp.hubfactory.moco.bean.PurchaseResponseBean;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,18 +21,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Component
 public class VerifyReceipt {
 
-    private static final Logger logger = LoggerFactory
-            .getLogger(VerifyReceipt.class);
+//    private static final Logger logger = LoggerFactory
+//            .getLogger(VerifyReceipt.class);
 
-    @Autowired
-    private MocoProperties mocoProperties;
-
-    public boolean verifyReceipt(String receipt) throws Exception {
+    public int verifyReceipt(String receipt, String itunesPath) throws Exception {
         int status = -1;
 
-        String path = mocoProperties.getSystem().getItunes();
+        // 本番用
+//        String path = mocoProperties.getSystem().getItunes();
         // This is the URL of the REST webservice in iTunes App Store
-        URL url = new URL(path);
+        URL url = new URL(itunesPath);
 
         // make connection, use post mode
         HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
@@ -73,25 +65,31 @@ public class VerifyReceipt {
         StringBuffer sb = new StringBuffer();
         while ((str = br.readLine()) != null) {
             sb.append(str);
-            sb.append("/n");
+//            sb.append("/n");
         }
         br.close();
         String response = sb.toString();
 
         // Deserialize response
-        ObjectMapper mapper2 = new ObjectMapper();
+//        ObjectMapper mapper2 = new ObjectMapper();
         JsonNode result = mapper.readTree(response);
-        PurchaseResponseBean bean = mapper2.convertValue(result, PurchaseResponseBean.class);
 
-        status = bean.getStatus();
-        if (status == 0) {
-            // provide content
-            return true;
-        } else {
-            // signal error, throw an exception, do your stuff honey!
-            logger.error("レシート認証エラー. status=" + status);
-            return false;
-        }
+        status = result.get("status").asInt();
+
+//        PurchaseResponseBean bean = mapper2.convertValue(result, PurchaseResponseBean.class);
+
+//        status = bean.getStatus();
+        return status;
+
+
+//        if (status == 0) {
+//            // provide content
+//            return true;
+//        } else if (status == 21007) {
+//            // signal error, throw an exception, do your stuff honey!
+//            logger.error("レシート認証エラー. status=" + status);
+//            return false;
+//        }
 
         // return status ;
 
