@@ -82,17 +82,16 @@ public class PurchaseService {
             String itunesPath = mocoProperties.getSystem().getItunes();
             int status = verifyReceipt.verifyReceipt(receipt, itunesPath);
 
-            logger.error("iTunesPath=" + itunesPath);
-            logger.error("status=" + status);
-
+//            logger.error("iTunesPath=" + itunesPath);
+//            logger.error("status=" + status);
 
             // ステータスが21007の場合、サンドボックス用パスで認証
             if (status == 21007) {
                 itunesPath = mocoProperties.getSystem().getItunesSandbox();
                 status = verifyReceipt.verifyReceipt(receipt, itunesPath);
 
-                logger.error("iTunesPath=" + itunesPath);
-                logger.error("status=" + status);
+//                logger.error("iTunesPath=" + itunesPath);
+//                logger.error("status=" + status);
             }
 
             if (status != 0) {
@@ -207,17 +206,16 @@ public class PurchaseService {
             String itunesPath = mocoProperties.getSystem().getItunes();
             int status = verifyReceipt.verifyReceipt(receipt, itunesPath);
 
-            logger.error("iTunesPath=" + itunesPath);
-            logger.error("status=" + status);
-
+//            logger.error("iTunesPath=" + itunesPath);
+//            logger.error("status=" + status);
 
             // ステータスが21007の場合、サンドボックス用パスで認証
             if (status == 21007) {
                 itunesPath = mocoProperties.getSystem().getItunesSandbox();
                 status = verifyReceipt.verifyReceipt(receipt, itunesPath);
 
-                logger.error("iTunesPath=" + itunesPath);
-                logger.error("status=" + status);
+//                logger.error("iTunesPath=" + itunesPath);
+//                logger.error("status=" + status);
             }
 
             if (status != 0) {

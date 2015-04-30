@@ -58,9 +58,9 @@ public class PurchaseController extends BaseController {
 
         List<VoiceSetBean> voiceSetBeans = null;
 
-//        if (!super.checkAuth(form.getUserId(), form.getToken())) {
-//            return new ResponseEntity<List<VoiceSetBean>>(voiceSetBeans, HttpStatus.UNAUTHORIZED);
-//        }
+        if (!super.checkAuth(form.getUserId(), form.getToken())) {
+            return new ResponseEntity<List<VoiceSetBean>>(voiceSetBeans, HttpStatus.UNAUTHORIZED);
+        }
 
         voiceSetBeans = purchaseService.getVoiceSetList(form.getUserId(), form.getGirlId());
 

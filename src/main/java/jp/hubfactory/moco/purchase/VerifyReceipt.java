@@ -21,15 +21,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Component
 public class VerifyReceipt {
 
-//    private static final Logger logger = LoggerFactory
-//            .getLogger(VerifyReceipt.class);
-
     public int verifyReceipt(String receipt, String itunesPath) throws Exception {
         int status = -1;
 
         // 本番用
-//        String path = mocoProperties.getSystem().getItunes();
-        // This is the URL of the REST webservice in iTunes App Store
         URL url = new URL(itunesPath);
 
         // make connection, use post mode
@@ -38,15 +33,6 @@ public class VerifyReceipt {
         connection.setDoOutput(true);
         connection.setAllowUserInteraction(false);
 
-        // Encode the binary receipt data into Base 64
-        // Here I'm using org.apache.commons.codec.binary.Base64 as an encoder,
-        // since commons-codec is already in Grails classpath
-        // Base64 encoder = new Base64();
-        // //encoder.decode(pArray);
-        // String encodedReceipt = new String(encoder.encode(receipt));
-
-        // Create a JSON query object
-        // Here I'm using Grails' org.codehaus.groovy.grails.web.json.JSONObject
         Map<String, String> map = new HashMap<>();
         map.put("receipt-data", receipt);
 
@@ -65,33 +51,15 @@ public class VerifyReceipt {
         StringBuffer sb = new StringBuffer();
         while ((str = br.readLine()) != null) {
             sb.append(str);
-//            sb.append("/n");
         }
         br.close();
         String response = sb.toString();
 
         // Deserialize response
-//        ObjectMapper mapper2 = new ObjectMapper();
         JsonNode result = mapper.readTree(response);
 
         status = result.get("status").asInt();
-
-//        PurchaseResponseBean bean = mapper2.convertValue(result, PurchaseResponseBean.class);
-
-//        status = bean.getStatus();
         return status;
-
-
-//        if (status == 0) {
-//            // provide content
-//            return true;
-//        } else if (status == 21007) {
-//            // signal error, throw an exception, do your stuff honey!
-//            logger.error("レシート認証エラー. status=" + status);
-//            return false;
-//        }
-
-        // return status ;
 
     }
 }
