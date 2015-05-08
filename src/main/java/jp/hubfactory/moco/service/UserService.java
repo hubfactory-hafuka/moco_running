@@ -1,6 +1,5 @@
 package jp.hubfactory.moco.service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -18,7 +17,6 @@ import jp.hubfactory.moco.entity.UserAuthKey;
 import jp.hubfactory.moco.entity.UserGirl;
 import jp.hubfactory.moco.entity.UserGirlKey;
 import jp.hubfactory.moco.entity.UserGirlVoice;
-import jp.hubfactory.moco.entity.UserGirlVoiceKey;
 import jp.hubfactory.moco.enums.GirlType;
 import jp.hubfactory.moco.enums.UserVoiceStatus;
 import jp.hubfactory.moco.enums.VoiceType;
@@ -27,6 +25,7 @@ import jp.hubfactory.moco.repository.UserGirlRepository;
 import jp.hubfactory.moco.repository.UserGirlVoiceRepository;
 import jp.hubfactory.moco.repository.UserRepository;
 import jp.hubfactory.moco.util.MocoDateUtils;
+import jp.hubfactory.moco.util.TableSuffixGenerator;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -201,26 +200,28 @@ public class UserService {
             this.insertUserGirl(userId, mstGirl.getGirlId());
 
             // ユーザーガールボイス情報登録
-            List<UserGirlVoice> insertRecords = new ArrayList<>();
+//            List<UserGirlVoice> insertRecords = new ArrayList<>();
             List<MstVoice> voiceList = mstVoiceCache.getVoiceList(mstGirl.getGirlId());
             for (MstVoice mstVoice : voiceList) {
 
                 if (VoiceType.NORMAL.getKey().equals(mstVoice.getType())) {
                     continue;
                 }
-                UserGirlVoiceKey key = new UserGirlVoiceKey(userId, mstGirl.getGirlId(), mstVoice.getKey().getVoiceId());
-                UserGirlVoice userGirlVoiceRecord = new UserGirlVoice();
-                userGirlVoiceRecord.setKey(key);
-                userGirlVoiceRecord.setStatus(UserVoiceStatus.OFF.getKey());
-                userGirlVoiceRecord.setUpdDatetime(nowDate);
-                userGirlVoiceRecord.setInsDatetime(nowDate);
-                insertRecords.add(userGirlVoiceRecord);
+//                UserGirlVoiceKey key = new UserGirlVoiceKey(userId, mstGirl.getGirlId(), mstVoice.getKey().getVoiceId());
+//                UserGirlVoice userGirlVoiceRecord = new UserGirlVoice();
+//                userGirlVoiceRecord.setKey(key);
+//                userGirlVoiceRecord.setStatus(UserVoiceStatus.OFF.getKey());
+//                userGirlVoiceRecord.setUpdDatetime(nowDate);
+//                userGirlVoiceRecord.setInsDatetime(nowDate);
+//                insertRecords.add(userGirlVoiceRecord);
+
+                userGirlVoiceRepository.insert(TableSuffixGenerator.getUserIdSuffix(userId), userId, mstGirl.getGirlId(), mstVoice.getKey().getVoiceId(), UserVoiceStatus.OFF.getKey());
             }
 
             // ***************************************************************************//
             // ユーザーガールボイス情報登録
             // ***************************************************************************//
-            userGirlVoiceRepository.save(insertRecords);
+//            userGirlVoiceRepository.save(insertRecords);
         }
 
         return new LoginBean(record.getUserId(), record.getToken(), record.getGirlId());
@@ -233,7 +234,7 @@ public class UserService {
      * @return
      */
     public List<UserGirlVoice> getUserGirlVoiceList(Long userId, Integer girlId) {
-        return userGirlVoiceRepository.findByKeyUserIdAndKeyGirlId(userId, girlId);
+        return userGirlVoiceRepository.findByKeyUserIdAndKeyGirlId(TableSuffixGenerator.getUserIdSuffix(userId), userId, girlId);
     }
 
     /**

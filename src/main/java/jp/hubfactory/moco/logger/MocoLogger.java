@@ -14,9 +14,9 @@ public class MocoLogger {
      * @param purchaseType
      * @param id
      */
-    public static void purchaseLog(Long userId, PurchaseType purchaseType, Integer id, String receipt) {
+    public static void purchaseLog(Long userId, PurchaseType purchaseType, Integer id) {
         Logger logger = LoggerFactory.getLogger("purchaseLog");
-        Object[] logs = {userId, purchaseType, id, receipt};
+        Object[] logs = {userId, purchaseType, id};
         String log = StringUtils.join(logs, "\t");
         logger.info(log);
     }

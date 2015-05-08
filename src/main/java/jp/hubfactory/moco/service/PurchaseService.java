@@ -18,7 +18,6 @@ import jp.hubfactory.moco.entity.MstVoice;
 import jp.hubfactory.moco.entity.MstVoiceSet;
 import jp.hubfactory.moco.entity.MstVoiceSetDetail;
 import jp.hubfactory.moco.entity.UserGirlVoice;
-import jp.hubfactory.moco.entity.UserGirlVoiceKey;
 import jp.hubfactory.moco.entity.UserPurchaseHistory;
 import jp.hubfactory.moco.entity.UserPurchaseHistoryKey;
 import jp.hubfactory.moco.enums.PurchaseType;
@@ -30,6 +29,7 @@ import jp.hubfactory.moco.purchase.VerifyReceipt;
 import jp.hubfactory.moco.repository.UserGirlVoiceRepository;
 import jp.hubfactory.moco.repository.UserPurchaseHistoryRepository;
 import jp.hubfactory.moco.util.MocoDateUtils;
+import jp.hubfactory.moco.util.TableSuffixGenerator;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -75,23 +75,17 @@ public class PurchaseService {
         Date nowDate = MocoDateUtils.getNowDate();
 
         // 課金ログ出力
-        MocoLogger.purchaseLog(userId, PurchaseType.VOICE, setId, receipt);
+        MocoLogger.purchaseLog(userId, PurchaseType.VOICE, setId);
 
         try {
             // 本番用iTunesパスで認証
             String itunesPath = mocoProperties.getSystem().getItunes();
             int status = verifyReceipt.verifyReceipt(receipt, itunesPath);
 
-//            logger.error("iTunesPath=" + itunesPath);
-//            logger.error("status=" + status);
-
             // ステータスが21007の場合、サンドボックス用パスで認証
             if (status == 21007) {
                 itunesPath = mocoProperties.getSystem().getItunesSandbox();
                 status = verifyReceipt.verifyReceipt(receipt, itunesPath);
-
-//                logger.error("iTunesPath=" + itunesPath);
-//                logger.error("status=" + status);
             }
 
             if (status != 0) {
@@ -121,24 +115,26 @@ public class PurchaseService {
         }
 
         // ユーザーのボイス情報取得
-        List<UserGirlVoice> userGirlVoiceList = userGirlVoiceRepository.findByKeyUserIdAndKeyGirlId(userId, girlId);
+        List<UserGirlVoice> userGirlVoiceList = userService.getUserGirlVoiceList(userId, girlId);
         if (CollectionUtils.isNotEmpty(userGirlVoiceList)) {
 
             for (UserGirlVoice userGirlVoice : userGirlVoiceList) {
 
                 if (voiceIdSet.contains(userGirlVoice.getKey().getVoiceId())) {
-                    userGirlVoice.setStatus(UserVoiceStatus.ON.getKey());
+//                    userGirlVoice.setStatus(UserVoiceStatus.ON.getKey());
+                    userGirlVoiceRepository.updateStatus(TableSuffixGenerator.getUserIdSuffix(userId), userId, girlId, userGirlVoice.getKey().getVoiceId(), UserVoiceStatus.ON.getKey());
                 }
             }
         } else {
 
             for (MstVoiceSetDetail mstVoiceSet : mstVoiceSetList) {
-                UserGirlVoiceKey key = new UserGirlVoiceKey(userId, girlId, mstVoiceSet.getKey().getVoiceId());
-                UserGirlVoice record = new UserGirlVoice(key, UserVoiceStatus.ON.getKey(), nowDate,nowDate);
-                userGirlVoiceRepository.save(record);
+//                UserGirlVoiceKey key = new UserGirlVoiceKey(userId, girlId, mstVoiceSet.getKey().getVoiceId());
+//                UserGirlVoice record = new UserGirlVoice(key, UserVoiceStatus.ON.getKey(), nowDate,nowDate);
+//                userGirlVoiceRepository.save(record);
+
+                userGirlVoiceRepository.updateStatus(TableSuffixGenerator.getUserIdSuffix(userId), userId, girlId, mstVoiceSet.getKey().getVoiceId(), UserVoiceStatus.ON.getKey());
             }
         }
-
 
         // 購入履歴登録
         UserPurchaseHistoryKey historyKey = new UserPurchaseHistoryKey(userId, PurchaseType.VOICE.getKey(), setId);
@@ -199,23 +195,17 @@ public class PurchaseService {
     public boolean purchaseGirl(Long userId, Integer girlId, String receipt) {
 
         // 課金ログ出力
-        MocoLogger.purchaseLog(userId, PurchaseType.GIRL, girlId, receipt);
+        MocoLogger.purchaseLog(userId, PurchaseType.GIRL, girlId);
 
         try {
             // 本番用iTunesパスで認証
             String itunesPath = mocoProperties.getSystem().getItunes();
             int status = verifyReceipt.verifyReceipt(receipt, itunesPath);
 
-//            logger.error("iTunesPath=" + itunesPath);
-//            logger.error("status=" + status);
-
             // ステータスが21007の場合、サンドボックス用パスで認証
             if (status == 21007) {
                 itunesPath = mocoProperties.getSystem().getItunesSandbox();
                 status = verifyReceipt.verifyReceipt(receipt, itunesPath);
-
-//                logger.error("iTunesPath=" + itunesPath);
-//                logger.error("status=" + status);
             }
 
             if (status != 0) {
@@ -245,21 +235,30 @@ public class PurchaseService {
         userService.insertUserGirl(userId, girlId);
 
         // ユーザーガールボイス情報登録
-        List<UserGirlVoice> insertRecords = new ArrayList<>();
+//        List<UserGirlVoice> insertRecords = new ArrayList<>();
         for (MstVoice mstVoice : mstVoiceList) {
             if (VoiceType.NORMAL.getKey().equals(mstVoice.getType())) {
                 continue;
             }
-            UserGirlVoiceKey key = new UserGirlVoiceKey(userId, girlId, mstVoice.getKey().getVoiceId());
-            UserGirlVoice record = new UserGirlVoice();
-            record.setKey(key);
-            record.setStatus(UserVoiceStatus.OFF.getKey());
-            record.setUpdDatetime(nowDate);
-            record.setInsDatetime(nowDate);
-            insertRecords.add(record);
+//            UserGirlVoiceKey key = new UserGirlVoiceKey(userId, girlId, mstVoice.getKey().getVoiceId());
+//            UserGirlVoice record = new UserGirlVoice();
+//            record.setKey(key);
+//            record.setStatus(UserVoiceStatus.OFF.getKey());
+//            record.setUpdDatetime(nowDate);
+//            record.setInsDatetime(nowDate);
+//            insertRecords.add(record);
+//
+
+            userGirlVoiceRepository.insert(TableSuffixGenerator.getUserIdSuffix(userId), userId, girlId, mstVoice.getKey().getVoiceId(), UserVoiceStatus.OFF.getKey());
+
         }
         // バルクインサート
-        userGirlVoiceRepository.save(insertRecords);
+//        userGirlVoiceRepository.save(insertRecords);
+
+        // 購入履歴登録
+        UserPurchaseHistoryKey historyKey = new UserPurchaseHistoryKey(userId, PurchaseType.GIRL.getKey(), girlId);
+        UserPurchaseHistory history = new UserPurchaseHistory(historyKey, nowDate, nowDate);
+        userPurchaseHistoryRepository.save(history);
 
         return true;
     }
