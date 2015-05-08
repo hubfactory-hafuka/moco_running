@@ -10,6 +10,8 @@ public class ActivityResultBean implements Serializable {
     /** serialVersionUID */
     private static final long serialVersionUID = 1L;
 
+    private String girlName;
+
     private boolean newRecordFlg;
 
     private List<MissionClearVoiceBean> missionClearVoiceBeans;

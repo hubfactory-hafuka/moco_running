@@ -12,8 +12,10 @@ import jp.hubfactory.moco.bean.MissionClearVoiceBean;
 import jp.hubfactory.moco.bean.UserActivityBean;
 import jp.hubfactory.moco.bean.UserActivityDetailBean;
 import jp.hubfactory.moco.bean.UserActivityLocationBean;
+import jp.hubfactory.moco.cache.MstGirlCache;
 import jp.hubfactory.moco.cache.MstGirlMissionCache;
 import jp.hubfactory.moco.cache.MstVoiceCache;
+import jp.hubfactory.moco.entity.MstGirl;
 import jp.hubfactory.moco.entity.MstGirlMission;
 import jp.hubfactory.moco.entity.MstVoice;
 import jp.hubfactory.moco.entity.User;
@@ -63,6 +65,8 @@ public class ActivityService {
     private MstGirlMissionCache mstGirlMissionCache;
     @Autowired
     private MstVoiceCache mstVoiceCache;
+    @Autowired
+    private MstGirlCache mstGirlCache;
     @Autowired
     private UserService userService;
 
@@ -199,9 +203,14 @@ public class ActivityService {
             beanList.add(bean);
         }
 
+        // 結果情報生成
         ActivityResultBean resultBean = new ActivityResultBean();
         resultBean.setNewRecordFlg(isNewRecord);
         resultBean.setMissionClearVoiceBeans(beanList);
+
+        MstGirl mstGirl = mstGirlCache.getGirl(form.getGirlId());
+        resultBean.setGirlName(mstGirl.getName());
+
         return resultBean;
     }
 

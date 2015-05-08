@@ -164,7 +164,7 @@ public class UserService {
 
         Date nowDate = MocoDateUtils.getNowDate();
         Long userId = userRepository.findMaxUserId();
-        userId = userId == null ? 1 : userId + 1;
+        userId = userId == null ? 1000 : userId + 1;
 
         // ***************************************************************************//
         // ユーザー情報登録
