@@ -3,9 +3,12 @@ package jp.hubfactory.moco.controller;
 import jp.hubfactory.moco.bean.LoginBean;
 import jp.hubfactory.moco.bean.UserBean;
 import jp.hubfactory.moco.entity.UserGirl;
+import jp.hubfactory.moco.entity.UserTakeover;
 import jp.hubfactory.moco.form.BaseForm;
+import jp.hubfactory.moco.form.CreateUserForm;
 import jp.hubfactory.moco.form.GirlFavoriteForm;
 import jp.hubfactory.moco.form.LoginForm;
+import jp.hubfactory.moco.form.TakeoverForm;
 import jp.hubfactory.moco.service.InformationService;
 import jp.hubfactory.moco.service.UserService;
 
@@ -36,28 +39,28 @@ public class UserController extends BaseController {
      * @param user
      * @return
      */
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseEntity<LoginBean> login(@Validated @RequestBody LoginForm form) {
-        LoginBean loginBean = userService.createUser(form.getLoginId(), form.getPassword(), form.getServiceId(), form.getUuId(), form.getUserName());
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    public ResponseEntity<LoginBean> create(@Validated @RequestBody CreateUserForm form) {
+        LoginBean loginBean = userService.createUser(form.getUuId(), form.getUserName());
         if (loginBean == null) {
             return new ResponseEntity<LoginBean>(loginBean, HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<LoginBean>(loginBean, HttpStatus.OK);
     }
 
-//    /**
-//     * ログイン
-//     * @param form
-//     * @return
-//     */
-//    @RequestMapping(value = "/login", method = RequestMethod.POST)
-//    public ResponseEntity<LoginBean> login(@Validated @RequestBody LoginForm form) {
-//        LoginBean loginBean = userService.login(form.getLoginId(), form.getPassword(), form.getServiceId(), form.getUuId());
-//        if (loginBean == null) {
-//            return new ResponseEntity<LoginBean>(loginBean, HttpStatus.BAD_REQUEST);
-//        }
-//        return new ResponseEntity<LoginBean>(loginBean, HttpStatus.OK);
-//    }
+    /**
+     * ログイン
+     * @param form
+     * @return
+     */
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public ResponseEntity<LoginBean> login(@Validated @RequestBody LoginForm form) {
+        LoginBean loginBean = userService.login(form.getUserId(), form.getUuId());
+        if (loginBean == null) {
+            return new ResponseEntity<LoginBean>(loginBean, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<LoginBean>(loginBean, HttpStatus.OK);
+    }
 
     /**
      * ログアウト
@@ -112,5 +115,34 @@ public class UserController extends BaseController {
         // お気に入り設定処理
         boolean execFlg = userService.updFavoriete(form.getUserId(), form.getGirlId());
         return new ResponseEntity<Boolean>(execFlg, execFlg == true ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+    }
+
+
+    @RequestMapping(value = "/issue-takeover", method = RequestMethod.POST)
+    public ResponseEntity<UserTakeover> issueTakeover(@Validated @RequestBody BaseForm form) {
+
+        UserTakeover userTakeover = null;
+
+        if (!super.checkAuth(form.getUserId(), form.getToken())) {
+            return new ResponseEntity<UserTakeover>(userTakeover, HttpStatus.UNAUTHORIZED);
+        }
+
+        userTakeover = userService.issueTakeOverId(form.getUserId());
+        if (userTakeover == null) {
+            return new ResponseEntity<UserTakeover>(userTakeover, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<UserTakeover>(userTakeover, HttpStatus.OK);
+
+    }
+
+    @RequestMapping(value = "/takeover", method = RequestMethod.POST)
+    public ResponseEntity<LoginBean> takeover(@Validated @RequestBody TakeoverForm form) {
+
+        LoginBean loginBean = userService.takeover(form.getUserId(), form.getUuId(), form.getTakeoverId());
+        if (loginBean == null) {
+            return new ResponseEntity<LoginBean>(loginBean, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<LoginBean>(loginBean, HttpStatus.OK);
+
     }
 }

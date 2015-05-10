@@ -13,6 +13,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import org.hibernate.validator.constraints.Email;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -37,6 +39,9 @@ public class User implements Serializable {
     public String totalAvgTime;
     @Column
     public Integer girlId;
+    @Email
+    @Column
+    public String mailAddress;
     @Column
     @Temporal(TemporalType.TIMESTAMP)
     public Date updDatetime;

@@ -1,10 +1,10 @@
 package jp.hubfactory.moco.repository;
 
-import jp.hubfactory.moco.entity.User;
+import jp.hubfactory.moco.entity.UserTakeover;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UserTakeoverRepository extends JpaRepository<User, Long> {
+public interface UserTakeoverRepository extends JpaRepository<UserTakeover, Long> {
 }

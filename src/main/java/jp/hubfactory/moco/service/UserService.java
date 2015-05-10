@@ -12,11 +12,10 @@ import jp.hubfactory.moco.entity.MstGirl;
 import jp.hubfactory.moco.entity.MstGirlMission;
 import jp.hubfactory.moco.entity.MstVoice;
 import jp.hubfactory.moco.entity.User;
-import jp.hubfactory.moco.entity.UserAuth;
-import jp.hubfactory.moco.entity.UserAuthKey;
 import jp.hubfactory.moco.entity.UserGirl;
 import jp.hubfactory.moco.entity.UserGirlKey;
 import jp.hubfactory.moco.entity.UserGirlVoice;
+import jp.hubfactory.moco.entity.UserTakeover;
 import jp.hubfactory.moco.enums.GirlType;
 import jp.hubfactory.moco.enums.UserVoiceStatus;
 import jp.hubfactory.moco.enums.VoiceType;
@@ -24,9 +23,11 @@ import jp.hubfactory.moco.repository.UserAuthRepository;
 import jp.hubfactory.moco.repository.UserGirlRepository;
 import jp.hubfactory.moco.repository.UserGirlVoiceRepository;
 import jp.hubfactory.moco.repository.UserRepository;
+import jp.hubfactory.moco.repository.UserTakeoverRepository;
 import jp.hubfactory.moco.util.MocoDateUtils;
 import jp.hubfactory.moco.util.TableSuffixGenerator;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,8 @@ public class UserService {
     @Autowired
     private UserAuthRepository userAuthRepository;
     @Autowired
+    private UserTakeoverRepository userTakeoverRepository;
+    @Autowired
     private MstGirlMissionCache mstGirlMissionCache;
     @Autowired
     private MstGirlCache mstGirlCache;
@@ -62,13 +65,13 @@ public class UserService {
      * @param uuId
      * @return
      */
-    public LoginBean login(String loginId, String password, String serviceId, String uuId) {
-        UserAuth userAuth = userAuthRepository.findOne(new UserAuthKey(loginId, password, serviceId));
-        if (userAuth == null) {
-            return null;
-        }
+    public LoginBean login(Long userId, String uuId) {
+//        UserAuth userAuth = userAuthRepository.findOne(new UserAuthKey(loginId, password, serviceId));
+//        if (userAuth == null) {
+//            return null;
+//        }
 
-        User user = this.getUser(userAuth.getUserId());
+        User user = this.getUser(userId);
         if (user == null) {
             return null;
         }
@@ -149,12 +152,12 @@ public class UserService {
      * @param user
      * @return
      */
-    public LoginBean createUser(String loginId, String password, String serviceId, String uuId, String userName) {
+    public LoginBean createUser(String uuId, String userName) {
 
-        LoginBean loginBean = this.login(loginId, password, serviceId, uuId);
-        if (loginBean != null) {
-            return loginBean;
-        }
+//        LoginBean loginBean = this.login(loginId, password, serviceId, uuId);
+//        if (loginBean != null) {
+//            return loginBean;
+//        }
 
         // トークン取得
         String token = tokenService.getToken(uuId);
@@ -184,12 +187,12 @@ public class UserService {
         // ***************************************************************************//
         // ユーザー認証登録
         // ***************************************************************************//
-        UserAuth userAuth = new UserAuth();
-        userAuth.setKey(new UserAuthKey(loginId, password, serviceId));
-        userAuth.setUserId(userId);
-        userAuth.setUpdDatetime(nowDate);
-        userAuth.setInsDatetime(nowDate);
-        userAuthRepository.save(userAuth);
+//        UserAuth userAuth = new UserAuth();
+//        userAuth.setKey(new UserAuthKey(loginId, password, serviceId));
+//        userAuth.setUserId(userId);
+//        userAuth.setUpdDatetime(nowDate);
+//        userAuth.setInsDatetime(nowDate);
+//        userAuthRepository.save(userAuth);
 
         List<MstGirl> normalGirls = mstGirlCache.getGirlTypeList(GirlType.NORMAL.getKey());
         for (MstGirl mstGirl : normalGirls) {
@@ -281,5 +284,45 @@ public class UserService {
         userGirl.setUpdDatetime(nowDate);
         userGirl.setInsDatetime(nowDate);
         userGirlRepository.save(userGirl);
+    }
+
+    /**
+     * 引き継ぎID発行
+     * @param userId
+     * @return
+     */
+    public UserTakeover issueTakeOverId(Long userId) {
+
+        String takeoverId = RandomStringUtils.randomAlphanumeric(8);
+
+        Date nowDate = MocoDateUtils.getNowDate();
+
+        UserTakeover userTakeover = userTakeoverRepository.findOne(userId);
+        if (userTakeover == null) {
+            userTakeover = new UserTakeover(userId, takeoverId, nowDate, nowDate);
+            userTakeoverRepository.save(userTakeover);
+        } else {
+            userTakeover.setTakeoverId(takeoverId);
+            userTakeover.setUpdDatetime(nowDate);
+        }
+        return userTakeover;
+    }
+
+    public LoginBean takeover(Long userId, String uuId, String takeoverId) {
+
+        UserTakeover userTakeover = userTakeoverRepository.findOne(userId);
+        if (userTakeover == null) {
+            return null;
+        }
+
+        if (!StringUtils.equals(takeoverId, userTakeover.getTakeoverId())) {
+            return null;
+        }
+
+        Date nowDate = MocoDateUtils.getNowDate();
+        userTakeover.setTakeoverId(null);
+        userTakeover.setUpdDatetime(nowDate);
+
+        return this.login(userId, uuId);
     }
 }

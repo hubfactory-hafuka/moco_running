@@ -18,7 +18,7 @@ public interface UserActivityRepository extends JpaRepository<UserActivity, User
     @Query(value = "SELECT * FROM user_activity_?1 WHERE user_id = ?2 ORDER BY activity_id DESC", nativeQuery = true)
     public List<UserActivity> findByKeyUserIdOrderByKeyActivityIdDesc(Integer suffix, Long userId);
 
-    @Query(value = "select MAX(activity_id) from user_activity_?1 WHERE user_id = ?1", nativeQuery = true)
+    @Query(value = "select MAX(activity_id) from user_activity_?1 WHERE user_id = ?2", nativeQuery = true)
     public Integer findMaxActivityId(Integer suffix, Long userId);
 
     @Modifying
