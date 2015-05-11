@@ -19,7 +19,6 @@ import jp.hubfactory.moco.entity.UserTakeover;
 import jp.hubfactory.moco.enums.GirlType;
 import jp.hubfactory.moco.enums.UserVoiceStatus;
 import jp.hubfactory.moco.enums.VoiceType;
-import jp.hubfactory.moco.repository.UserAuthRepository;
 import jp.hubfactory.moco.repository.UserGirlRepository;
 import jp.hubfactory.moco.repository.UserGirlVoiceRepository;
 import jp.hubfactory.moco.repository.UserRepository;
@@ -45,8 +44,6 @@ public class UserService {
     @Autowired
     private UserGirlRepository userGirlRepository;
     @Autowired
-    private UserAuthRepository userAuthRepository;
-    @Autowired
     private UserTakeoverRepository userTakeoverRepository;
     @Autowired
     private MstGirlMissionCache mstGirlMissionCache;
@@ -66,10 +63,6 @@ public class UserService {
      * @return
      */
     public LoginBean login(Long userId, String uuId) {
-//        UserAuth userAuth = userAuthRepository.findOne(new UserAuthKey(loginId, password, serviceId));
-//        if (userAuth == null) {
-//            return null;
-//        }
 
         User user = this.getUser(userId);
         if (user == null) {
@@ -154,11 +147,6 @@ public class UserService {
      */
     public LoginBean createUser(String uuId, String userName) {
 
-//        LoginBean loginBean = this.login(loginId, password, serviceId, uuId);
-//        if (loginBean != null) {
-//            return loginBean;
-//        }
-
         // トークン取得
         String token = tokenService.getToken(uuId);
         if (token == null) {
@@ -167,7 +155,7 @@ public class UserService {
 
         Date nowDate = MocoDateUtils.getNowDate();
         Long userId = userRepository.findMaxUserId();
-        userId = userId == null ? 1000 : userId + 1;
+        userId = userId == null ? 1001 : userId + 1;
 
         // ***************************************************************************//
         // ユーザー情報登録
@@ -184,16 +172,6 @@ public class UserService {
         record.setInsDatetime(nowDate);
         userRepository.save(record);
 
-        // ***************************************************************************//
-        // ユーザー認証登録
-        // ***************************************************************************//
-//        UserAuth userAuth = new UserAuth();
-//        userAuth.setKey(new UserAuthKey(loginId, password, serviceId));
-//        userAuth.setUserId(userId);
-//        userAuth.setUpdDatetime(nowDate);
-//        userAuth.setInsDatetime(nowDate);
-//        userAuthRepository.save(userAuth);
-
         List<MstGirl> normalGirls = mstGirlCache.getGirlTypeList(GirlType.NORMAL.getKey());
         for (MstGirl mstGirl : normalGirls) {
 
@@ -203,28 +181,15 @@ public class UserService {
             this.insertUserGirl(userId, mstGirl.getGirlId());
 
             // ユーザーガールボイス情報登録
-//            List<UserGirlVoice> insertRecords = new ArrayList<>();
             List<MstVoice> voiceList = mstVoiceCache.getVoiceList(mstGirl.getGirlId());
             for (MstVoice mstVoice : voiceList) {
 
                 if (VoiceType.NORMAL.getKey().equals(mstVoice.getType())) {
                     continue;
                 }
-//                UserGirlVoiceKey key = new UserGirlVoiceKey(userId, mstGirl.getGirlId(), mstVoice.getKey().getVoiceId());
-//                UserGirlVoice userGirlVoiceRecord = new UserGirlVoice();
-//                userGirlVoiceRecord.setKey(key);
-//                userGirlVoiceRecord.setStatus(UserVoiceStatus.OFF.getKey());
-//                userGirlVoiceRecord.setUpdDatetime(nowDate);
-//                userGirlVoiceRecord.setInsDatetime(nowDate);
-//                insertRecords.add(userGirlVoiceRecord);
 
                 userGirlVoiceRepository.insert(TableSuffixGenerator.getUserIdSuffix(userId), userId, mstGirl.getGirlId(), mstVoice.getKey().getVoiceId(), UserVoiceStatus.OFF.getKey());
             }
-
-            // ***************************************************************************//
-            // ユーザーガールボイス情報登録
-            // ***************************************************************************//
-//            userGirlVoiceRepository.save(insertRecords);
         }
 
         return new LoginBean(record.getUserId(), record.getToken(), record.getGirlId());

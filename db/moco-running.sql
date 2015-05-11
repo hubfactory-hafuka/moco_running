@@ -11,7 +11,6 @@ DROP TABLE IF EXISTS mst_voice_set_detail;
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS user_activity;
 DROP TABLE IF EXISTS user_activity_detail;
-DROP TABLE IF EXISTS user_auth;
 DROP TABLE IF EXISTS user_girl;
 DROP TABLE IF EXISTS user_girl_voice;
 DROP TABLE IF EXISTS user_goal;
@@ -147,18 +146,6 @@ CREATE TABLE user_activity_detail
     upd_datetime datetime NOT NULL,
     ins_datetime datetime NOT NULL,
     PRIMARY KEY (user_id, activity_id, detail_id)
-);
-
-
-CREATE TABLE user_auth
-(
-    login_id varchar(255) NOT NULL,
-    password varchar(255) NOT NULL,
-    service_id varchar(255) NOT NULL,
-    user_id bigint NOT NULL,
-    upd_datetime datetime NOT NULL,
-    ins_datetime datetime NOT NULL,
-    PRIMARY KEY (login_id, password, service_id)
 );
 
 
