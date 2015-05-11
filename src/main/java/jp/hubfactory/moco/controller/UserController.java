@@ -117,7 +117,11 @@ public class UserController extends BaseController {
         return new ResponseEntity<Boolean>(execFlg, execFlg == true ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
 
-
+    /**
+     * 引継コード発行
+     * @param form
+     * @return
+     */
     @RequestMapping(value = "/issue-takeover", method = RequestMethod.POST)
     public ResponseEntity<UserTakeover> issueTakeover(@Validated @RequestBody BaseForm form) {
 
@@ -127,7 +131,7 @@ public class UserController extends BaseController {
             return new ResponseEntity<UserTakeover>(userTakeover, HttpStatus.UNAUTHORIZED);
         }
 
-        userTakeover = userService.issueTakeOverId(form.getUserId());
+        userTakeover = userService.issueTakeOverCode(form.getUserId());
         if (userTakeover == null) {
             return new ResponseEntity<UserTakeover>(userTakeover, HttpStatus.BAD_REQUEST);
         }
@@ -135,10 +139,15 @@ public class UserController extends BaseController {
 
     }
 
+    /**
+     * 引継処理
+     * @param form
+     * @return
+     */
     @RequestMapping(value = "/takeover", method = RequestMethod.POST)
     public ResponseEntity<LoginBean> takeover(@Validated @RequestBody TakeoverForm form) {
 
-        LoginBean loginBean = userService.takeover(form.getUserId(), form.getUuId(), form.getTakeoverId());
+        LoginBean loginBean = userService.takeover(form.getUserId(), form.getUuId(), form.getTakeoverCode());
         if (loginBean == null) {
             return new ResponseEntity<LoginBean>(loginBean, HttpStatus.BAD_REQUEST);
         }

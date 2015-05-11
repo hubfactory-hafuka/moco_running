@@ -210,7 +210,7 @@ CREATE TABLE user_purchase_history
 CREATE TABLE user_takeover
 (
     user_id bigint NOT NULL,
-    takeover_id varchar(16) NOT NULL,
+    takeover_code varchar(16),
     upd_datetime datetime NOT NULL,
     ins_datetime datetime NOT NULL,
     PRIMARY KEY (user_id)

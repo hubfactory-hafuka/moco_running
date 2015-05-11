@@ -291,36 +291,43 @@ public class UserService {
      * @param userId
      * @return
      */
-    public UserTakeover issueTakeOverId(Long userId) {
+    public UserTakeover issueTakeOverCode(Long userId) {
 
-        String takeoverId = RandomStringUtils.randomAlphanumeric(8);
+        String takeoverCode = RandomStringUtils.randomAlphanumeric(8);
 
         Date nowDate = MocoDateUtils.getNowDate();
 
         UserTakeover userTakeover = userTakeoverRepository.findOne(userId);
         if (userTakeover == null) {
-            userTakeover = new UserTakeover(userId, takeoverId, nowDate, nowDate);
+            userTakeover = new UserTakeover(userId, takeoverCode, nowDate, nowDate);
             userTakeoverRepository.save(userTakeover);
         } else {
-            userTakeover.setTakeoverId(takeoverId);
+            userTakeover.setTakeoverCode(takeoverCode);
             userTakeover.setUpdDatetime(nowDate);
         }
         return userTakeover;
     }
 
-    public LoginBean takeover(Long userId, String uuId, String takeoverId) {
+    /**
+     * データ引継処理
+     * @param userId
+     * @param uuId
+     * @param takeoverCode
+     * @return
+     */
+    public LoginBean takeover(Long userId, String uuId, String takeoverCode) {
 
         UserTakeover userTakeover = userTakeoverRepository.findOne(userId);
         if (userTakeover == null) {
             return null;
         }
 
-        if (!StringUtils.equals(takeoverId, userTakeover.getTakeoverId())) {
+        if (!StringUtils.equals(takeoverCode, userTakeover.getTakeoverCode())) {
             return null;
         }
 
         Date nowDate = MocoDateUtils.getNowDate();
-        userTakeover.setTakeoverId(null);
+        userTakeover.setTakeoverCode(null);
         userTakeover.setUpdDatetime(nowDate);
 
         return this.login(userId, uuId);

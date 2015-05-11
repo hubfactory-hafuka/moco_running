@@ -26,7 +26,7 @@ public class UserTakeover implements Serializable {
     @Column
     private Long userId;
     @Column
-    private String takeoverId;
+    private String takeoverCode;
     @Column
     @Temporal(TemporalType.TIMESTAMP)
     public Date updDatetime;

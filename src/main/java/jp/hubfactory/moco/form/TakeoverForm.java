@@ -9,6 +9,6 @@ public class TakeoverForm {
     private Long userId;
     @NotNull(message="uuIdは必須です")
     private String uuId;
-    @NotNull(message="takeoverIdは必須です")
-    private String takeoverId;
+    @NotNull(message="takeoverCodeは必須です")
+    private String takeoverCode;
 }
