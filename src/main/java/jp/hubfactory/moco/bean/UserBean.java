@@ -11,11 +11,11 @@ public class UserBean implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String name;
-    public String totalDistance;
-    public Integer totalCount;
-    public String totalAvgTime;
-    public Integer girlId;
-    public String girlDistance;
-    public String remainDistance;
-    public InformationBean infoBean;
+    private String totalDistance;
+    private Integer totalCount;
+    private String totalAvgTime;
+    private Integer girlId;
+    private String girlDistance;
+    private String remainDistance;
+    private InformationBean infoBean;
 }
