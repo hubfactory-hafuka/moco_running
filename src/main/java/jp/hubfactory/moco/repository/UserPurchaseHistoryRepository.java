@@ -12,4 +12,7 @@ public interface UserPurchaseHistoryRepository extends JpaRepository<UserPurchas
 
     @Query("select count(uph.key.itemId) from UserPurchaseHistory uph where uph.key.userId = ?1 and uph.key.type = ?2 and uph.key.itemId = ?3")
     public Integer selectCountByKey(Long userId, Integer type, Integer itemId);
+
+    @Query(value = "SELECT COUNT(*) FROM user_purchase_history WHERE type = ?1", nativeQuery = true)
+    public Integer selectCountByType(Integer type);
 }
