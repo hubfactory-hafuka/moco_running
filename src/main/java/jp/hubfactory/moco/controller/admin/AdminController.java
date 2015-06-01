@@ -1,17 +1,12 @@
 package jp.hubfactory.moco.controller.admin;
 
-import java.util.List;
 import java.util.Map;
 
-import jp.hubfactory.moco.entity.MstGirl;
 import jp.hubfactory.moco.enums.PurchaseType;
-import jp.hubfactory.moco.repository.MstGirlRepository;
 import jp.hubfactory.moco.repository.UserPurchaseHistoryRepository;
 import jp.hubfactory.moco.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -22,8 +17,6 @@ public class AdminController {
     private transient UserRepository userRepository;
     @Autowired
     private transient UserPurchaseHistoryRepository userPurchaseHistoryRepository;
-    @Autowired
-    private transient MstGirlRepository mstGirlRepository;
 
     @RequestMapping("/adm/")
     public String index(Map<String, Object> model) {
@@ -49,12 +42,5 @@ public class AdminController {
         model.put("girlCount", girlCount);
 
         return "sales";
-    }
-
-    @RequestMapping("/adm/girls/")
-    public String girls(Map<String, Object> model) {
-        List<MstGirl> girls = mstGirlRepository.findAll(new Sort(Direction.ASC, "girlId"));
-        model.put("girls", girls);
-        return "girls";
     }
 }
