@@ -45,3 +45,16 @@ create table user_goal_6 like user_goal;
 create table user_goal_7 like user_goal;
 create table user_goal_8 like user_goal;
 create table user_goal_9 like user_goal;
+
+/* user_girl 今後対応するかもしれない
+insert into user_girl_0 select * from user_girl where (user_id % 10 = 0);
+insert into user_girl_1 select * from user_girl where (user_id % 10 = 1);
+insert into user_girl_2 select * from user_girl where (user_id % 10 = 2);
+insert into user_girl_3 select * from user_girl where (user_id % 10 = 3);
+insert into user_girl_4 select * from user_girl where (user_id % 10 = 4);
+insert into user_girl_5 select * from user_girl where (user_id % 10 = 5);
+insert into user_girl_6 select * from user_girl where (user_id % 10 = 6);
+insert into user_girl_7 select * from user_girl where (user_id % 10 = 7);
+insert into user_girl_8 select * from user_girl where (user_id % 10 = 8);
+insert into user_girl_9 select * from user_girl where (user_id % 10 = 9);
+*/
