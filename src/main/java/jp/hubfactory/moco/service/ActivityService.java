@@ -242,17 +242,6 @@ public class ActivityService {
         // 平均時間算出
         String avgTime = MocoDateUtils.calcAvgTime(form.getTime(), form.getDistance());
 
-//        UserActivity record = new UserActivity();
-//        UserActivityKey userActivityKey = new UserActivityKey(form.getUserId(), activityId);
-//        record.setKey(userActivityKey);
-//        record.setGirlId(form.getGirlId());
-//        record.setDistance(form.getDistance());
-//        record.setRunDate(runDate);
-//        record.setTime(form.getTime());
-//        record.setAvgTime(avgTime);
-//        record.setUpdDatetime(nowDate);
-//        record.setInsDatetime(nowDate);
-
         String locationStr = null;
         ObjectMapper mapper = new ObjectMapper();
         List<RegistUserActivityLocationForm> locations = form.getLocations();
@@ -262,9 +251,6 @@ public class ActivityService {
             e.printStackTrace();
             throw new IllegalStateException("JSON変換エラー:" + e.toString());
         }
-//        record.setLocations(locationStr);
-
-//        userActivityRepository.save(record);
 
         userActivityRepository.insert(TableSuffixGenerator.getUserIdSuffix(form.getUserId()), form.getUserId(), activityId, form.getGirlId(), runDate, form.getDistance(), form.getTime(), avgTime, locationStr);
 
@@ -279,7 +265,6 @@ public class ActivityService {
     private void registActivityDetail(RegistUserActivityForm form, Integer activityId, Date nowDate) {
 
         List<RegistUserActivityDetailForm> detailList = form.getDetails();
-//        List<UserActivityDetail> detailRecords = new ArrayList<>(detailList.size());
         int index = 1;
         int beforeTimeElapsedSec = 0;
         int beforeLapTime = 0;
@@ -319,22 +304,9 @@ public class ActivityService {
             }
             beforeTimeElapsedSec = timeElapsed;
 
-//            UserActivityDetailKey detailKey = new UserActivityDetailKey(form.getUserId(), activityId, index);
-//            UserActivityDetail detailRecord = new UserActivityDetail();
-//            detailRecord.setKey(detailKey);
-//            detailRecord.setDistance(registUserActivityDetailForm.getDistance());
-//            detailRecord.setIncDecTime(incDecTime);
-//            detailRecord.setLapTime(lapTime);
-//            detailRecord.setTimeElapsed(timeElapsedStr);
-//            detailRecord.setUpdDatetime(nowDate);
-//            detailRecord.setInsDatetime(nowDate);
-//            detailRecords.add(detailRecord);
-            index++;
-
             userActivityDetailRepository.insert(TableSuffixGenerator.getUserIdSuffix(form.getUserId()), form.getUserId(), activityId, index, registUserActivityDetailForm.getDistance(), timeElapsedStr, lapTime, incDecTime);
-
+            index++;
         }
-//        userActivityDetailRepository.save(detailRecords);
     }
 
     /**
@@ -366,10 +338,6 @@ public class ActivityService {
                     double targetDistance = mstGirlMission.getDistance();
 
                     if (targetDistance <= form.getDistance().doubleValue()) {
-//                        UserGirlVoice userGirlVoice = userGirlVoiceMap.get(mstGirlMission.getKey().getVoiceId());
-//                        userGirlVoice.setStatus(UserVoiceStatus.ON.getKey());
-//                        userGirlVoice.setUpdDatetime(nowDate);
-//                        userGirlVoiceRepository.save(userGirlVoice);
 
                         userGirlVoiceRepository.updateStatus(TableSuffixGenerator.getUserIdSuffix(form.getUserId()), form.getUserId(), form.getGirlId(), mstGirlMission.getKey().getVoiceId(), UserVoiceStatus.ON.getKey());
 
@@ -386,10 +354,6 @@ public class ActivityService {
                     double targetDistance = mstGirlMission.getDistance();
 
                     if (userGirl.getDistance() < targetDistance && targetDistance <= userDistance) {
-//                        UserGirlVoice userGirlVoice = userGirlVoiceMap.get(mstGirlMission.getKey().getVoiceId());
-//                        userGirlVoice.setStatus(UserVoiceStatus.ON.getKey());
-//                        userGirlVoice.setUpdDatetime(nowDate);
-//                        userGirlVoiceRepository.save(userGirlVoice);
 
                         userGirlVoiceRepository.updateStatus(TableSuffixGenerator.getUserIdSuffix(form.getUserId()), form.getUserId(), form.getGirlId(), mstGirlMission.getKey().getVoiceId(), UserVoiceStatus.ON.getKey());
 
@@ -410,12 +374,6 @@ public class ActivityService {
      * @param nowDate
      */
     private void updateUserGirlDistance(RegistUserActivityForm form, UserGirl userGirl, Date nowDate) {
-//        UserGirl record = new UserGirl();
-//        BeanUtils.copyProperties(userGirl, record);
-//        record.setDistance(record.getDistance() + form.getDistance());
-//        record.setUpdDatetime(nowDate);
-//        userGirlRepository.save(record);
-//
         userGirl.setDistance(userGirl.getDistance() + form.getDistance());
         userGirl.setUpdDatetime(nowDate);
 
@@ -457,23 +415,13 @@ public class ActivityService {
             return false;
         }
 
-//        Date nowDate = MocoDateUtils.getNowDate();
         UserGoal userGoal = userGoalRepository.selectUserGoal(TableSuffixGenerator.getUserIdSuffix(userId), userId, goalDistance);
-//        UserGoal userGoal = userGoalRepository.findOne(new UserGoalKey(userId, goalDistance));
         if (userGoal == null) {
-//            userGoal = new UserGoal();
-//            userGoal.setKey(new UserGoalKey(userId, goalDistance));
-//            userGoal.setTime(goalTime);
-//            userGoal.setUpdDatetime(nowDate);
-//            userGoal.setInsDatetime(nowDate);
-//            userGoalRepository.save(userGoal);
             userGoalRepository.insert(TableSuffixGenerator.getUserIdSuffix(userId), userId, goalDistance, goalTime);
             return false;
         } else {
             // 記録更新
             if (goalTime < userGoal.getTime().intValue()) {
-//                userGoal.setTime(goalTime);
-//                userGoal.setUpdDatetime(nowDate);
                 userGoalRepository.updateTime(TableSuffixGenerator.getUserIdSuffix(userId), userId, goalDistance, goalTime);
                 return true;
             }
