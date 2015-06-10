@@ -29,6 +29,8 @@ public class MocoDateUtils {
     public static final String DATE_FORMAT_HHmm = "HH:mm";
     /** 日時フォーマット : yyyyMMdd */
     public static final String DATE_FORMAT_yyyyMMdd = "yyyyMMdd";
+    /** 日時フォーマット : yyyyMM */
+    public static final String DATE_FORMAT_yyyyMM = "yyyyMM";
     /** 日時フォーマット : yyyy-MM-dd */
     public static final String DATE_FORMAT_yyyyMMdd_HYPHEN = "yyyy-MM-dd";
     /** 日時フォーマット : MM */
