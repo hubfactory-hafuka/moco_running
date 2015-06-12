@@ -1,5 +1,8 @@
 package jp.hubfactory.moco.controller;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +26,7 @@ public class TestController extends BaseController {
     private StringRedisTemplate template;
 
     @RequestMapping(value = "/add-data", method = RequestMethod.POST)
-    public ResponseEntity<Boolean> getActivity() {
+    public ResponseEntity<Boolean> getActivity() throws IllegalAccessException, IOException {
 
 //        ValueOperations<String, String> ops = this.template.opsForValue();
 //        String key = "spring.boot.redis.test";
@@ -32,50 +35,73 @@ public class TestController extends BaseController {
 //            System.out.println(ops.get(key));
 //        }
 //
+         BigDecimal L01 = new BigDecimal("3.36");
+         System.out.println("元の値　：" + L01);
+         System.out.println("切り上げ：" + L01.setScale(2, RoundingMode.CEILING));
+         System.out.println("切り捨て：" + L01.setScale(2, RoundingMode.FLOOR));
+         System.out.println("四捨五入：" + L01.setScale(2, RoundingMode.HALF_UP));
 
         String key = "ranking_1";
         ZSetOperations<String, String> zsetOps = this.template.opsForZSet();
+        if (!this.template.hasKey(key)) {
+            System.out.println("keyがありません");
+            for (int i = 1; i <= 30; i++) {
+                String userId = "100" + String.valueOf(i);
 
-//        for (int i = 1; i <= 10000; i++) {
-//            String userId = "100" + String.valueOf(i);
-//
-//            double score = Double.valueOf(i);
-//            if (i == 9902 || i == 9901) {
-//                score = 9900D;
-//            }
-//            zsetOps.incrementScore(key, userId, score);
-//        }
+                // 距離を小数点第２位で切り捨て
+                double score = new BigDecimal(String.valueOf(3.36)).setScale(2, RoundingMode.FLOOR).doubleValue();
+                zsetOps.incrementScore(key, userId, score);
+            }
+        }
 
         long rank = 0L;
         long start = 0;
         long end = 99;
 
         Set<TypedTuple<String>> set = zsetOps.reverseRangeWithScores(key, start, end);
-        System.out.println(set.size());
+
+        if (set.size() == 0) {
+            System.out.println("データがありません。");
+            return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+        }
+
         for (TypedTuple<String> typedTuple : set) {
             rank = zsetOps.count(key, typedTuple.getScore() + 1, Double.MAX_VALUE) + 1;
             String data = "順位:" + rank + " " + typedTuple.getValue() + ":" + typedTuple.getScore();
             System.out.println(data);
         }
-        long diff = 0;
 
-        while ((diff = 100 - rank) > 0) {
-            start = end + 1;
-            end = start + diff - 1;
+        Long ranks = zsetOps.reverseRank(key, "10010");
 
-            set = zsetOps.reverseRangeWithScores(key, start, end);
 
-            for (TypedTuple<String> typedTuple : set) {
-                rank = zsetOps.count(key, typedTuple.getScore() + 1, Double.MAX_VALUE) + 1;
-                if (rank > 100) {
-                    rank = 100;
-                    break;
-                }
+//        Cursor<TypedTuple<String>> aa = zsetOps.scan(key, ScanOptions.scanOptions().match("15").build());
+//        if (aa.hasNext()) {
+//            System.out.println("aa");
+//        } else {
+//            System.out.println("bb");
+//        }
 
-                String data = "順位:" + rank + " " + typedTuple.getValue() + ":" + typedTuple.getScore();
-                System.out.println(data);
-            }
-        }
+        // ユーザーのランキング情報取得
+//        double userScore = zsetOps.score(key, "99999");
+//        long diff = 0;
+//
+//        while ((diff = set.size() - rank) > 0) {
+//            start = end + 1;
+//            end = start + diff - 1;
+//
+//            set = zsetOps.reverseRangeWithScores(key, start, end);
+//
+//            for (TypedTuple<String> typedTuple : set) {
+//                rank = zsetOps.count(key, typedTuple.getScore() + 1, Double.MAX_VALUE) + 1;
+//                if (rank > 100) {
+//                    rank = 100;
+//                    break;
+//                }
+//
+//                String data = "順位:" + rank + " " + typedTuple.getValue() + ":" + typedTuple.getScore();
+//                System.out.println(data);
+//            }
+//        }
 
 
 

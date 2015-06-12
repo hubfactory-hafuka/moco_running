@@ -2,6 +2,7 @@ package jp.hubfactory.moco.controller;
 
 import jp.hubfactory.moco.bean.LoginBean;
 import jp.hubfactory.moco.bean.UserBean;
+import jp.hubfactory.moco.entity.User;
 import jp.hubfactory.moco.entity.UserGirl;
 import jp.hubfactory.moco.entity.UserTakeover;
 import jp.hubfactory.moco.form.BaseForm;
@@ -9,6 +10,7 @@ import jp.hubfactory.moco.form.CreateUserForm;
 import jp.hubfactory.moco.form.GirlFavoriteForm;
 import jp.hubfactory.moco.form.LoginForm;
 import jp.hubfactory.moco.form.TakeoverForm;
+import jp.hubfactory.moco.form.UpdateNameForm;
 import jp.hubfactory.moco.service.InformationService;
 import jp.hubfactory.moco.service.UserService;
 
@@ -63,20 +65,6 @@ public class UserController extends BaseController {
     }
 
     /**
-     * ログアウト
-     * @param form
-     * @return
-     */
-    @RequestMapping(value = "/logout", method = RequestMethod.POST)
-    public ResponseEntity<Boolean> logout(@Validated @RequestBody BaseForm form) {
-        boolean logoutFlg = userService.logout(form.getUserId(), form.getToken());
-        if (!logoutFlg) {
-            return new ResponseEntity<Boolean>(logoutFlg, HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<Boolean>(logoutFlg, HttpStatus.OK);
-    }
-
-    /**
      * ユーザー情報取得
      * @param user
      * @return
@@ -114,6 +102,29 @@ public class UserController extends BaseController {
 
         // お気に入り設定処理
         boolean execFlg = userService.updFavoriete(form.getUserId(), form.getGirlId());
+        return new ResponseEntity<Boolean>(execFlg, execFlg == true ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * ニックネーム更新登録
+     * @param form
+     * @return
+     */
+    @RequestMapping(value = "/upd-name", method = RequestMethod.POST)
+    public ResponseEntity<Boolean> updName(@RequestBody UpdateNameForm form) {
+
+        if (!super.checkAuth(form.getUserId(), form.getToken())) {
+            return new ResponseEntity<Boolean>(false, HttpStatus.UNAUTHORIZED);
+        }
+        // ガール所持しているかの判定
+        User user = userService.getUser(form.getUserId());
+        if (user == null) {
+            logger.error("user is null. userId=" + form.getUserId());
+            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
+        }
+
+        // お気に入り設定処理
+        boolean execFlg = userService.updName(form.getUserId(), form.getName());
         return new ResponseEntity<Boolean>(execFlg, execFlg == true ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
 

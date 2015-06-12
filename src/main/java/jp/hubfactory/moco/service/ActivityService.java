@@ -32,6 +32,7 @@ import jp.hubfactory.moco.repository.UserActivityDetailRepository;
 import jp.hubfactory.moco.repository.UserActivityRepository;
 import jp.hubfactory.moco.repository.UserGirlVoiceRepository;
 import jp.hubfactory.moco.repository.UserGoalRepository;
+import jp.hubfactory.moco.repository.UserRepository;
 import jp.hubfactory.moco.util.MocoDateUtils;
 import jp.hubfactory.moco.util.TableSuffixGenerator;
 
@@ -54,6 +55,8 @@ public class ActivityService {
     private static final Logger logger = LoggerFactory.getLogger(ActivityService.class);
 
     @Autowired
+    private UserRepository userRepository;
+    @Autowired
     private UserActivityRepository userActivityRepository;
     @Autowired
     private UserActivityDetailRepository userActivityDetailRepository;
@@ -69,6 +72,8 @@ public class ActivityService {
     private MstGirlCache mstGirlCache;
     @Autowired
     private UserService userService;
+    @Autowired
+    private RedisService redisService;
 
     /**
      * ユーザーのアクティビティ一覧取得
@@ -194,6 +199,11 @@ public class ActivityService {
         // 新記録更新処理
         // ***************************************************************************//
         boolean isNewRecord = this.updateUserGoal(form.getUserId(), form.getGoalDistance(), form.getGoalTime(), form.getDistance());
+
+        // ***************************************************************************//
+        // ランキング更新処理(Redis)
+        // ***************************************************************************//
+        redisService.updateRanking(form.getUserId(), form.getGirlId(), form.getDistance());
 
         List<MissionClearVoiceBean> beanList = new ArrayList<MissionClearVoiceBean>();
         for (MstVoice mstVoice : clearVoiceList) {
@@ -385,7 +395,8 @@ public class ActivityService {
      * @param nowDate
      */
     private void updateUser(RegistUserActivityForm form, String totalAvgTime, Date nowDate) {
-        User user = userService.getUser(form.getUserId());
+
+        User user = userRepository.findOne(form.getUserId());
         if (user == null) {
             throw new IllegalStateException("user is null. userId=" + form.getUserId());
         }
@@ -393,6 +404,9 @@ public class ActivityService {
         user.setTotalCount(user.getTotalCount().intValue() + 1);
         user.setTotalAvgTime(totalAvgTime);
         user.setUpdDatetime(nowDate);
+
+        // redisのユーザー情報更新
+        redisService.updateUser(user);
     }
 
 

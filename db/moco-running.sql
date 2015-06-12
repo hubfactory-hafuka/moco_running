@@ -5,6 +5,7 @@ SET SESSION FOREIGN_KEY_CHECKS=0;
 DROP TABLE IF EXISTS mst_girl;
 DROP TABLE IF EXISTS mst_girl_mission;
 DROP TABLE IF EXISTS mst_information;
+DROP TABLE IF EXISTS mst_ranking;
 DROP TABLE IF EXISTS mst_voice;
 DROP TABLE IF EXISTS mst_voice_set;
 DROP TABLE IF EXISTS mst_voice_set_detail;
@@ -64,6 +65,16 @@ CREATE TABLE mst_information
     upd_datetime datetime NOT NULL,
     ins_datetime datetime NOT NULL,
     PRIMARY KEY (id)
+);
+
+
+CREATE TABLE mst_ranking
+(
+    type int NOT NULL,
+    view_num int NOT NULL,
+    start_datetime datetime,
+    end_datetime datetime,
+    PRIMARY KEY (type)
 );
 
 

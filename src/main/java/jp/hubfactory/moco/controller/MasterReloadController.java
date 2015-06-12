@@ -3,6 +3,7 @@ package jp.hubfactory.moco.controller;
 import jp.hubfactory.moco.cache.MstGirlCache;
 import jp.hubfactory.moco.cache.MstGirlMissionCache;
 import jp.hubfactory.moco.cache.MstInformationCache;
+import jp.hubfactory.moco.cache.MstRankingCache;
 import jp.hubfactory.moco.cache.MstVoiceCache;
 import jp.hubfactory.moco.cache.MstVoiceSetDetailCache;
 
@@ -37,6 +38,8 @@ public class MasterReloadController {
     private MstVoiceSetDetailCache mstVoiceSetDetailCache;
     @Autowired
     private MstInformationCache mstInformationCache;
+    @Autowired
+    private MstRankingCache mstRankingCache;
 
     @RequestMapping(value = "/fa8ed510d830fff7ec209533e38fc3e2106404f02a4b504ced14e969be0151913645e126beaf136f", method = RequestMethod.POST)
     public ResponseEntity<Boolean> masterReload() {
@@ -47,6 +50,7 @@ public class MasterReloadController {
         mstGirlMissionCache.load();
         mstVoiceSetDetailCache.load();
         mstInformationCache.load();
+        mstRankingCache.load();
         logger.info("master reload end.");
         return new ResponseEntity<Boolean>(true, HttpStatus.OK);
     }

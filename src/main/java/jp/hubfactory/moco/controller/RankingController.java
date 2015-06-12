@@ -2,7 +2,7 @@ package jp.hubfactory.moco.controller;
 
 import jp.hubfactory.moco.bean.RankingInfo;
 import jp.hubfactory.moco.form.RankingForm;
-import jp.hubfactory.moco.service.RankingService;
+import jp.hubfactory.moco.service.RedisService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class RankingController extends BaseController {
 
     @Autowired
-    private RankingService rankingService;
+    private RedisService redisService;
 
     /**
      * アクティビティ一覧取得
@@ -37,7 +37,7 @@ public class RankingController extends BaseController {
             return new ResponseEntity<RankingInfo>(rankingInfo, HttpStatus.UNAUTHORIZED);
         }
         // ランキング情報取得
-        rankingInfo = rankingService.getRankingInfo(form.getUserId(), form.getType(), form.getGirlId());
+        rankingInfo = redisService.getRankingInfo(form.getUserId(), form.getType(), form.getGirlId());
 
         return new ResponseEntity<RankingInfo>(rankingInfo, HttpStatus.OK);
     }

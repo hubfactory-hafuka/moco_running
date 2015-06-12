@@ -3,6 +3,7 @@ package jp.hubfactory.moco;
 import jp.hubfactory.moco.cache.MstGirlCache;
 import jp.hubfactory.moco.cache.MstGirlMissionCache;
 import jp.hubfactory.moco.cache.MstInformationCache;
+import jp.hubfactory.moco.cache.MstRankingCache;
 import jp.hubfactory.moco.cache.MstVoiceCache;
 import jp.hubfactory.moco.cache.MstVoiceSetCache;
 import jp.hubfactory.moco.cache.MstVoiceSetDetailCache;
@@ -37,6 +38,8 @@ import org.springframework.boot.context.web.SpringBootServletInitializer;
     private MstGirlMissionCache mstGirlMissionCache;
     @Autowired
     private MstInformationCache mstInformationCache;
+    @Autowired
+    private MstRankingCache mstRankingCache;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -54,6 +57,7 @@ import org.springframework.boot.context.web.SpringBootServletInitializer;
         mstVoiceSetDetailCache.load();
         mstGirlMissionCache.load();
         mstInformationCache.load();
+        mstRankingCache.load();
         logger.info("master load end.");
     }
 
