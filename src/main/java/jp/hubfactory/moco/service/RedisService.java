@@ -58,9 +58,6 @@ public class RedisService {
             throw new IllegalStateException("JSON変換エラー");
         }
 
-//        ValueOperations<String,String> valueOps = this.redisTemplate.opsForValue();
-//        valueOps.set(userKey, userJson);
-
         HashOperations<String, Object, Object> hashOps = this.redisTemplate.opsForHash();
         hashOps.put(USER_KEY, user.getUserId().toString(), userJson);
 
@@ -72,9 +69,8 @@ public class RedisService {
      * @return
      */
     public User getUser(Long userId) {
+
         String userKey = userId.toString();
-//        ValueOperations<String,String> valueOps = this.redisTemplate.opsForValue();
-//        String userJson = valueOps.get(userKey);
 
         HashOperations<String, Object, Object> hashOps = this.redisTemplate.opsForHash();
         String userJson = (String)hashOps.get(USER_KEY, userKey);
@@ -99,7 +95,7 @@ public class RedisService {
 
         Date nowDate = MocoDateUtils.getNowDate();
         // 距離を小数点第２位で切り捨て
-        double updDistance = new BigDecimal(String.valueOf(distance)).setScale(2, RoundingMode.FLOOR).doubleValue();
+        Double updDistance = new BigDecimal(String.valueOf(distance)).setScale(2, RoundingMode.FLOOR).doubleValue();
 
         MstRanking mstRankingAll = mstRankingCache.getMstRanking(RankingType.ALL.getKey());
         if (mstRankingAll != null && MocoDateUtils.isWithin(mstRankingAll.getStartDatetime(), mstRankingAll.getEndDatetime(), nowDate)) {
@@ -163,13 +159,31 @@ public class RedisService {
 
         ZSetOperations<String, String> zsetOps = this.redisTemplate.opsForZSet();
 
+        // ユーザーのランキング情報取得
+        User user = userService.getUser(userId);
+
+        UserRankingBean myRankingBean = new UserRankingBean();
+        myRankingBean.setUserId(userId);
+        myRankingBean.setName(user.getName());
+        myRankingBean.setGirlId(user.getGirlId());
+
+        // ランキング情報に自分が存在する場合
+        if (zsetOps.rank(rankingKey, userId.toString()) != null) {
+
+            Double userScore = zsetOps.score(rankingKey, userId.toString());
+            // 小数点第以下切り捨て
+            userScore = new BigDecimal(String.valueOf(userScore)).setScale(2, RoundingMode.FLOOR).doubleValue();
+            Long userRank = zsetOps.count(rankingKey, userScore + 1, Double.MAX_VALUE) + 1;
+            myRankingBean.setRank(userRank);
+            myRankingBean.setDistance(userScore);
+        }
+
         long rank = 0L;
         long start = 0;
         long end = limit - 1;
 
-        List<UserRankingBean> userRankingList = new ArrayList<>();
-
         // ランキングデータ取得
+        List<UserRankingBean> userRankingList = new ArrayList<>();
         Set<TypedTuple<String>> set = zsetOps.reverseRangeWithScores(rankingKey, start, end);
         if (CollectionUtils.isEmpty(set)) {
             return null;
@@ -186,14 +200,19 @@ public class RedisService {
             if (rankUser == null) {
                 continue;
             }
+            // 小数点第以下切り捨て
+            Double userScore = new BigDecimal(String.valueOf(typedTuple.getScore())).setScale(2, RoundingMode.FLOOR).doubleValue();
 
             UserRankingBean rankingBean = new UserRankingBean();
             rankingBean.setUserId(rankUserId);
             rankingBean.setName(rankUser.getName());
             rankingBean.setRank(rank);
-            rankingBean.setDistance(typedTuple.getScore());
+            rankingBean.setDistance(userScore);
+            rankingBean.setGirlId(rankUser.getGirlId());
             userRankingList.add(rankingBean);
         }
+
+
 //        long diff = 0;
 //        while ((diff = 100 - rank) > 0) {
 //            start = end + 1;
@@ -225,21 +244,6 @@ public class RedisService {
 //                userRankingList.add(rankingBean);
 //            }
 //        }
-
-        // ユーザーのランキング情報取得
-        User user = userService.getUser(userId);
-
-        UserRankingBean myRankingBean = new UserRankingBean();
-        myRankingBean.setUserId(userId);
-        myRankingBean.setName(user.getName());
-
-        // ランキング情報に自分が存在する場合
-        if (zsetOps.rank(rankingKey, userId.toString()) != null) {
-            Double userScore = zsetOps.score(rankingKey, userId.toString());
-            Long userRank = zsetOps.count(rankingKey, userScore + 1, Double.MAX_VALUE) + 1;
-            myRankingBean.setRank(userRank);
-            myRankingBean.setDistance(userScore);
-        }
 
         RankingInfo rankingInfo = new RankingInfo();
         rankingInfo.setUserRank(myRankingBean);

@@ -116,14 +116,14 @@ public class UserController extends BaseController {
         if (!super.checkAuth(form.getUserId(), form.getToken())) {
             return new ResponseEntity<Boolean>(false, HttpStatus.UNAUTHORIZED);
         }
-        // ガール所持しているかの判定
+        // ユーザー情報存在チェック判定
         User user = userService.getUser(form.getUserId());
         if (user == null) {
             logger.error("user is null. userId=" + form.getUserId());
             return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
         }
 
-        // お気に入り設定処理
+        // ニックネーム変更処理
         boolean execFlg = userService.updName(form.getUserId(), form.getName());
         return new ResponseEntity<Boolean>(execFlg, execFlg == true ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }

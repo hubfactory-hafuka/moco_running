@@ -1,6 +1,7 @@
 package jp.hubfactory.moco.controller;
 
 import jp.hubfactory.moco.bean.RankingInfo;
+import jp.hubfactory.moco.enums.RankingType;
 import jp.hubfactory.moco.form.RankingForm;
 import jp.hubfactory.moco.service.RedisService;
 
@@ -36,6 +37,12 @@ public class RankingController extends BaseController {
         if (!super.checkAuth(form.getUserId(), form.getToken())) {
             return new ResponseEntity<RankingInfo>(rankingInfo, HttpStatus.UNAUTHORIZED);
         }
+
+        RankingType rankingType = RankingType.valueOf(form.getType());
+        if (RankingType.GIRL == rankingType && form.getGirlId() == null) {
+            return new ResponseEntity<RankingInfo>(rankingInfo, HttpStatus.BAD_REQUEST);
+        }
+
         // ランキング情報取得
         rankingInfo = redisService.getRankingInfo(form.getUserId(), form.getType(), form.getGirlId());
 

@@ -14,4 +14,5 @@ public class UserRankingBean implements Serializable {
     private String name;
     private Double distance;
     private Long rank;
+    private Integer girlId;
 }

@@ -20,6 +20,6 @@ public enum RankingType {
                 return type;
             }
         }
-        throw new IllegalStateException("RankingType error. key=" + key);
+        return ALL;
     }
 }
