@@ -64,20 +64,18 @@ public class GirlService {
             return null;
         }
 
-        // ガール所持しているか判定
-        UserGirl userGirl = userService.getUserGirl(userId, girlId);
-        if (userGirl == null) {
-            logger.error("girl not purchase. userId=" + userId + " girlId=" + girlId);
-            return null;
-        }
-
         GirlBean bean = new GirlBean();
         BeanUtils.copyProperties(mstGirl, bean);
+
+        // ガール所持しているか判定
+        UserGirl userGirl = userService.getUserGirl(userId, girlId);
+        if (userGirl != null) {
+            bean.setHoldFlg(true);
+        }
 
         if (user.getGirlId().equals(girlId)) {
             bean.setFavoriteFlg(true);
         }
-        bean.setHoldFlg(true);
 
         return bean;
     }
