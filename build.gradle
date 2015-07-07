@@ -15,9 +15,9 @@ apply plugin: 'spring-boot'
 apply plugin: 'war'
 
 war {
-    //baseName = 'moco'
-    //version =  '0.0.1'
-    archiveName = 'moco-running.war'
+    //baseName = 'moco-runnning'
+    //version =  '1.0.1'
+    archiveName = 'moco-running2.war'
 }
 
 repositories {
