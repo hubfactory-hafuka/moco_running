@@ -53,6 +53,8 @@ public class UserService {
     private MstVoiceCache mstVoiceCache;
     @Autowired
     private TokenService tokenService;
+    @Autowired
+    private RedisService redisService;
 
     /**
      * ログイン処理
@@ -74,29 +76,6 @@ public class UserService {
 
         return new LoginBean(user.getUserId(), user.getToken(), user.getGirlId());
     }
-
-    /**
-     * ログインアウト処理
-     * @param userId
-     * @param token
-     * @return
-     */
-    public boolean logout(Long userId, String token) {
-
-        User user = this.getUser(userId);
-        if (user == null) {
-            return false;
-        }
-        // tokenチェック
-        if (StringUtils.equals(user.getToken(), token)) {
-            user.setToken(null);
-            user.setUpdDatetime(MocoDateUtils.getNowDate());
-        } else {
-            return false;
-        }
-        return true;
-    }
-
 
     /**
      * ユーザー情報取得
@@ -137,7 +116,12 @@ public class UserService {
      * @return
      */
     public User getUser(Long userId) {
-        return userRepository.findOne(userId);
+        User user = redisService.getUser(userId);
+        if (user == null) {
+            user = userRepository.findOne(userId);
+            redisService.updateUser(user);
+        }
+        return user;
     }
 
     /**
@@ -171,6 +155,8 @@ public class UserService {
         record.setUpdDatetime(nowDate);
         record.setInsDatetime(nowDate);
         userRepository.save(record);
+        // Redisのユーザー情報更新
+        redisService.updateUser(record);
 
         List<MstGirl> normalGirls = mstGirlCache.getGirlTypeList(GirlType.NORMAL.getKey());
         for (MstGirl mstGirl : normalGirls) {
@@ -206,19 +192,39 @@ public class UserService {
     }
 
     /**
-     * お気に入り登録処理
+     * お気に入り更新処理
      * @param userId
      * @param girlId
      * @return
      */
     public boolean updFavoriete(Long userId, Integer girlId) {
-
-        User user = this.getUser(userId);
+        User user = userRepository.findOne(userId);
         if (user == null) {
             return false;
         }
         // テーブルから取得したentityに対してセットするとＤＢも更新されている
         user.setGirlId(girlId);
+        // redisのユーザー情報も更新
+        redisService.updateUser(user);
+
+        return true;
+    }
+
+    /**
+     * 名前更新処理
+     * @param userId
+     * @param girlId
+     * @return
+     */
+    public boolean updName(Long userId, String name) {
+        User user = userRepository.findOne(userId);
+        if (user == null) {
+            return false;
+        }
+        // テーブルから取得したentityに対してセットするとＤＢも更新されている
+        user.setName(name);
+        // redisのユーザー情報も更新
+        redisService.updateUser(user);
 
         return true;
     }
