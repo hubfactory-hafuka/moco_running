@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -250,6 +251,61 @@ public class RedisService {
         rankingInfo.setRankList(userRankingList);
 
         return rankingInfo;
+    }
+
+
+    public void getRankingHistory(Long userId, Integer type, Integer girlId) {
+
+        Date nowDate = MocoDateUtils.getNowDate();
+
+        // 全体ランキングの場合
+        String keyPreffix = null;
+        RankingType rankingType = RankingType.valueOf(type);
+        switch (rankingType) {
+        case ALL:
+            keyPreffix = ALL_RANKING_KEY;
+            break;
+        case GIRL:
+            keyPreffix = GIRL_RANKING_KEY + girlId + "_";
+            break;
+        default:
+            keyPreffix = ALL_RANKING_KEY;
+            break;
+        }
+
+        List<UserRankingBean> rankingHistoryList = new ArrayList<>();
+
+        // 過去６カ月分繰りかえす
+        for (int i = 1; i <= 6; i++) {
+
+            UserRankingBean rankingBean = new UserRankingBean();
+            rankingBean.setDistance(0d);
+
+            int addNum = i * -1;
+
+            Date targetDate = MocoDateUtils.add(nowDate, addNum, Calendar.MONTH);
+            String keySuffix = MocoDateUtils.convertString(targetDate, MocoDateUtils.DATE_FORMAT_yyyyMM);
+            String key = keyPreffix + keySuffix;
+
+            ZSetOperations<String, String> zsetOps = this.redisTemplate.opsForZSet();
+            if (!this.redisTemplate.hasKey(key)) {
+                rankingHistoryList.add(rankingBean);
+                continue;
+            }
+
+            // ランキング情報に自分が存在する場合
+            if (zsetOps.rank(key, userId.toString()) != null) {
+
+                Double userScore = zsetOps.score(key, userId.toString());
+                // 小数点第以下切り捨て
+                userScore = new BigDecimal(String.valueOf(userScore)).setScale(2, RoundingMode.FLOOR).doubleValue();
+                Long userRank = zsetOps.count(key, userScore + 1, Double.MAX_VALUE) + 1;
+                rankingBean.setRank(userRank);
+                rankingBean.setDistance(userScore);
+            }
+            rankingHistoryList.add(rankingBean);
+        }
+
     }
 
     /**

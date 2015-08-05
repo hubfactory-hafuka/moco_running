@@ -3,6 +3,7 @@ package jp.hubfactory.moco.util;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import lombok.NoArgsConstructor;
 
@@ -95,26 +96,6 @@ public class MocoDateUtils {
         }
         return timeStr;
     }
-
-//    public static String convertAvgTimeString(Date date, String format) {
-//
-//        Calendar cal = Calendar.getInstance();
-//        cal.setTime(date);
-//
-//        int minute = cal.get(Calendar.MINUTE);
-//        int second = cal.get(Calendar.SECOND);
-//
-//        String timeStr = null;
-//
-//        if (minute > 0) {
-//            timeStr = String.format("%01d'%02d\"", minute, second);
-//        } else if (second > 0) {
-//            timeStr = String.format("%01d\"", second);
-//        } else {
-//            timeStr = "";
-//        }
-//        return timeStr;
-//    }
 
     public static String convertTimeString(int minute, int second) {
 
@@ -234,5 +215,21 @@ public class MocoDateUtils {
         }
 
         return timeStr;
+    }
+
+
+    /**
+     * 日付の加減算を行います。
+     *
+     * @param target 対象日付
+     * @param addNum 加減日数
+     * @param addKind 年、月、日、等々（Calendarのフィールド）
+     * @return 加減算の結果
+     */
+    public static Date add(Date target, int addNum, int addKind) {
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.setTime(target);
+        cal.add(addKind, addNum);
+        return new Date(cal.getTimeInMillis());
     }
 }
