@@ -85,6 +85,11 @@ public class RedisService {
         }
     }
 
+    public void deleteUser(Long userId) {
+        HashOperations<String, Object, Object> hashOps = this.redisTemplate.opsForHash();
+        hashOps.delete(USER_KEY, userId.toString());
+    }
+
     /**
      * ランキング更新
      * @param userId ユーザーID
@@ -173,7 +178,8 @@ public class RedisService {
             Double userScore = zsetOps.score(rankingKey, userId.toString());
             // 小数点第以下切り捨て
             userScore = new BigDecimal(String.valueOf(userScore)).setScale(2, RoundingMode.FLOOR).doubleValue();
-            Long userRank = zsetOps.count(rankingKey, userScore + 1, Double.MAX_VALUE) + 1;
+            Long userRank = zsetOps.reverseRank(rankingKey, userId.toString()) + 1;
+//            Long userRank = zsetOps.count(rankingKey, userScore + 1, Double.MAX_VALUE) + 1;
             myRankingBean.setRank(userRank);
             myRankingBean.setDistance(userScore);
         }
@@ -192,7 +198,8 @@ public class RedisService {
         for (TypedTuple<String> typedTuple : set) {
 
             // 順位取得
-            rank = zsetOps.count(rankingKey, typedTuple.getScore() + 1, Double.MAX_VALUE) + 1;
+            rank = zsetOps.reverseRank(rankingKey, typedTuple.getValue()) + 1;
+            //rank = zsetOps.count(rankingKey, typedTuple.getScore() + 1, Double.MAX_VALUE) + 1;
             // ユーザーID
             Long rankUserId = Long.valueOf(typedTuple.getValue());
             // ユーザー情報
