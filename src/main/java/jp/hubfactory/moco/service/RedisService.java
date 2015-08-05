@@ -85,6 +85,11 @@ public class RedisService {
         }
     }
 
+    public void deleteUser(Long userId) {
+        HashOperations<String, Object, Object> hashOps = this.redisTemplate.opsForHash();
+        hashOps.delete(USER_KEY, userId.toString());
+    }
+
     /**
      * ランキング更新
      * @param userId ユーザーID

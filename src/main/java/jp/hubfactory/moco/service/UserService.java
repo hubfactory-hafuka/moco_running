@@ -66,7 +66,8 @@ public class UserService {
      */
     public LoginBean login(Long userId, String uuId) {
 
-        User user = this.getUser(userId);
+//        User user = this.getUser(userId);
+        User user = userRepository.findOne(userId);
         if (user == null) {
             return null;
         }
@@ -74,7 +75,6 @@ public class UserService {
         user.setToken(tokenService.getToken(uuId));
         user.setUpdDatetime(MocoDateUtils.getNowDate());
 
-        // redis側も更新
         redisService.updateUser(user);
 
         return new LoginBean(user.getUserId(), user.getToken(), user.getGirlId());
