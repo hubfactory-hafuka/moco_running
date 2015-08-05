@@ -74,6 +74,9 @@ public class UserService {
         user.setToken(tokenService.getToken(uuId));
         user.setUpdDatetime(MocoDateUtils.getNowDate());
 
+        // redis側も更新
+        redisService.updateUser(user);
+
         return new LoginBean(user.getUserId(), user.getToken(), user.getGirlId());
     }
 
