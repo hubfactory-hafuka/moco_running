@@ -16,4 +16,5 @@ public class UserGirlVoiceBean implements Serializable {
     private Integer situation;
     private Integer type;
     private Integer status;
+    private String openCondition;
 }

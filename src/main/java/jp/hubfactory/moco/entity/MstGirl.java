@@ -41,6 +41,8 @@ public class MstGirl implements Serializable {
     @Column
     private Integer price;
     @Column
+    private String comment;
+    @Column
     @Temporal(TemporalType.TIMESTAMP)
     private Date startDatetime;
     @Column

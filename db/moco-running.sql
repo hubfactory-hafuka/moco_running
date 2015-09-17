@@ -21,8 +21,6 @@ DROP TABLE IF EXISTS user_takeover;
 
 
 
-/* Create Tables */
-
 CREATE TABLE mst_girl
 (
     girl_id int NOT NULL,
@@ -35,6 +33,7 @@ CREATE TABLE mst_girl
     profile varchar(255),
     cv varchar(255),
     price int NOT NULL,
+    comment varchar(128),
     start_datetime datetime,
     end_datetime datetime,
     upd_datetime datetime NOT NULL,

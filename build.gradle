@@ -17,7 +17,7 @@ apply plugin: 'war'
 war {
     //baseName = 'moco-runnning'
     //version =  '1.0.1'
-    archiveName = 'moco-running.war'
+    archiveName = 'moco-running2.war'
 }
 
 repositories {
