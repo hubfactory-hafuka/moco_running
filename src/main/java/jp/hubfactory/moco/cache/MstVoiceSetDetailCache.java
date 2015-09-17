@@ -33,7 +33,9 @@ public class MstVoiceSetDetailCache {
 
     private Map<Integer, List<MstVoiceSetDetail>> setIdKeyListMap;
 
-    private Map<String, List<MstVoiceSetDetail>> girlIdKeyListMap;
+    private Map<String, List<MstVoiceSetDetail>> setIdGirlIdKeyListMap;
+
+    private Map<Integer, List<MstVoiceSetDetail>> girlIdKeyListMap;
 
     public void load() {
         list = repository.findAll();
@@ -53,11 +55,18 @@ public class MstVoiceSetDetailCache {
     }
 
     public List<MstVoiceSetDetail> getVoiceSetDetailList(Integer setId, Integer girlId) {
-        if (girlIdKeyListMap == null) {
+        if (setIdGirlIdKeyListMap == null) {
             this.load();
         }
         String key = setId + "-" + girlId;
-        return girlIdKeyListMap.get(key);
+        return setIdGirlIdKeyListMap.get(key);
+    }
+
+    public List<MstVoiceSetDetail> getVoiceSetDetailByGirlId(Integer girlId) {
+        if (girlIdKeyListMap == null) {
+            this.load();
+        }
+        return girlIdKeyListMap.get(girlId);
     }
 
     @SuppressWarnings("unchecked")
@@ -75,6 +84,7 @@ public class MstVoiceSetDetailCache {
     private void createData() {
         Map<Integer, List<MstVoiceSetDetail>> tmpMap = new HashMap<>();
         Map<String, List<MstVoiceSetDetail>> tmpMap2 = new HashMap<>();
+        Map<Integer, List<MstVoiceSetDetail>> tmpMap3 = new HashMap<>();
 
         for (MstVoiceSetDetail mst : list) {
             Integer key = mst.getKey().getSetId();
@@ -82,12 +92,18 @@ public class MstVoiceSetDetailCache {
             list.add(mst);
             tmpMap.put(key, list);
 
-            String keyGirlId = mst.getKey().getSetId() + "-" + mst.getKey().getGirlId();
-            List<MstVoiceSetDetail> list2 = (tmpMap2.containsKey(keyGirlId)) ? tmpMap2.get(keyGirlId) : new ArrayList<MstVoiceSetDetail>();
+            String keySetIdGirlId = mst.getKey().getSetId() + "-" + mst.getKey().getGirlId();
+            List<MstVoiceSetDetail> list2 = (tmpMap2.containsKey(keySetIdGirlId)) ? tmpMap2.get(keySetIdGirlId) : new ArrayList<MstVoiceSetDetail>();
             list2.add(mst);
-            tmpMap2.put(keyGirlId, list2);
+            tmpMap2.put(keySetIdGirlId, list2);
+
+            Integer keyGirlId = mst.getKey().getGirlId();
+            List<MstVoiceSetDetail> list3 = (tmpMap3.containsKey(keyGirlId)) ? tmpMap3.get(keyGirlId) : new ArrayList<MstVoiceSetDetail>();
+            list3.add(mst);
+            tmpMap3.put(keyGirlId, list3);
         }
         setIdKeyListMap = Collections.unmodifiableMap(tmpMap);
-        girlIdKeyListMap = Collections.unmodifiableMap(tmpMap2);
+        setIdGirlIdKeyListMap = Collections.unmodifiableMap(tmpMap2);
+        girlIdKeyListMap = Collections.unmodifiableMap(tmpMap3);
     }
 }

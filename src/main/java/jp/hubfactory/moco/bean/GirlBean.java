@@ -21,4 +21,5 @@ public class GirlBean implements Serializable {
     private Integer price;
     private boolean holdFlg;
     private boolean favoriteFlg;
+    private String comment;
 }
