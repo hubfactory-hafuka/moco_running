@@ -5,6 +5,7 @@ import jp.hubfactory.moco.cache.MstGirlMissionCache;
 import jp.hubfactory.moco.cache.MstInformationCache;
 import jp.hubfactory.moco.cache.MstRankingCache;
 import jp.hubfactory.moco.cache.MstVoiceCache;
+import jp.hubfactory.moco.cache.MstVoiceSetCache;
 import jp.hubfactory.moco.cache.MstVoiceSetDetailCache;
 
 import org.slf4j.Logger;
@@ -31,9 +32,9 @@ public class MasterReloadController {
     @Autowired
     private MstVoiceCache mstVoiceCache;
     @Autowired
-    private MstVoiceSetDetailCache mstVoiceSetCache;
-    @Autowired
     private MstGirlMissionCache mstGirlMissionCache;
+    @Autowired
+    private MstVoiceSetCache mstVoiceSetCache;
     @Autowired
     private MstVoiceSetDetailCache mstVoiceSetDetailCache;
     @Autowired

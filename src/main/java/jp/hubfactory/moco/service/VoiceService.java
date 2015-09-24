@@ -140,7 +140,7 @@ public class VoiceService {
             // 課金ボイスの場合
             int viewSetId = voiceSetIdMap.get(voiceId).intValue() % 3;
             viewSetId = viewSetId == 0 ? 3 : viewSetId;
-            String conditionStr = "声援セット" + viewSetId + "を購入すると聴けるよ";
+            String conditionStr = "★★声援セット" + viewSetId + "を購入すると聴けるよ★★";
             return conditionStr;
 
         } else {
