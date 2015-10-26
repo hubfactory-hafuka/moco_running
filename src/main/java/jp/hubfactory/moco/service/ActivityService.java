@@ -12,6 +12,7 @@ import jp.hubfactory.moco.bean.MissionClearVoiceBean;
 import jp.hubfactory.moco.bean.UserActivityBean;
 import jp.hubfactory.moco.bean.UserActivityDetailBean;
 import jp.hubfactory.moco.bean.UserActivityLocationBean;
+import jp.hubfactory.moco.cache.MstConfigCache;
 import jp.hubfactory.moco.cache.MstGirlCache;
 import jp.hubfactory.moco.cache.MstGirlMissionCache;
 import jp.hubfactory.moco.cache.MstVoiceCache;
@@ -33,6 +34,7 @@ import jp.hubfactory.moco.repository.UserActivityRepository;
 import jp.hubfactory.moco.repository.UserGirlVoiceRepository;
 import jp.hubfactory.moco.repository.UserGoalRepository;
 import jp.hubfactory.moco.repository.UserRepository;
+import jp.hubfactory.moco.util.CalcUtils;
 import jp.hubfactory.moco.util.MocoDateUtils;
 import jp.hubfactory.moco.util.TableSuffixGenerator;
 
@@ -70,6 +72,8 @@ public class ActivityService {
     private MstVoiceCache mstVoiceCache;
     @Autowired
     private MstGirlCache mstGirlCache;
+    @Autowired
+    private MstConfigCache mstConfigCache;
     @Autowired
     private UserService userService;
     @Autowired
@@ -112,6 +116,7 @@ public class ActivityService {
             bean.setDistance(String.format("%.2f", userActivity.getDistance()));
             bean.setTime(userActivity.getTime());
             bean.setAvgTime(userActivity.getAvgTime());
+            bean.setCalories(userActivity.getCalories());
 
             try {
                 List<UserActivityLocationBean> locations = new ObjectMapper().readValue(userActivity.getLocations(), new TypeReference<List<UserActivityLocationBean>>() {});
@@ -173,7 +178,9 @@ public class ActivityService {
         // ***************************************************************************//
         // アクティビティ登録
         // ***************************************************************************//
-        this.registActivity(form, activityId, nowDate);
+        // 平均時間算出
+        String avgTime = MocoDateUtils.calcAvgTime(form.getTime(), form.getDistance());
+        int calories = this.registActivity(form, activityId, avgTime);
 
         // ***************************************************************************//
         // アクティビティ詳細登録
@@ -193,7 +200,7 @@ public class ActivityService {
         // ***************************************************************************//
         // ユーザー総距離更新
         // ***************************************************************************//
-        this.updateUser(form, totalAvgTime, nowDate);
+        this.updateUser(form, totalAvgTime, nowDate, calories);
 
         // ***************************************************************************//
         // 新記録更新処理
@@ -203,7 +210,7 @@ public class ActivityService {
         // ***************************************************************************//
         // ランキング更新処理(Redis)
         // ***************************************************************************//
-        redisService.updateRanking(form.getUserId(), form.getGirlId(), form.getDistance());
+        redisService.updateRanking(form.getUserId(), form.getGirlId(), form.getDistance(), avgTime);
 
         List<MissionClearVoiceBean> beanList = new ArrayList<MissionClearVoiceBean>();
         for (MstVoice mstVoice : clearVoiceList) {
@@ -242,15 +249,11 @@ public class ActivityService {
      * アクティビティ情報登録
      * @param form
      * @param activityId
-     * @param nowDate
-     * @return 総平均時間(9'99")
+     * @return 消費カロリー
      */
-    private void registActivity(RegistUserActivityForm form, Integer activityId, Date nowDate) {
+    private int registActivity(RegistUserActivityForm form, Integer activityId, String avgTime) {
 
         Date runDate = MocoDateUtils.convertDate(form.getRunDate(), MocoDateUtils.DATE_FORMAT_yyyyMMdd_SLASH);
-
-        // 平均時間算出
-        String avgTime = MocoDateUtils.calcAvgTime(form.getTime(), form.getDistance());
 
         String locationStr = null;
         ObjectMapper mapper = new ObjectMapper();
@@ -262,8 +265,16 @@ public class ActivityService {
             throw new IllegalStateException("JSON変換エラー:" + e.toString());
         }
 
-        userActivityRepository.insert(TableSuffixGenerator.getUserIdSuffix(form.getUserId()), form.getUserId(), activityId, form.getGirlId(), runDate, form.getDistance(), form.getTime(), avgTime, locationStr);
+        // 消費カロリーの計算
+        int calories = 0;
+        User user = userService.getUser(form.getUserId());
+        if (user.getWeight() != null) {
+            calories = CalcUtils.calcCalories(user.getWeight(), form.getTime(), avgTime);
+        }
 
+        userActivityRepository.insert(TableSuffixGenerator.getUserIdSuffix(form.getUserId()), form.getUserId(), activityId, form.getGirlId(), runDate, form.getDistance(), form.getTime(), avgTime, calories, locationStr);
+
+        return calories;
     }
 
     /**
@@ -392,9 +403,11 @@ public class ActivityService {
     /**
      * ユーザーの総距離・回数更新
      * @param form
+     * @param totalAvgTime
      * @param nowDate
+     * @param calories
      */
-    private void updateUser(RegistUserActivityForm form, String totalAvgTime, Date nowDate) {
+    private void updateUser(RegistUserActivityForm form, String totalAvgTime, Date nowDate, int calories) {
 
         User user = userRepository.findOne(form.getUserId());
         if (user == null) {
@@ -404,6 +417,12 @@ public class ActivityService {
         user.setTotalCount(user.getTotalCount().intValue() + 1);
         user.setTotalAvgTime(totalAvgTime);
         user.setUpdDatetime(nowDate);
+
+        // ポイント化有効な場合
+        if (mstConfigCache.isPointEnable()) {
+            long point = user.getPoint() == null ? Long.parseLong(String.valueOf(calories)) : user.getPoint() + Long.parseLong(String.valueOf(calories));
+            user.setPoint(point);
+        }
 
         // redisのユーザー情報更新
         redisService.updateUser(user);

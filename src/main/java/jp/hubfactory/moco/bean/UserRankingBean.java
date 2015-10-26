@@ -12,7 +12,10 @@ public class UserRankingBean implements Serializable {
 
     private Long userId;
     private String name;
+    private String imageData;
     private Double distance;
     private Long rank;
     private Integer girlId;
+    private String yearMonth;
+    private String profImgPath;
 }

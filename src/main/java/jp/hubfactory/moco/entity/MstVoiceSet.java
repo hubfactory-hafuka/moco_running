@@ -27,6 +27,8 @@ public class MstVoiceSet implements Serializable {
     @Column
     private Integer price;
     @Column
+    private Long point;
+    @Column
     @Temporal(TemporalType.TIMESTAMP)
     private Date updDatetime;
     @Column

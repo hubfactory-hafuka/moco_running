@@ -14,6 +14,7 @@ public class VoiceSetBean implements Serializable {
     private Integer setId;
     private Integer girlId;
     private Integer price;
+    private Long point;
     private boolean holdFlg;
     private List<VoiceSetDetailBean> setDetailList;
 }

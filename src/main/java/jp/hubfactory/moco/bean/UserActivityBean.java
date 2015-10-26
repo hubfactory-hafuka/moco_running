@@ -27,4 +27,6 @@ public class UserActivityBean implements Serializable {
     private List<UserActivityLocationBean> locations;
 
     private List<UserActivityDetailBean> details;
+
+    private Integer calories;
 }

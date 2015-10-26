@@ -164,6 +164,7 @@ public class PurchaseService {
             voiceSetBean.setGirlId(girlId);
             voiceSetBean.setPrice(mstVoiceSet.getPrice());
             voiceSetBean.setHoldFlg(count <= 0 ? false : true);
+            voiceSetBean.setPoint(mstVoiceSet.getPoint());
 
             List<VoiceSetDetailBean> detailBeans = new ArrayList<>();
             List<MstVoiceSetDetail> mstVoiceSetList = mstVoiceSetDetailCache.getVoiceSetDetailList(mstVoiceSet.getKey().getSetId(), mstVoiceSet.getKey().getGirlId());

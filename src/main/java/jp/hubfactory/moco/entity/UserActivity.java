@@ -42,6 +42,9 @@ public class UserActivity implements Serializable {
     private String avgTime;
 
     @Column
+    private Integer calories;
+
+    @Column
     private String locations;
 
     @Column

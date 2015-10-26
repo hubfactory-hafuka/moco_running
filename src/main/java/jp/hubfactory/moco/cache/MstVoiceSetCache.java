@@ -24,6 +24,8 @@ public class MstVoiceSetCache {
 
     private Map<Integer, List<MstVoiceSet>> girlIdKeyListMap;
 
+    private Map<Integer, MstVoiceSet> setIdKeyMap;
+
     public void load() {
         list = repository.findAll();
         this.sort();
@@ -41,6 +43,13 @@ public class MstVoiceSetCache {
         return girlIdKeyListMap.get(girlId);
     }
 
+    public MstVoiceSet getMstVoiceSet(Integer setId) {
+        if (setIdKeyMap == null) {
+            this.load();
+        }
+        return setIdKeyMap.get(setId);
+    }
+
     private void sort() {
         Collections.sort(list, new Comparator<MstVoiceSet>() {
             @Override
@@ -52,13 +61,18 @@ public class MstVoiceSetCache {
 
     private void createData() {
         Map<Integer, List<MstVoiceSet>> tmpMap = new HashMap<>();
+        Map<Integer, MstVoiceSet> tmpSetIdKeyMap = new HashMap<>();
 
         for (MstVoiceSet mst : list) {
             Integer key = mst.getKey().getGirlId();
             List<MstVoiceSet> list = (tmpMap.containsKey(key)) ? tmpMap.get(key) : new ArrayList<MstVoiceSet>();
             list.add(mst);
             tmpMap.put(key, list);
+
+            Integer setId = mst.getKey().getSetId();
+            tmpSetIdKeyMap.put(setId, mst);
         }
         girlIdKeyListMap = Collections.unmodifiableMap(tmpMap);
+        setIdKeyMap = Collections.unmodifiableMap(tmpSetIdKeyMap);
     }
 }

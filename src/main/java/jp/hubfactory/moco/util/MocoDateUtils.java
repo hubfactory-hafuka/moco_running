@@ -3,6 +3,7 @@ package jp.hubfactory.moco.util;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import lombok.NoArgsConstructor;
 
@@ -15,6 +16,8 @@ public class MocoDateUtils {
 
     /** 日時フォーマット : yyyy/MM/dd */
     public static final String DATE_FORMAT_yyyyMMdd_SLASH = "yyyy/MM/dd";
+    /** 日時フォーマット : yyyy/MM */
+    public static final String DATE_FORMAT_yyyyMM_SLASH = "yyyy/MM";
     /** 日時フォーマット : HH:mm:ss */
     public static final String DATE_FORMAT_HHmmss = "HH:mm:ss";
 
@@ -73,7 +76,7 @@ public class MocoDateUtils {
         }
     }
 
-    public static String convertTimeString(Date date, String format) {
+    public static String convertTimeString(Date date) {
 
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
@@ -234,5 +237,62 @@ public class MocoDateUtils {
         }
 
         return timeStr;
+    }
+
+    public static Date getTimeZeroDate(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
+
+    /**
+     * startDateからendDateまでの日数を返す
+     *
+     * @param startDate 開始時間
+     * @param endDate 終了時間
+     * @return Long
+     */
+    public static Long getDiffereceDays(Date startDate, Date endDate) {
+        long diffTime = endDate.getTime() - startDate.getTime();
+        if (diffTime > 0) {
+            // 秒/分/時/日
+            long second = diffTime / 1000;
+            long minute = second / 60;
+            long hour = minute / 60;
+            long day = hour / 24;
+
+            return day;
+        }
+        return null;
+    }
+
+    /**
+     * 曜日取得
+     * @param date
+     * @return
+     */
+    public static int getWeek(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        return cal.get(Calendar.DAY_OF_WEEK);
+    }
+
+    /**
+     * 日付の加減算を行います。
+     *
+     * @param target 対象日付
+     * @param addNum 加減日数
+     * @param addKind 年、月、日、等々（Calendarのフィールド）
+     * @return 加減算の結果
+     */
+    public static Date add(Date target, int addNum, int addKind) {
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.setTime(target);
+        cal.add(addKind, addNum);
+        return new Date(cal.getTimeInMillis());
     }
 }

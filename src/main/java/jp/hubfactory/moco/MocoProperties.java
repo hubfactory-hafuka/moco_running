@@ -19,5 +19,7 @@ public class MocoProperties {
     public static class System {
         private String itunes;
         private String itunesSandbox;
+        private boolean debug;
+        private String writeImageUrl;
     }
 }

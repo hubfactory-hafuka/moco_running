@@ -22,6 +22,6 @@ public interface UserActivityRepository extends JpaRepository<UserActivity, User
     public Integer findMaxActivityId(Integer suffix, Long userId);
 
     @Modifying
-    @Query(value = "INSERT INTO user_activity_?1 VALUES (?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, sysdate(), sysdate())", nativeQuery = true)
-    public void insert(Integer suffix, Long userId, Integer activityId, Integer girlId, Date runDate, Double distance, String time, String avgTime, String locations);
+    @Query(value = "INSERT INTO user_activity_?1 VALUES (?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, sysdate(), sysdate())", nativeQuery = true)
+    public void insert(Integer suffix, Long userId, Integer activityId, Integer girlId, Date runDate, Double distance, String time, String avgTime, Integer calories, String locations);
 }
