@@ -5,7 +5,6 @@ import java.util.Map;
 
 import jp.hubfactory.moco.bean.UserGirlVoiceBean;
 import jp.hubfactory.moco.form.UserGirlVoiceForm;
-import jp.hubfactory.moco.repository.MstVoiceRepository;
 import jp.hubfactory.moco.service.VoiceService;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -29,9 +28,6 @@ public class VoiceController extends BaseController {
 
     @Autowired
     private VoiceService voiceService;
-
-    @Autowired
-    private MstVoiceRepository mstVoiceRepository;
 
     /**
      * ユーザーガールボイス一覧取得
