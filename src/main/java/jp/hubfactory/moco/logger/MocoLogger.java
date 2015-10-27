@@ -22,6 +22,19 @@ public class MocoLogger {
     }
 
     /**
+     * 交換ログ
+     * @param userId
+     * @param purchaseType
+     * @param id
+     */
+    public static void exchangeLog(Long userId, PurchaseType purchaseType, Integer id, Long usePoint, Long beforePoint, Long afterPoint) {
+        Logger logger = LoggerFactory.getLogger("exchangeLog");
+        Object[] logs = {userId, purchaseType, id, usePoint, beforePoint, afterPoint};
+        String log = StringUtils.join(logs, "\t");
+        logger.info(log);
+    }
+
+    /**
      * ユーザー登録ログ
      * @param userId
      */

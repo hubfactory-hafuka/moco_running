@@ -14,8 +14,10 @@ import jp.hubfactory.moco.entity.MstVoiceSet;
 import jp.hubfactory.moco.entity.MstVoiceSetDetail;
 import jp.hubfactory.moco.entity.User;
 import jp.hubfactory.moco.entity.UserGirlVoice;
+import jp.hubfactory.moco.enums.PurchaseType;
 import jp.hubfactory.moco.enums.UserVoiceStatus;
 import jp.hubfactory.moco.enums.VoiceType;
+import jp.hubfactory.moco.logger.MocoLogger;
 import jp.hubfactory.moco.repository.UserGirlVoiceRepository;
 import jp.hubfactory.moco.util.MocoDateUtils;
 import jp.hubfactory.moco.util.TableSuffixGenerator;
@@ -77,8 +79,14 @@ public class ExchangeService {
             userGirlVoiceRepository.insert(TableSuffixGenerator.getUserIdSuffix(userId), userId, girlId, mstVoice.getKey().getVoiceId(), UserVoiceStatus.OFF.getKey());
         }
 
+        // インクリメントするためマイナス値にする
         long usePoint = mstGirl.getPoint().longValue() * -1;
         userService.updUserPoint(userId, usePoint);
+
+        long afterPoint = user.getPoint() + usePoint;
+
+        // 交換ログ出力
+        MocoLogger.exchangeLog(userId, PurchaseType.GIRL, girlId, mstGirl.getPoint(), user.getPoint(), afterPoint);
 
         return true;
     }
@@ -140,6 +148,11 @@ public class ExchangeService {
 
         long usePoint = mstVoiceSet.getPoint().longValue() * -1;
         userService.updUserPoint(userId, usePoint);
+
+        long afterPoint = user.getPoint() + usePoint;
+
+        // 交換ログ出力
+        MocoLogger.exchangeLog(userId, PurchaseType.VOICE, setId, mstVoiceSet.getPoint(), user.getPoint(), afterPoint);
 
         return true;
 
