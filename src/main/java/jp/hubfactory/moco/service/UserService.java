@@ -136,10 +136,8 @@ public class UserService {
         userBean.setWeight(user.getWeight() == null ? null : String.valueOf(user.getWeight()));
         userBean.setPoint(user.getPoint());
 
-        // TOP情報取得の場合
-        if (topFlg) {
-            // ログインボーナス付与処理
-            this.sendLoginBonus(userId, userBean);
+        // TOP情報取得の場合、ログインボーナス付与処理
+        if (topFlg && this.sendLoginBonus(userId, userBean)) {
             // ランキングボーナス情報取得
             userBean.setRankingBonusBean(this.getRankingBonusBean(userId));
         }
@@ -447,27 +445,29 @@ public class UserService {
      * ログインボーナス付与処理
      * @param userBean ユーザー情報
      */
-    private void sendLoginBonus(Long userId, UserBean userBean) {
+    private boolean sendLoginBonus(Long userId, UserBean userBean) {
 
         if (!mstConfigCache.isPointEnable()) {
-            return;
+            return false;
         }
 
         User user = userRepository.findOne(userId);
         if (user == null) {
-            return;
+            return false;
         }
 
         Date nowDate = MocoDateUtils.getNowDate();
-        Date targetDate = MocoDateUtils.getTimeZeroDate(nowDate);
+        // ログインボーナス日時(4:00)
+        Date loginBonusDatetime = MocoDateUtils.getLoginBonusDate(nowDate);
 
-        if (user.getLoginBonusDatetime() != null && targetDate.compareTo(user.getLoginBonusDatetime()) <= 0) {
-            return;
+        // ログインボーナス日がnullかつ、当日4:00前の場合。または、ログインボーナス日が当日4:00以降の場合
+        if ((user.getLoginBonusDatetime() == null && nowDate.compareTo(loginBonusDatetime) < 0) || (user.getLoginBonusDatetime() != null && loginBonusDatetime.compareTo(user.getLoginBonusDatetime()) <= 0)) {
+            return false;
         }
 
-        MstLoginBonus mstLoginBonus = mstLoginBonusCache.getLoginBonus(targetDate);
+        MstLoginBonus mstLoginBonus = mstLoginBonusCache.getLoginBonus(loginBonusDatetime);
         if (mstLoginBonus == null) {
-            return;
+            return false;
         }
 
         Long userPoint = user.getPoint() == null ? 0L : user.getPoint();
@@ -477,8 +477,11 @@ public class UserService {
         user.setPoint(userPoint + nowPoint);
 
         userBean.setLoginBonusPoint(nowPoint);
+        userBean.setPoint(userPoint + nowPoint);
 
         redisService.updateUser(user);
+
+        return true;
     }
 
     /**

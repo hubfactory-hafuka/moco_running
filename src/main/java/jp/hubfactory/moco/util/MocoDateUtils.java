@@ -239,10 +239,30 @@ public class MocoDateUtils {
         return timeStr;
     }
 
+    /**
+     * 時間項目を0に設定
+     * @param date
+     * @return
+     */
     public static Date getTimeZeroDate(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
+
+    /**
+     * ログインボーナス付与日時取得
+     * @param date
+     * @return
+     */
+    public static Date getLoginBonusDate(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 4);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
