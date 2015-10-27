@@ -447,10 +447,12 @@ public class UserService {
      */
     private boolean sendLoginBonus(Long userId, UserBean userBean) {
 
+        // ポイント有効期間外の場合
         if (!mstConfigCache.isPointEnable()) {
             return false;
         }
 
+        // ユーザー情報が存在しない場合
         User user = userRepository.findOne(userId);
         if (user == null) {
             return false;
@@ -464,7 +466,7 @@ public class UserService {
         if ((user.getLoginBonusDatetime() == null && nowDate.compareTo(loginBonusDatetime) < 0) || (user.getLoginBonusDatetime() != null && loginBonusDatetime.compareTo(user.getLoginBonusDatetime()) <= 0)) {
             return false;
         }
-
+        // ログインボーナス情報取得
         MstLoginBonus mstLoginBonus = mstLoginBonusCache.getLoginBonus(loginBonusDatetime);
         if (mstLoginBonus == null) {
             return false;
