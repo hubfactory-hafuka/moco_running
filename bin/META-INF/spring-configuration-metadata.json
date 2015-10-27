@@ -24,6 +24,26 @@
       "sourceType": "jp.hubfactory.moco.MocoProperties$System"
     },
     {
+      "name": "moco.system.debug",
+      "type": "java.lang.Boolean",
+      "sourceType": "jp.hubfactory.moco.MocoProperties$System"
+    },
+    {
+      "name": "moco.system.debug",
+      "type": "java.lang.Boolean",
+      "sourceType": "jp.hubfactory.moco.MocoProperties$System"
+    },
+    {
+      "name": "moco.system.itunes",
+      "type": "java.lang.String",
+      "sourceType": "jp.hubfactory.moco.MocoProperties$System"
+    },
+    {
+      "name": "moco.system.itunes",
+      "type": "java.lang.String",
+      "sourceType": "jp.hubfactory.moco.MocoProperties$System"
+    },
+    {
       "name": "moco.system.itunes",
       "type": "java.lang.String",
       "sourceType": "jp.hubfactory.moco.MocoProperties$System"
@@ -40,6 +60,26 @@
     },
     {
       "name": "moco.system.itunes-sandbox",
+      "type": "java.lang.String",
+      "sourceType": "jp.hubfactory.moco.MocoProperties$System"
+    },
+    {
+      "name": "moco.system.itunes-sandbox",
+      "type": "java.lang.String",
+      "sourceType": "jp.hubfactory.moco.MocoProperties$System"
+    },
+    {
+      "name": "moco.system.itunes-sandbox",
+      "type": "java.lang.String",
+      "sourceType": "jp.hubfactory.moco.MocoProperties$System"
+    },
+    {
+      "name": "moco.system.write-image-url",
+      "type": "java.lang.String",
+      "sourceType": "jp.hubfactory.moco.MocoProperties$System"
+    },
+    {
+      "name": "moco.system.write-image-url",
       "type": "java.lang.String",
       "sourceType": "jp.hubfactory.moco.MocoProperties$System"
     },
