@@ -18,16 +18,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
 
 @SpringBootApplication
-//@EnableCaching
  public class Application extends SpringBootServletInitializer implements CommandLineRunner {
-
-//    private static final Logger logger = LoggerFactory.getLogger(Application.class);
-
-    // @Override
-    // protected SpringApplicationBuilder configure(SpringApplicationBuilder
-    // application) {
-    // return super.configure(application);
-    // }
 
     @Autowired
     private MstGirlCache mstGirlCache;
@@ -72,9 +63,4 @@ import org.springframework.boot.context.web.SpringBootServletInitializer;
         mstRankingRewardCache.load();
         logger.info("master load end.");
     }
-
-//    @Bean
-//    public CacheManager cacheManager() {
-//        return new ConcurrentMapCacheManager("mstVoiceCache");
-//    }
 }
