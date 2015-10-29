@@ -75,4 +75,20 @@ public class DebugController extends BaseController {
 
         return new ResponseEntity<Boolean>(true, HttpStatus.OK);
     }
+
+    /**
+     * ログインボーナスリセット
+     * @param form
+     * @return
+     */
+    @RequestMapping(value = "/del-redis-user", method = RequestMethod.POST)
+    public ResponseEntity<Boolean> delRedisUser(@RequestBody Map<String, Long> map) {
+
+        if (!mocoProperties.getSystem().isDebug()) {
+            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
+        }
+        redisService.deleteUser(map.get("userId"));
+
+        return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+    }
 }

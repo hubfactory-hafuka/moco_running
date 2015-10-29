@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -136,8 +137,9 @@ public class UserService {
         userBean.setWeight(user.getWeight() == null ? null : String.valueOf(user.getWeight()));
         userBean.setPoint(user.getPoint());
 
-        // TOP情報取得の場合、ログインボーナス付与処理
-        if (topFlg && this.sendLoginBonus(userId, userBean)) {
+        // TOP情報取得の場合、ログインボーナス判定
+        if (topFlg && this.isLoginBonus(user)) {
+            this.sendLoginBonus(userId, userBean);
             // ランキングボーナス情報取得
             userBean.setRankingBonusBean(this.getRankingBonusBean(userId));
         }
@@ -442,34 +444,48 @@ public class UserService {
     }
 
     /**
-     * ログインボーナス付与処理
-     * @param userBean ユーザー情報
+     * ログインボーナス判定
+     * @param user
+     * @return
      */
-    private boolean sendLoginBonus(Long userId, UserBean userBean) {
+    private boolean isLoginBonus(User user) {
 
         // ポイント有効期間外の場合
         if (!mstConfigCache.isPointEnable()) {
             return false;
         }
 
+        Date nowDate = MocoDateUtils.getNowDate();
+        // 現在日時の4:00:00を取得 ex)2015年6月1日 4:00:00
+        Date todayLoginBonusDate = MocoDateUtils.getLoginBonusDate(nowDate);
+        // 現在日時の１日前の4:00:00を取得 ex)2015年5月31日 4:00:00
+        Date yesterdayLoginBonusDate = MocoDateUtils.add(todayLoginBonusDate, -1, Calendar.DATE);
+
+        // 付与時刻以降(付与時刻含む）の場合、本日の付与時刻から現在までにボーナス付与を受けていない→ボーナス確定
+        // 付与時刻以前の場合、前日の付与時刻から現在までにボーナス付与を受けていない→ボーナス確定
+        return user.getLoginBonusDatetime() == null || ((nowDate.compareTo(todayLoginBonusDate) >= 0 && user.getLoginBonusDatetime().before(todayLoginBonusDate)) || (nowDate.before(todayLoginBonusDate) && user.getLoginBonusDatetime().before(yesterdayLoginBonusDate)));
+    }
+
+    /**
+     * ログインボーナス付与処理
+     * @param userBean ユーザー情報
+     */
+    private void sendLoginBonus(Long userId, UserBean userBean) {
+
         // ユーザー情報が存在しない場合
         User user = userRepository.findOne(userId);
         if (user == null) {
-            return false;
+            return;
         }
 
         Date nowDate = MocoDateUtils.getNowDate();
-        // ログインボーナス日時(4:00)
-        Date loginBonusDatetime = MocoDateUtils.getLoginBonusDate(nowDate);
+        // 現在日時の4:00:00を取得 ex)2015年6月1日 4:00:00
+        Date todayLoginBonusDate = MocoDateUtils.getLoginBonusDate(nowDate);
 
-        // ログインボーナス日がnullかつ、当日4:00前の場合。または、ログインボーナス日が当日4:00以降の場合
-        if ((user.getLoginBonusDatetime() == null && nowDate.compareTo(loginBonusDatetime) < 0) || (user.getLoginBonusDatetime() != null && loginBonusDatetime.compareTo(user.getLoginBonusDatetime()) <= 0)) {
-            return false;
-        }
         // ログインボーナス情報取得
-        MstLoginBonus mstLoginBonus = mstLoginBonusCache.getLoginBonus(loginBonusDatetime);
+        MstLoginBonus mstLoginBonus = mstLoginBonusCache.getLoginBonus(todayLoginBonusDate);
         if (mstLoginBonus == null) {
-            return false;
+            return;
         }
 
         Long userPoint = user.getPoint() == null ? 0L : user.getPoint();
@@ -482,8 +498,6 @@ public class UserService {
         userBean.setPoint(userPoint + nowPoint);
 
         redisService.updateUser(user);
-
-        return true;
     }
 
     /**
