@@ -19,5 +19,7 @@ public class ActivityResultBean implements Serializable {
     private boolean newRecordFlg;
     /** ミッションクリアボイスリスト */
     private List<MissionClearVoiceBean> missionClearVoiceBeans;
+    /** ポイント */
+    private Long point;
 
 }

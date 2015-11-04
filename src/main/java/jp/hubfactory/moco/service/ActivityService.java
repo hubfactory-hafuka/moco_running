@@ -200,7 +200,7 @@ public class ActivityService {
         // ***************************************************************************//
         // ユーザー総距離更新
         // ***************************************************************************//
-        this.updateUser(form, totalAvgTime, nowDate, calories);
+        Long point = this.updateUser(form, totalAvgTime, nowDate, calories);
 
         // ***************************************************************************//
         // 新記録更新処理
@@ -227,6 +227,8 @@ public class ActivityService {
 
         MstGirl mstGirl = mstGirlCache.getGirl(form.getGirlId());
         resultBean.setGirlName(mstGirl.getName());
+        
+        resultBean.setPoint(point);
 
         return resultBean;
     }
@@ -407,7 +409,7 @@ public class ActivityService {
      * @param nowDate
      * @param calories
      */
-    private void updateUser(RegistUserActivityForm form, String totalAvgTime, Date nowDate, int calories) {
+    private Long updateUser(RegistUserActivityForm form, String totalAvgTime, Date nowDate, int calories) {
 
         User user = userRepository.findOne(form.getUserId());
         if (user == null) {
@@ -419,13 +421,18 @@ public class ActivityService {
         user.setUpdDatetime(nowDate);
 
         // ポイント化有効な場合
+        Long nowPoint = null;
         if (mstConfigCache.isPointEnable()) {
+        	nowPoint = Long.parseLong(String.valueOf(calories));
+        	
             long point = user.getPoint() == null ? Long.parseLong(String.valueOf(calories)) : user.getPoint() + Long.parseLong(String.valueOf(calories));
             user.setPoint(point);
         }
 
         // redisのユーザー情報更新
         redisService.updateUser(user);
+        
+        return nowPoint;
     }
 
 
