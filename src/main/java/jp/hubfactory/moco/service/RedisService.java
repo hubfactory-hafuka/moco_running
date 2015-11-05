@@ -282,7 +282,7 @@ public class RedisService {
             rankingBean.setRank(rank);
             rankingBean.setDistance(userScore);
             rankingBean.setGirlId(rankUser.getGirlId());
-            rankingBean.setProfImgPath(user.getProfImgPath());
+            rankingBean.setProfImgPath(rankUser.getProfImgPath());
             userRankingList.add(rankingBean);
         }
 

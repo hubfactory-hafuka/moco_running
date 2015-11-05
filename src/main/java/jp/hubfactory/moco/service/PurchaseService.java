@@ -26,6 +26,7 @@ import jp.hubfactory.moco.enums.VoiceSituation;
 import jp.hubfactory.moco.enums.VoiceType;
 import jp.hubfactory.moco.logger.MocoLogger;
 import jp.hubfactory.moco.purchase.VerifyReceipt;
+import jp.hubfactory.moco.repository.UserExchangeHistoryRepository;
 import jp.hubfactory.moco.repository.UserGirlVoiceRepository;
 import jp.hubfactory.moco.repository.UserPurchaseHistoryRepository;
 import jp.hubfactory.moco.util.MocoDateUtils;
@@ -56,6 +57,8 @@ public class PurchaseService {
     private UserGirlVoiceRepository userGirlVoiceRepository;
     @Autowired
     private UserPurchaseHistoryRepository userPurchaseHistoryRepository;
+    @Autowired
+    private UserExchangeHistoryRepository userExchangeHistoryRepository;
     @Autowired
     private UserService userService;
     @Autowired
@@ -121,17 +124,12 @@ public class PurchaseService {
             for (UserGirlVoice userGirlVoice : userGirlVoiceList) {
 
                 if (voiceIdSet.contains(userGirlVoice.getKey().getVoiceId())) {
-//                    userGirlVoice.setStatus(UserVoiceStatus.ON.getKey());
                     userGirlVoiceRepository.updateStatus(TableSuffixGenerator.getUserIdSuffix(userId), userId, girlId, userGirlVoice.getKey().getVoiceId(), UserVoiceStatus.ON.getKey());
                 }
             }
         } else {
 
             for (MstVoiceSetDetail mstVoiceSet : mstVoiceSetList) {
-//                UserGirlVoiceKey key = new UserGirlVoiceKey(userId, girlId, mstVoiceSet.getKey().getVoiceId());
-//                UserGirlVoice record = new UserGirlVoice(key, UserVoiceStatus.ON.getKey(), nowDate,nowDate);
-//                userGirlVoiceRepository.save(record);
-
                 userGirlVoiceRepository.updateStatus(TableSuffixGenerator.getUserIdSuffix(userId), userId, girlId, mstVoiceSet.getKey().getVoiceId(), UserVoiceStatus.ON.getKey());
             }
         }
@@ -157,7 +155,12 @@ public class PurchaseService {
         List<MstVoiceSet> voiceSetList = mstVoiceSetCache.getVoiceSetListByGirlId(girlId);
         for (MstVoiceSet mstVoiceSet : voiceSetList) {
 
-            Integer count = userPurchaseHistoryRepository.selectCountByKey(userId, PurchaseType.VOICE.getKey(), mstVoiceSet.getKey().getSetId());
+            // ボイス交換履歴から件数を取得する
+            Integer count = userExchangeHistoryRepository.selectCountByKey(userId, PurchaseType.VOICE.getKey(), mstVoiceSet.getKey().getSetId());
+            if (count <= 0) {
+                // ボイス購入履歴から件数を取得する
+                count = userPurchaseHistoryRepository.selectCountByKey(userId, PurchaseType.VOICE.getKey(), mstVoiceSet.getKey().getSetId());
+            }
 
             VoiceSetBean voiceSetBean = new VoiceSetBean();
             voiceSetBean.setSetId(mstVoiceSet.getKey().getSetId());
@@ -236,25 +239,13 @@ public class PurchaseService {
         userService.insertUserGirl(userId, girlId);
 
         // ユーザーガールボイス情報登録
-//        List<UserGirlVoice> insertRecords = new ArrayList<>();
         for (MstVoice mstVoice : mstVoiceList) {
             if (VoiceType.NORMAL.getKey().equals(mstVoice.getType())) {
                 continue;
             }
-//            UserGirlVoiceKey key = new UserGirlVoiceKey(userId, girlId, mstVoice.getKey().getVoiceId());
-//            UserGirlVoice record = new UserGirlVoice();
-//            record.setKey(key);
-//            record.setStatus(UserVoiceStatus.OFF.getKey());
-//            record.setUpdDatetime(nowDate);
-//            record.setInsDatetime(nowDate);
-//            insertRecords.add(record);
-//
-
             userGirlVoiceRepository.insert(TableSuffixGenerator.getUserIdSuffix(userId), userId, girlId, mstVoice.getKey().getVoiceId(), UserVoiceStatus.OFF.getKey());
 
         }
-        // バルクインサート
-//        userGirlVoiceRepository.save(insertRecords);
 
         // 購入履歴登録
         UserPurchaseHistoryKey historyKey = new UserPurchaseHistoryKey(userId, PurchaseType.GIRL.getKey(), girlId);

@@ -15,6 +15,7 @@ DROP TABLE IF EXISTS mst_voice_set_detail;
 DROP TABLE IF EXISTS user;
 DROP TABLE IF EXISTS user_activity;
 DROP TABLE IF EXISTS user_activity_detail;
+DROP TABLE IF EXISTS user_exchange_history;
 DROP TABLE IF EXISTS user_girl;
 DROP TABLE IF EXISTS user_girl_voice;
 DROP TABLE IF EXISTS user_goal;
@@ -30,6 +31,7 @@ DROP TABLE IF EXISTS user_takeover;
 CREATE TABLE mst_config
 (
 	name varchar(255) NOT NULL,
+	value varchar(255),
 	start_datetime datetime,
 	end_datetime datetime,
 	upd_datetime datetime NOT NULL,
@@ -169,7 +171,6 @@ CREATE TABLE user
 	weight double(4,1),
 	point bigint DEFAULT 0,
 	login_bonus_datetime datetime,
-	image_data text,
 	prof_img_path varchar(255),
 	upd_datetime datetime NOT NULL,
 	ins_datetime datetime NOT NULL,
@@ -206,6 +207,17 @@ CREATE TABLE user_activity_detail
 	upd_datetime datetime NOT NULL,
 	ins_datetime datetime NOT NULL,
 	PRIMARY KEY (user_id, activity_id, detail_id)
+);
+
+
+CREATE TABLE user_exchange_history
+(
+	user_id bigint NOT NULL,
+	type int NOT NULL,
+	item_id int NOT NULL,
+	upd_datetime datetime NOT NULL,
+	ins_datetime datetime NOT NULL,
+	PRIMARY KEY (user_id, type, item_id)
 );
 
 

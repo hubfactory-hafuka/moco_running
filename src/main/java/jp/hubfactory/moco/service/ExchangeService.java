@@ -1,5 +1,6 @@
 package jp.hubfactory.moco.service;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -13,11 +14,14 @@ import jp.hubfactory.moco.entity.MstVoice;
 import jp.hubfactory.moco.entity.MstVoiceSet;
 import jp.hubfactory.moco.entity.MstVoiceSetDetail;
 import jp.hubfactory.moco.entity.User;
+import jp.hubfactory.moco.entity.UserExchangeHistory;
+import jp.hubfactory.moco.entity.UserExchangeHistoryKey;
 import jp.hubfactory.moco.entity.UserGirlVoice;
 import jp.hubfactory.moco.enums.PurchaseType;
 import jp.hubfactory.moco.enums.UserVoiceStatus;
 import jp.hubfactory.moco.enums.VoiceType;
 import jp.hubfactory.moco.logger.MocoLogger;
+import jp.hubfactory.moco.repository.UserExchangeHistoryRepository;
 import jp.hubfactory.moco.repository.UserGirlVoiceRepository;
 import jp.hubfactory.moco.util.MocoDateUtils;
 import jp.hubfactory.moco.util.TableSuffixGenerator;
@@ -41,6 +45,8 @@ public class ExchangeService {
     private MstVoiceSetDetailCache mstVoiceSetDetailCache;
     @Autowired
     private UserGirlVoiceRepository userGirlVoiceRepository;
+    @Autowired
+    private UserExchangeHistoryRepository userExchangeHistoryRepository;
     @Autowired
     private UserService userService;
 
@@ -84,6 +90,12 @@ public class ExchangeService {
         userService.updUserPoint(userId, usePoint);
 
         long afterPoint = user.getPoint() + usePoint;
+
+        // 交換履歴登録
+        Date nowDate = MocoDateUtils.getNowDate();
+        UserExchangeHistoryKey historyKey = new UserExchangeHistoryKey(userId, PurchaseType.GIRL.getKey(), girlId);
+        UserExchangeHistory history = new UserExchangeHistory(historyKey, nowDate, nowDate);
+        userExchangeHistoryRepository.save(history);
 
         // 交換ログ出力
         MocoLogger.exchangeLog(userId, PurchaseType.GIRL, girlId, mstGirl.getPoint(), user.getPoint(), afterPoint);
@@ -150,6 +162,12 @@ public class ExchangeService {
         userService.updUserPoint(userId, usePoint);
 
         long afterPoint = user.getPoint() + usePoint;
+
+        // 交換履歴登録
+        Date nowDate = MocoDateUtils.getNowDate();
+        UserExchangeHistoryKey historyKey = new UserExchangeHistoryKey(userId, PurchaseType.VOICE.getKey(), setId);
+        UserExchangeHistory history = new UserExchangeHistory(historyKey, nowDate, nowDate);
+        userExchangeHistoryRepository.save(history);
 
         // 交換ログ出力
         MocoLogger.exchangeLog(userId, PurchaseType.VOICE, setId, mstVoiceSet.getPoint(), user.getPoint(), afterPoint);

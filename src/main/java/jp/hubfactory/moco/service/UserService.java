@@ -389,6 +389,13 @@ public class UserService {
         if (user == null) {
             return false;
         }
+
+        // 動画広告視聴回数チェック
+
+
+
+
+
         user.setPoint(user.getPoint().longValue() + point.longValue());
         redisService.updateUser(user);
 

@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -17,25 +17,18 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MstConfig implements Serializable {
+public class UserExchangeHistory implements Serializable {
 
     /** serialVersionUID */
     private static final long serialVersionUID = 1L;
 
-    @Id
-    private String name;
-    @Column
-    private String value;
-    @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date startDatetime;
-    @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date endDatetime;
+    @EmbeddedId
+    private UserExchangeHistoryKey key;
     @Column
     @Temporal(TemporalType.TIMESTAMP)
     private Date updDatetime;
     @Column
     @Temporal(TemporalType.TIMESTAMP)
     private Date insDatetime;
+
 }
