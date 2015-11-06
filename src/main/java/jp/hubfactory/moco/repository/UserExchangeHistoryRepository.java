@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserExchangeHistoryRepository extends JpaRepository<UserExchangeHistory, UserExchangeHistoryKey> {
 
-    @Query(value = "SELECT COUNT(itemId) FROM user_exchange_history WHERE user_id = ?1 AND type = ?2 AND itemId = ?3", nativeQuery = true)
+    @Query(value = "SELECT COUNT(item_id) FROM user_exchange_history WHERE user_id = ?1 AND type = ?2 AND item_id = ?3", nativeQuery = true)
     public Integer selectCountByKey(Long userId, Integer type, Integer itemId);
 }
