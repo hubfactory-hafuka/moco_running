@@ -48,6 +48,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.mortennobel.imagescaling.AdvancedResizeOp;
+import com.mortennobel.imagescaling.ResampleFilters;
+import com.mortennobel.imagescaling.ResampleOp;
+
 @Service
 @Transactional
 public class UserService {
@@ -445,7 +449,14 @@ public class UserService {
         if (!file.exists()) {
             file.mkdirs();
         }
-        ImageIO.write(image, "jpg", file);
+
+        // 画像縮小
+        ResampleOp resampleOp = new ResampleOp(120, 120);
+        resampleOp.setFilter(ResampleFilters.getLanczos3Filter());
+        resampleOp.setUnsharpenMask(AdvancedResizeOp.UnsharpenMask.VerySharp);
+        BufferedImage rescaled = resampleOp.filter(image, null);
+        // 画像書き出し
+        ImageIO.write(rescaled, "jpg", file);
 
         return true;
     }

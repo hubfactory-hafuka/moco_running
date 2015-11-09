@@ -34,6 +34,9 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-redis")
     compile("org.springframework.boot:spring-boot-configuration-processor")
 
+    // 画像縮小
+    compile("com.mortennobel:java-image-scaling:0.8.6")
+
     // commons系
     compile("commons-collections:commons-collections")
     compile("commons-codec:commons-codec:1.10")
