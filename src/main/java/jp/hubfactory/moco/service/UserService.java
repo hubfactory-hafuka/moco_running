@@ -425,13 +425,14 @@ public class UserService {
         if (StringUtils.isNotEmpty(user.getProfImgPath())) {
             // 前回の画像を削除
             File delFile = new File(mocoProperties.getSystem().getWriteImageUrl() + user.getProfImgPath());
-            if(delFile.delete()){
-                //ファイル削除成功
-                System.out.println("ファイル削除成功");
-             }else{
-                //ファイル削除失敗
-                System.out.println("ファイル削除失敗");
-             }
+            delFile.delete();
+//            if(delFile.delete()){
+//                //ファイル削除成功
+//                System.out.println("ファイル削除成功");
+//             }else{
+//                //ファイル削除失敗
+//                System.out.println("ファイル削除失敗");
+//             }
         }
 
         // 画像ファイル名を生成する
@@ -450,8 +451,8 @@ public class UserService {
             file.mkdirs();
         }
 
-        // 画像縮小
-        ResampleOp resampleOp = new ResampleOp(120, 120);
+        // 画像縮小 750x750→240x240
+        ResampleOp resampleOp = new ResampleOp(240, 240);
         resampleOp.setFilter(ResampleFilters.getLanczos3Filter());
         resampleOp.setUnsharpenMask(AdvancedResizeOp.UnsharpenMask.VerySharp);
         BufferedImage rescaled = resampleOp.filter(image, null);
