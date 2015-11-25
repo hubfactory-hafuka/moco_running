@@ -1,5 +1,7 @@
 package jp.hubfactory.moco.controller;
 
+import java.io.IOException;
+
 import jp.hubfactory.moco.bean.LoginBean;
 import jp.hubfactory.moco.bean.UserBean;
 import jp.hubfactory.moco.entity.User;
@@ -11,6 +13,7 @@ import jp.hubfactory.moco.form.GirlFavoriteForm;
 import jp.hubfactory.moco.form.LoginForm;
 import jp.hubfactory.moco.form.TakeoverForm;
 import jp.hubfactory.moco.form.UpdateNameForm;
+import jp.hubfactory.moco.form.UpdateProfileForm;
 import jp.hubfactory.moco.service.InformationService;
 import jp.hubfactory.moco.service.UserService;
 
@@ -19,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -77,7 +81,7 @@ public class UserController extends BaseController {
         if (!super.checkAuth(form.getUserId(), form.getToken())) {
             return new ResponseEntity<UserBean>(userBean, HttpStatus.UNAUTHORIZED);
         }
-        userBean = userService.getUserBean(form.getUserId());
+        userBean = userService.getUserBean(form.getUserId(), true);
         userBean.setInfoBean(informationService.getInformation());
         return new ResponseEntity<UserBean>(userBean, HttpStatus.OK);
     }
@@ -165,4 +169,130 @@ public class UserController extends BaseController {
         return new ResponseEntity<LoginBean>(loginBean, HttpStatus.OK);
 
     }
+
+    /**
+     * 身長更新登録
+     * @param form
+     * @return
+     */
+    @RequestMapping(value = "/upd-height", method = RequestMethod.POST)
+    public ResponseEntity<Boolean> updHeight(@RequestBody UpdateProfileForm form) {
+
+        if (StringUtils.isEmpty(form.getHeight())) {
+            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
+        }
+
+        if (!super.checkAuth(form.getUserId(), form.getToken())) {
+            return new ResponseEntity<Boolean>(false, HttpStatus.UNAUTHORIZED);
+        }
+        // ユーザー情報存在チェック判定
+        User user = userService.getUser(form.getUserId());
+        if (user == null) {
+            logger.error("user is null. userId=" + form.getUserId());
+            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
+        }
+
+        // 体重更新処理
+        boolean execFlg = userService.updHeight(form.getUserId(), form.getHeight());
+        return new ResponseEntity<Boolean>(execFlg, execFlg == true ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * 体重更新登録
+     * @param form
+     * @return
+     */
+    @RequestMapping(value = "/upd-weight", method = RequestMethod.POST)
+    public ResponseEntity<Boolean> updWeight(@RequestBody UpdateProfileForm form) {
+
+        if (StringUtils.isEmpty(form.getWeight())) {
+            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
+        }
+
+        if (!super.checkAuth(form.getUserId(), form.getToken())) {
+            return new ResponseEntity<Boolean>(false, HttpStatus.UNAUTHORIZED);
+        }
+        // ユーザー情報存在チェック判定
+        User user = userService.getUser(form.getUserId());
+        if (user == null) {
+            logger.error("user is null. userId=" + form.getUserId());
+            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
+        }
+
+        // 体重更新処理
+        boolean execFlg = userService.updWeight(form.getUserId(), form.getWeight());
+        return new ResponseEntity<Boolean>(execFlg, execFlg == true ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+    }
+
+
+    /**
+     * プロフィール情報取得
+     * @param user
+     * @return
+     */
+    @RequestMapping(value = "/get-profile", method = RequestMethod.POST)
+    public ResponseEntity<UserBean> getProfileInfo(@Validated @RequestBody BaseForm form) {
+
+        UserBean userBean = null;
+
+        if (!super.checkAuth(form.getUserId(), form.getToken())) {
+            return new ResponseEntity<UserBean>(userBean, HttpStatus.UNAUTHORIZED);
+        }
+        userBean = userService.getUserBean(form.getUserId(), false);
+        userBean.setInfoBean(informationService.getInformation());
+        return new ResponseEntity<UserBean>(userBean, HttpStatus.OK);
+    }
+
+    /**
+     * プロフィール画像アップロード
+     * @param form
+     * @return
+     * @throws IOException
+     */
+    @RequestMapping(value = "/upd-profile-image", method = RequestMethod.POST)
+    public ResponseEntity<Boolean> upload(@RequestBody UpdateProfileForm form) throws IOException {
+
+        if (!super.checkAuth(form.getUserId(), form.getToken())) {
+            return new ResponseEntity<Boolean>(false, HttpStatus.UNAUTHORIZED);
+        }
+        // ユーザー情報存在チェック判定
+        User user = userService.getUser(form.getUserId());
+        if (user == null) {
+            logger.error("user is null. userId=" + form.getUserId());
+            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
+        }
+
+        // プロフ画像データ更新処理
+        boolean execFlg = userService.updProfileImage(form.getUserId(), form.getImageData());
+        return new ResponseEntity<Boolean>(execFlg, execFlg == true ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * ポイント更新処理
+     * @param form
+     * @return
+     */
+    @RequestMapping(value = "/upd-point", method = RequestMethod.POST)
+    public ResponseEntity<Boolean> updPoint(@RequestBody UpdateProfileForm form) {
+
+        if (form.getPoint() == null || form.getPoint().longValue() <= 0) {
+            return new ResponseEntity<Boolean>(false, HttpStatus.UNAUTHORIZED);
+        }
+
+        if (!super.checkAuth(form.getUserId(), form.getToken())) {
+            return new ResponseEntity<Boolean>(false, HttpStatus.UNAUTHORIZED);
+        }
+        // ユーザー情報存在チェック判定
+        User user = userService.getUser(form.getUserId());
+        if (user == null) {
+            logger.error("user is null. userId=" + form.getUserId());
+            return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
+        }
+
+        // ポイント更新処理
+        boolean execFlg = userService.updUserPoint(form.getUserId(), form.getPoint());
+        return new ResponseEntity<Boolean>(execFlg, execFlg == true ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+    }
+
+
 }

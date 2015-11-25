@@ -18,4 +18,14 @@ public class UserBean implements Serializable {
     private String girlDistance;
     private String remainDistance;
     private InformationBean infoBean;
+    private String height;
+    private String weight;
+    /** ポイント */
+    private Long point;
+    /** ログインボーナスポイント */
+    private Long LoginBonusPoint;
+    /** ランキングポイント */
+    private RankingBonusBean rankingBonusBean;
+    /** プロフィール画像パス */
+    private String profImgPath;
 }

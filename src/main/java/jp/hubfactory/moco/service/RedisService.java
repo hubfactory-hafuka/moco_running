@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +35,7 @@ public class RedisService {
     private static final String ALL_RANKING_KEY = "all_ranking_";
     private static final String GIRL_RANKING_KEY = "girl_ranking_";
     private static final String USER_KEY = "user";
+    private static final String RANKING_START_DATE = "20150801";
 
     @Autowired
     private StringRedisTemplate redisTemplate;
@@ -96,7 +98,13 @@ public class RedisService {
      * @param girlId ガールID
      * @param distance 距離
      */
-    public void updateRanking(Long userId, Integer girlId, Double distance) {
+    public void updateRanking(Long userId, Integer girlId, Double distance, String avgTime) {
+
+        // 平均ペースが2分00秒以内の場合はランキングに加算しない
+        String[] avgTimes = avgTime.split("\'");
+        if (Integer.parseInt(avgTimes[0]) <= 2 && Integer.parseInt(avgTimes[1]) <= 0) {
+            return;
+        }
 
         Date nowDate = MocoDateUtils.getNowDate();
         // 距離を小数点第２位で切り捨て
@@ -155,6 +163,63 @@ public class RedisService {
     }
 
     /**
+     * ユーザーのランキング履歴取得
+     * @param userId
+     * @return
+     */
+    public List<UserRankingBean> getRankingHistory(Long userId) {
+
+        List<UserRankingBean> list = new ArrayList<>();
+
+        // 現在日時
+        Date nowDate = MocoDateUtils.getNowDate();
+        // ランキング開始日時
+        Date rankingStartDate = MocoDateUtils.convertDate(RANKING_START_DATE, MocoDateUtils.DATE_FORMAT_yyyyMMdd);
+
+        for (int i = 1; i < 12; i++) {
+
+            Date targetDate = MocoDateUtils.add(nowDate, -i, Calendar.MONTH);
+
+            // ランキング機能を入れた201508より前のランキングデータは無いのでブレイク
+            if (MocoDateUtils.getTimeZeroDate(targetDate).compareTo(rankingStartDate) < 0) {
+                break;
+            }
+
+            String yearMonth = MocoDateUtils.convertString(targetDate, MocoDateUtils.DATE_FORMAT_yyyyMM_SLASH);
+
+            ZSetOperations<String, String> zsetOps = this.redisTemplate.opsForZSet();
+
+            UserRankingBean myRankingBean = new UserRankingBean();
+            myRankingBean.setUserId(userId);
+            myRankingBean.setYearMonth(yearMonth);
+
+            // ランキングキー
+            String key = this.getAllRankingKey(targetDate);
+
+            // ランキング情報に自分が存在する場合
+            if (zsetOps.rank(key, userId.toString()) != null) {
+
+                Double userScore = zsetOps.score(key, userId.toString());
+                // 小数点第以下切り捨て
+                userScore = new BigDecimal(String.valueOf(userScore)).setScale(2, RoundingMode.FLOOR).doubleValue();
+                Long userRank = zsetOps.reverseRank(key, userId.toString()) + 1;
+                myRankingBean.setRank(userRank);
+                myRankingBean.setDistance(userScore);
+            }
+
+            list.add(myRankingBean);
+        }
+
+        return list;
+    }
+
+
+    public List<UserRankingBean> getRankingListForBatch(Date date) {
+        String rankingKey = this.getAllRankingKey(date);
+        return this.getList(rankingKey, 100);
+    }
+
+    /**
      * ランキング取得
      * @param userId ユーザーID
      * @param rankingKey ランキングキー
@@ -171,6 +236,7 @@ public class RedisService {
         myRankingBean.setUserId(userId);
         myRankingBean.setName(user.getName());
         myRankingBean.setGirlId(user.getGirlId());
+        myRankingBean.setProfImgPath(user.getProfImgPath());
 
         // ランキング情報に自分が存在する場合
         if (zsetOps.rank(rankingKey, userId.toString()) != null) {
@@ -216,6 +282,7 @@ public class RedisService {
             rankingBean.setRank(rank);
             rankingBean.setDistance(userScore);
             rankingBean.setGirlId(rankUser.getGirlId());
+            rankingBean.setProfImgPath(rankUser.getProfImgPath());
             userRankingList.add(rankingBean);
         }
 
@@ -257,6 +324,47 @@ public class RedisService {
         rankingInfo.setRankList(userRankingList);
 
         return rankingInfo;
+    }
+
+    private List<UserRankingBean> getList(String rankingKey, long limit) {
+
+        ZSetOperations<String, String> zsetOps = this.redisTemplate.opsForZSet();
+
+        long rank = 0L;
+        long start = 0;
+        long end = limit - 1;
+
+        // ランキングデータ取得
+        List<UserRankingBean> userRankingList = new ArrayList<>();
+        Set<TypedTuple<String>> set = zsetOps.reverseRangeWithScores(rankingKey, start, end);
+        if (CollectionUtils.isEmpty(set)) {
+            return null;
+        }
+
+        for (TypedTuple<String> typedTuple : set) {
+
+            // 順位取得
+            rank = zsetOps.reverseRank(rankingKey, typedTuple.getValue()) + 1;
+            //rank = zsetOps.count(rankingKey, typedTuple.getScore() + 1, Double.MAX_VALUE) + 1;
+            // ユーザーID
+            Long rankUserId = Long.valueOf(typedTuple.getValue());
+            // ユーザー情報
+            User rankUser = userService.getUser(rankUserId);
+            if (rankUser == null) {
+                continue;
+            }
+            // 小数点第以下切り捨て
+            Double userScore = new BigDecimal(String.valueOf(typedTuple.getScore())).setScale(2, RoundingMode.FLOOR).doubleValue();
+
+            UserRankingBean rankingBean = new UserRankingBean();
+            rankingBean.setUserId(rankUserId);
+            rankingBean.setName(rankUser.getName());
+            rankingBean.setRank(rank);
+            rankingBean.setDistance(userScore);
+            rankingBean.setGirlId(rankUser.getGirlId());
+            userRankingList.add(rankingBean);
+        }
+        return userRankingList;
     }
 
     /**

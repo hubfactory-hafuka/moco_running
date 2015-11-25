@@ -6,7 +6,6 @@ import jp.hubfactory.moco.bean.GirlBean;
 import jp.hubfactory.moco.form.BaseForm;
 import jp.hubfactory.moco.form.GetGirlForm;
 import jp.hubfactory.moco.service.GirlService;
-import jp.hubfactory.moco.service.UserService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +26,6 @@ public class GirlController extends BaseController {
 
     @Autowired
     private GirlService girlService;
-    @Autowired
-    private UserService userService;
 
     /**
      * 対象ガール取得

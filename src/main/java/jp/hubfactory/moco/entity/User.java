@@ -32,21 +32,32 @@ public class User implements Serializable {
     @Column
     private String name;
     @Column
-    public Double totalDistance;
+    private Double totalDistance;
     @Column
-    public Integer totalCount;
+    private Integer totalCount;
     @Column
-    public String totalAvgTime;
+    private String totalAvgTime;
     @Column
-    public Integer girlId;
+    private Integer girlId;
     @Email
     @Column
-    public String mailAddress;
+    private String mailAddress;
+    @Column
+    private Double height;
+    @Column
+    private Double weight;
+    @Column
+    private Long point;
     @Column
     @Temporal(TemporalType.TIMESTAMP)
-    public Date updDatetime;
+    private Date loginBonusDatetime;
+    @Column
+    private String profImgPath;
     @Column
     @Temporal(TemporalType.TIMESTAMP)
-    public Date insDatetime;
+    private Date updDatetime;
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date insDatetime;
 
 }

@@ -1,37 +1,56 @@
 package jp.hubfactory.moco.service;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+
+import jp.hubfactory.moco.MocoProperties;
 import jp.hubfactory.moco.bean.LoginBean;
+import jp.hubfactory.moco.bean.RankingBonusBean;
 import jp.hubfactory.moco.bean.UserBean;
+import jp.hubfactory.moco.cache.MstConfigCache;
 import jp.hubfactory.moco.cache.MstGirlCache;
 import jp.hubfactory.moco.cache.MstGirlMissionCache;
+import jp.hubfactory.moco.cache.MstLoginBonusCache;
 import jp.hubfactory.moco.cache.MstVoiceCache;
 import jp.hubfactory.moco.entity.MstGirl;
 import jp.hubfactory.moco.entity.MstGirlMission;
+import jp.hubfactory.moco.entity.MstLoginBonus;
 import jp.hubfactory.moco.entity.MstVoice;
 import jp.hubfactory.moco.entity.User;
 import jp.hubfactory.moco.entity.UserGirl;
 import jp.hubfactory.moco.entity.UserGirlKey;
 import jp.hubfactory.moco.entity.UserGirlVoice;
+import jp.hubfactory.moco.entity.UserRankingPoint;
 import jp.hubfactory.moco.entity.UserTakeover;
 import jp.hubfactory.moco.enums.GirlType;
 import jp.hubfactory.moco.enums.UserVoiceStatus;
 import jp.hubfactory.moco.enums.VoiceType;
 import jp.hubfactory.moco.repository.UserGirlRepository;
 import jp.hubfactory.moco.repository.UserGirlVoiceRepository;
+import jp.hubfactory.moco.repository.UserRankingPointRepository;
 import jp.hubfactory.moco.repository.UserRepository;
 import jp.hubfactory.moco.repository.UserTakeoverRepository;
 import jp.hubfactory.moco.util.MocoDateUtils;
 import jp.hubfactory.moco.util.TableSuffixGenerator;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.mortennobel.imagescaling.AdvancedResizeOp;
+import com.mortennobel.imagescaling.ResampleFilters;
+import com.mortennobel.imagescaling.ResampleOp;
 
 @Service
 @Transactional
@@ -46,15 +65,23 @@ public class UserService {
     @Autowired
     private UserTakeoverRepository userTakeoverRepository;
     @Autowired
+    private UserRankingPointRepository userRankingPointRepository;
+    @Autowired
     private MstGirlMissionCache mstGirlMissionCache;
+    @Autowired
+    private MstLoginBonusCache mstLoginBonusCache;
     @Autowired
     private MstGirlCache mstGirlCache;
     @Autowired
     private MstVoiceCache mstVoiceCache;
     @Autowired
+    private MstConfigCache mstConfigCache;
+    @Autowired
     private TokenService tokenService;
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private MocoProperties mocoProperties;
 
     /**
      * ログイン処理
@@ -85,7 +112,7 @@ public class UserService {
      * @param userId
      * @return
      */
-    public UserBean getUserBean(Long userId) {
+    public UserBean getUserBean(Long userId, boolean topFlg) {
 
         // ユーザー情報取得
         User user = this.getUser(userId);
@@ -108,6 +135,17 @@ public class UserService {
                 userBean.setRemainDistance(String.format("%.2f", remainDistance));
                 break;
             }
+        }
+
+        userBean.setHeight(user.getHeight() == null ? null : String.valueOf(user.getHeight()));
+        userBean.setWeight(user.getWeight() == null ? null : String.valueOf(user.getWeight()));
+        userBean.setPoint(user.getPoint());
+
+        // TOP情報取得の場合、ログインボーナス判定
+        if (topFlg && this.isLoginBonus(user)) {
+            this.sendLoginBonus(userId, userBean);
+            // ランキングボーナス情報取得
+            userBean.setRankingBonusBean(this.getRankingBonusBean(userId));
         }
 
         return userBean;
@@ -305,5 +343,201 @@ public class UserService {
         userTakeover.setUpdDatetime(nowDate);
 
         return this.login(userId, uuId);
+    }
+
+    /**
+     * 体重更新処理
+     * @param userId
+     * @param weight
+     * @return
+     */
+    public boolean updWeight(Long userId, String weight) {
+        User user = userRepository.findOne(userId);
+        if (user == null) {
+            return false;
+        }
+        // テーブルから取得したentityに対してセットするとＤＢも更新されている
+        user.setWeight(Double.valueOf(weight));
+        // redisのユーザー情報も更新
+        redisService.updateUser(user);
+
+        return true;
+    }
+
+    /**
+     * 身長更新処理
+     * @param userId
+     * @param height
+     * @return
+     */
+    public boolean updHeight(Long userId, String height) {
+        User user = userRepository.findOne(userId);
+        if (user == null) {
+            return false;
+        }
+        // テーブルから取得したentityに対してセットするとＤＢも更新されている
+        user.setHeight(Double.valueOf(height));
+        // redisのユーザー情報も更新
+        redisService.updateUser(user);
+
+        return true;
+    }
+
+    /**
+     * ユーザーポイント更新
+     * @param userId
+     * @param point
+     */
+    public boolean updUserPoint(Long userId, Long point) {
+        User user = userRepository.findOne(userId);
+        if (user == null) {
+            return false;
+        }
+
+        // 動画広告視聴回数チェック
+
+
+
+
+
+        user.setPoint(user.getPoint().longValue() + point.longValue());
+        redisService.updateUser(user);
+
+        return true;
+    }
+
+    /**
+     * プロフィール画像アップロード
+     * @param userId ユーザーID
+     * @param base64ImageStr 画像Base64エンコード文字列データ
+     * @return
+     * @throws IOException
+     */
+    public boolean updProfileImage(Long userId, String base64ImageStr) throws IOException {
+
+        // DBからユーザー情報取得
+        User user = userRepository.findOne(userId);
+        if (user == null) {
+            return false;
+        }
+
+        // プロフィール画像が既に存在する場合
+        if (StringUtils.isNotEmpty(user.getProfImgPath())) {
+            // 前回の画像を削除
+            File delFile = new File(mocoProperties.getSystem().getWriteImageUrl() + user.getProfImgPath());
+            delFile.delete();
+//            if(delFile.delete()){
+//                //ファイル削除成功
+//                System.out.println("ファイル削除成功");
+//             }else{
+//                //ファイル削除失敗
+//                System.out.println("ファイル削除失敗");
+//             }
+        }
+
+        // 画像ファイル名を生成する
+        String hash = RandomStringUtils.randomAlphanumeric(16);
+        String fileName = userId + "_" + hash +".jpg";
+
+        // テーブルとredisのユーザー情報を更新
+        user.setProfImgPath(fileName);
+        redisService.updateUser(user);
+
+        // 画像ファイルをサーバーに作成
+        byte[] imageData = base64ImageStr.getBytes();
+        BufferedImage image = ImageIO.read(new ByteArrayInputStream(Base64.decodeBase64(imageData)));
+        File file = new File(mocoProperties.getSystem().getWriteImageUrl() + fileName);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+
+        // 画像縮小 750x750→240x240
+        ResampleOp resampleOp = new ResampleOp(240, 240);
+        resampleOp.setFilter(ResampleFilters.getLanczos3Filter());
+        resampleOp.setUnsharpenMask(AdvancedResizeOp.UnsharpenMask.VerySharp);
+        BufferedImage rescaled = resampleOp.filter(image, null);
+        // 画像書き出し
+        ImageIO.write(rescaled, "jpg", file);
+
+        return true;
+    }
+
+    /**
+     * ログインボーナス判定
+     * @param user
+     * @return
+     */
+    private boolean isLoginBonus(User user) {
+
+        // ポイント有効期間外の場合
+        if (!mstConfigCache.isPointEnable()) {
+            return false;
+        }
+
+        Date nowDate = MocoDateUtils.getNowDate();
+        // 現在日時の4:00:00を取得 ex)2015年6月1日 4:00:00
+        Date todayLoginBonusDate = MocoDateUtils.getLoginBonusDate(nowDate);
+        // 現在日時の１日前の4:00:00を取得 ex)2015年5月31日 4:00:00
+        Date yesterdayLoginBonusDate = MocoDateUtils.add(todayLoginBonusDate, -1, Calendar.DATE);
+
+        // 付与時刻以降(付与時刻含む）の場合、本日の付与時刻から現在までにボーナス付与を受けていない→ボーナス確定
+        // 付与時刻以前の場合、前日の付与時刻から現在までにボーナス付与を受けていない→ボーナス確定
+        return user.getLoginBonusDatetime() == null || ((nowDate.compareTo(todayLoginBonusDate) >= 0 && user.getLoginBonusDatetime().before(todayLoginBonusDate)) || (nowDate.before(todayLoginBonusDate) && user.getLoginBonusDatetime().before(yesterdayLoginBonusDate)));
+    }
+
+    /**
+     * ログインボーナス付与処理
+     * @param userBean ユーザー情報
+     */
+    private void sendLoginBonus(Long userId, UserBean userBean) {
+
+        // ユーザー情報が存在しない場合
+        User user = userRepository.findOne(userId);
+        if (user == null) {
+            return;
+        }
+
+        Date nowDate = MocoDateUtils.getNowDate();
+        // 現在日時の4:00:00を取得 ex)2015年6月1日 4:00:00
+        Date todayLoginBonusDate = MocoDateUtils.getLoginBonusDate(nowDate);
+
+        // ログインボーナス情報取得
+        MstLoginBonus mstLoginBonus = mstLoginBonusCache.getLoginBonus(todayLoginBonusDate);
+        if (mstLoginBonus == null) {
+            return;
+        }
+
+        Long userPoint = user.getPoint() == null ? 0L : user.getPoint();
+        Long nowPoint = mstLoginBonus.getPoint();
+
+        user.setLoginBonusDatetime(nowDate);
+        user.setPoint(userPoint + nowPoint);
+
+        userBean.setLoginBonusPoint(nowPoint);
+        userBean.setPoint(userPoint + nowPoint);
+
+        redisService.updateUser(user);
+    }
+
+    /**
+     * ランキング情報取得
+     * @param userId ユーザーID
+     * @return
+     */
+    private RankingBonusBean getRankingBonusBean(Long userId) {
+        UserRankingPoint userRankingPoint = userRankingPointRepository.findOne(userId);
+        if (userRankingPoint == null) {
+            return null;
+        }
+
+        RankingBonusBean bean = new RankingBonusBean();
+        bean.setRankingDate(userRankingPoint.getRankingDate());
+        bean.setRank(userRankingPoint.getRank());
+        bean.setPoint(userRankingPoint.getPoint());
+
+        userRankingPointRepository.delete(userId);
+
+        return bean;
+
     }
 }

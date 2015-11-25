@@ -17,6 +17,7 @@
         </encoder>
     </appender>
      -->
+    <!-- 課金ログ -->
     <appender name="PURCHASE_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>/usr/local/moco/logs/purchase.log.%d{yyyy-MM-dd}</fileNamePattern>
@@ -26,26 +27,25 @@
             <pattern>%d{yyyy/MM/dd HH:mm:ss} %-5level %msg%n</pattern>
         </encoder>
     </appender>
-    <!--
-    <appender name="CREATE_USER_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+    <!-- 交換ログ -->
+    <appender name="EXCHANGE_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/usr/local/moco/logs/create_user.log.%d{yyyy-MM-dd}</fileNamePattern>
+            <fileNamePattern>/usr/local/moco/logs/exchange.log.%d{yyyy-MM-dd}</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>
             <pattern>%d{yyyy/MM/dd HH:mm:ss} %-5level %msg%n</pattern>
         </encoder>
     </appender>
-    -->
+
     <logger name="purchaseLog" level="info">
         <appender-ref ref="PURCHASE_LOG" />
     </logger>
-
-    <!--
-    <logger name="createUserLog" level="info">
-        <appender-ref ref="CREATE_USER_LOG" />
+    <logger name="exchangeLog" level="info">
+        <appender-ref ref="EXCHANGE_LOG" />
     </logger>
-     -->
+
     <root>
         <level value="ERROR" />
         <appender-ref ref="STDOUT" />

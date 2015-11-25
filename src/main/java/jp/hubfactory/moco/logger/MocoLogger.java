@@ -22,12 +22,17 @@ public class MocoLogger {
     }
 
     /**
-     * ユーザー登録ログ
+     * 交換ログ
      * @param userId
+     * @param purchaseType
+     * @param id
+     * @param usePoint
+     * @param beforePoint
+     * @param afterPoint
      */
-    public static void createUserLog(Long userId, String userName) {
-        Logger logger = LoggerFactory.getLogger("createUserLog");
-        Object[] logs = {userId, userName};
+    public static void exchangeLog(Long userId, PurchaseType purchaseType, Integer id, Long usePoint, Long beforePoint, Long afterPoint) {
+        Logger logger = LoggerFactory.getLogger("exchangeLog");
+        Object[] logs = {userId, purchaseType, id, usePoint, beforePoint, afterPoint};
         String log = StringUtils.join(logs, "\t");
         logger.info(log);
     }
