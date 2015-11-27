@@ -3,6 +3,8 @@ package jp.hubfactory.moco.util;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import org.apache.commons.lang.StringUtils;
+
 public final class CalcUtils {
 
     /** 軽いジョギングのMETS値 */
@@ -28,6 +30,8 @@ public final class CalcUtils {
      */
     public static int calcCalories(Double weight, String time, String avgTime) {
 
+System.out.println(avgTime);
+    	
         // 走った時間(秒)
         int timeSec = MocoDateUtils.convertTimeStrToSecond(time);
         // 走った時間を時間に変換
@@ -37,14 +41,15 @@ public final class CalcUtils {
         int mets = 0;
 
         String[] avgTimes = avgTime.split("\'");
+        String minuteStr = StringUtils.remove(avgTimes[0], "\"");
 
-        if (Integer.valueOf(avgTimes[0]).intValue() <= 4) {
+        if (Integer.parseInt(minuteStr) <= 4) {
             mets = METS_LEVEL_5;
-        } else if (Integer.valueOf(avgTimes[0]).intValue() <= 5) {
+        } else if (Integer.parseInt(minuteStr) <= 5) {
             mets = METS_LEVEL_4;
-        } else if (Integer.valueOf(avgTimes[0]).intValue() <= 6) {
+        } else if (Integer.parseInt(minuteStr) <= 6) {
             mets = METS_LEVEL_3;
-        } else if (Integer.valueOf(avgTimes[0]).intValue() <= 7) {
+        } else if (Integer.parseInt(minuteStr) <= 7) {
             mets = METS_LEVEL_2;
         } else {
             mets = METS_LEVEL_1;
