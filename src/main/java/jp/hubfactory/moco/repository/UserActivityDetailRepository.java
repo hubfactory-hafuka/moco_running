@@ -19,6 +19,9 @@ public interface UserActivityDetailRepository extends JpaRepository<UserActivity
 
     @Query(value = "SELECT * FROM user_activity_detail_?1 WHERE user_id = ?2 ORDER BY activity_id ASC", nativeQuery = true)
     public List<UserActivityDetail> findByKeyUserIdOrderByKeyActivityIdAsc(Integer suffix, Long userId);
+    
+    @Query(value = "SELECT * FROM user_activity_detail_?1 WHERE user_id = ?2 AND activity_id BETWEEN ?3 AND ?4 ORDER BY activity_id ASC", nativeQuery = true)
+    public List<UserActivityDetail> findActivityDetailListBetweenActivityId(Integer suffix, Long userId, Integer fromActId, Integer toActId);
 
     @Modifying
     @Query(value = "INSERT INTO user_activity_detail_?1 VALUES (?2, ?3, ?4, ?5, ?6, ?7, ?8, sysdate(), sysdate())", nativeQuery = true)

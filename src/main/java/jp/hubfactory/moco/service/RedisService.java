@@ -99,11 +99,13 @@ public class RedisService {
      * @param distance 距離
      */
     public void updateRanking(Long userId, Integer girlId, Double distance, String avgTime) {
-
-System.out.println(avgTime);
     	
         // 平均ペースが2分00秒以内の場合はランキングに加算しない
         String[] avgTimes = avgTime.split("\'");
+        if (avgTimes.length < 2)  {
+        	return;
+        }
+        
         String minuteStr = StringUtils.remove(avgTimes[0], "\"");
         String secondStr = StringUtils.remove(avgTimes[1], "\"");
         

@@ -26,7 +26,24 @@ public class ActivityController extends BaseController {
 
     @Autowired
     private ActivityService activityServie;
+    
+    /**
+     * アクティビティ一覧取得
+     * @param form
+     * @return
+     */
+    @RequestMapping(value = "/get-user-activity/top20", method = RequestMethod.POST)
+    public ResponseEntity<List<UserActivityBean>> getActivityTop20(@Validated @RequestBody BaseForm form) {
 
+        List<UserActivityBean> userActivities = null;
+
+        if (!super.checkAuth(form.getUserId(), form.getToken())) {
+            return new ResponseEntity<List<UserActivityBean>>(userActivities, HttpStatus.UNAUTHORIZED);
+        }
+        userActivities = activityServie.getUserActivitiesLimit20(form.getUserId());
+        return new ResponseEntity<List<UserActivityBean>>(userActivities, HttpStatus.OK);
+    }
+    
     /**
      * アクティビティ一覧取得
      * @param form

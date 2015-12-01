@@ -26,23 +26,19 @@ public final class CalcUtils {
      * @param weight 体重
      * @param time 運動時間
      * @param avgTime 平均時間
-     * @return
+     * @return calories 消費カロリー
      */
     public static int calcCalories(Double weight, String time, String avgTime) {
-
-System.out.println(avgTime);
     	
-        // 走った時間(秒)
-        int timeSec = MocoDateUtils.convertTimeStrToSecond(time);
-        // 走った時間を時間に変換
-        double timeHour = timeSec / 3600d;
-        timeHour = new BigDecimal(String.valueOf(timeHour)).setScale(3, RoundingMode.FLOOR).doubleValue();
-
-        int mets = 0;
-
+    	int calories = 0;
+    	
         String[] avgTimes = avgTime.split("\'");
+        if (avgTimes.length < 2) {
+        	return calories;
+        }
+        
+        int mets = 0;
         String minuteStr = StringUtils.remove(avgTimes[0], "\"");
-
         if (Integer.parseInt(minuteStr) <= 4) {
             mets = METS_LEVEL_5;
         } else if (Integer.parseInt(minuteStr) <= 5) {
@@ -55,8 +51,14 @@ System.out.println(avgTime);
             mets = METS_LEVEL_1;
         }
 
+        // 走った時間(秒)
+        int timeSec = MocoDateUtils.convertTimeStrToSecond(time);
+        // 走った時間を時間に変換
+        double timeHour = timeSec / 3600d;
+        timeHour = new BigDecimal(String.valueOf(timeHour)).setScale(3, RoundingMode.FLOOR).doubleValue();
+        
         // 消費カロリー(kcal) = METS x 運動時間(時間) x 体重(kg) x 1.05
-        int calories = Double.valueOf(Math.ceil(mets * timeHour * weight * 1.05)).intValue();
+        calories = Double.valueOf(Math.ceil(mets * timeHour * weight * 1.05)).intValue();
 
         return calories;
     }

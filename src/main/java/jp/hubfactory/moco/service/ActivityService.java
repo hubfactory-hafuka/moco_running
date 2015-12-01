@@ -1,6 +1,8 @@
 package jp.hubfactory.moco.service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -78,7 +80,75 @@ public class ActivityService {
     private UserService userService;
     @Autowired
     private RedisService redisService;
+    
+    /**
+     * 最新20件のアクティビティ情報取得
+     * @param userId ユーザーID
+     * @return
+     */
+    public List<UserActivityBean> getUserActivitiesLimit20(Long userId) {
+    	List<UserActivity> userActivities = userActivityRepository.findActivityListLimit20(TableSuffixGenerator.getUserIdSuffix(userId), userId);
+        if (CollectionUtils.isEmpty(userActivities)) {
+            return null;
+        }
+        
+        Map<Integer, List<UserActivityDetail>> activityIdKeyMap = new HashMap<>();
+        
+        Integer toActId = userActivities.get(0).getKey().getActivityId();
+        Integer fromActId = userActivities.get(userActivities.size() - 1).getKey().getActivityId();
 
+        List<UserActivityDetail> userActivityDetailAll = userActivityDetailRepository.findActivityDetailListBetweenActivityId(TableSuffixGenerator.getUserIdSuffix(userId), userId, fromActId, toActId);
+        if (CollectionUtils.isEmpty(userActivityDetailAll)) {
+            logger.error("アクティビティ詳細情報がありません。 userId=" + userId);
+        } else {
+
+            for (UserActivityDetail userActivityDetail : userActivityDetailAll) {
+                List<UserActivityDetail> detailList = (activityIdKeyMap.containsKey(userActivityDetail.getKey().getActivityId())) ? activityIdKeyMap.get(userActivityDetail.getKey().getActivityId()) : new ArrayList<UserActivityDetail>();
+                detailList.add(userActivityDetail);
+                activityIdKeyMap.put(userActivityDetail.getKey().getActivityId(), detailList);
+            }
+        }
+        
+        List<UserActivityBean> beanList = new ArrayList<>();
+        for (UserActivity userActivity : userActivities) {
+
+            UserActivityBean bean = new UserActivityBean();
+            bean.setGirlId(userActivity.getGirlId());
+            bean.setUserId(userActivity.getKey().getUserId());
+            bean.setActivityId(userActivity.getKey().getActivityId());
+            bean.setRunDate(MocoDateUtils.convertString(userActivity.getRunDate(), MocoDateUtils.DATE_FORMAT_yyyyMMdd_SLASH));
+            bean.setDistance(String.format("%.2f", userActivity.getDistance()));
+            bean.setTime(userActivity.getTime());
+            bean.setAvgTime(userActivity.getAvgTime());
+            bean.setCalories(userActivity.getCalories());
+
+            try {
+                List<UserActivityLocationBean> locations = new ObjectMapper().readValue(userActivity.getLocations(), new TypeReference<List<UserActivityLocationBean>>() {});
+                bean.setLocations(locations);
+            } catch (IOException e) {
+                logger.error("JSON変換エラー。 userId=" + userId + " activityId=" + userActivity.getKey().getActivityId());
+                e.printStackTrace();
+            }
+
+            List<UserActivityDetail> userActivityDetails = activityIdKeyMap.get(userActivity.getKey().getActivityId());
+            if (CollectionUtils.isEmpty(userActivityDetails)) {
+                logger.error("アクティビティ詳細情報がありません。 userId=" + userId + " activityId=" + userActivity.getKey().getActivityId());
+                beanList.add(bean);
+                continue;
+            }
+
+            List<UserActivityDetailBean> detailBeans = new ArrayList<>(userActivityDetails.size());
+            for (UserActivityDetail userActivityDetail : userActivityDetails) {
+                UserActivityDetailBean detailBean = new UserActivityDetailBean();
+                BeanUtils.copyProperties(userActivityDetail, detailBean);
+                detailBeans.add(detailBean);
+            }
+            bean.setDetails(detailBeans);
+            beanList.add(bean);
+        }
+        return beanList;
+    }
+    
     /**
      * ユーザーのアクティビティ一覧取得
      * @param userId ユーザーID
@@ -99,9 +169,9 @@ public class ActivityService {
         } else {
 
             for (UserActivityDetail userActivityDetail : userActivityDetailAll) {
-                List<UserActivityDetail> cardList = (activityIdKeyMap.containsKey(userActivityDetail.getKey().getActivityId())) ? activityIdKeyMap.get(userActivityDetail.getKey().getActivityId()) : new ArrayList<UserActivityDetail>();
-                cardList.add(userActivityDetail);
-                activityIdKeyMap.put(userActivityDetail.getKey().getActivityId(), cardList);
+                List<UserActivityDetail> detailList = (activityIdKeyMap.containsKey(userActivityDetail.getKey().getActivityId())) ? activityIdKeyMap.get(userActivityDetail.getKey().getActivityId()) : new ArrayList<UserActivityDetail>();
+                detailList.add(userActivityDetail);
+                activityIdKeyMap.put(userActivityDetail.getKey().getActivityId(), detailList);
             }
         }
 
@@ -260,6 +330,13 @@ public class ActivityService {
         String locationStr = null;
         ObjectMapper mapper = new ObjectMapper();
         List<RegistUserActivityLocationForm> locations = form.getLocations();
+        for (RegistUserActivityLocationForm location : locations) {
+        	String latitude = new BigDecimal(location.getLatitude()).setScale(4, RoundingMode.FLOOR).toString();
+        	String longitude = new BigDecimal(location.getLongitude()).setScale(6, RoundingMode.FLOOR).toString();
+        	location.setLatitude(latitude);
+        	location.setLongitude(longitude);
+		}
+
         try {
             locationStr = mapper.writeValueAsString(locations);
         } catch (JsonProcessingException e) {
@@ -270,7 +347,7 @@ public class ActivityService {
         // 消費カロリーの計算
         int calories = 0;
         User user = userService.getUser(form.getUserId());
-        if (user.getWeight() != null) {
+        if (user.getWeight() != null || user.getHeight() != null) {
             calories = CalcUtils.calcCalories(user.getWeight(), form.getTime(), avgTime);
         }
 
